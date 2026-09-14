@@ -441,26 +441,48 @@ export function useTableViewState({
     setActiveColumnId(columnId)
   }, [])
   const setColumnOrder = tablePreferences.setColumnOrder
+  const setPinnedColumnIds = tablePreferences.setPinnedColumnIds
   const columnVisibilityRef = useRef(tablePreferences.columnVisibility)
+  const pinnedColumnIdsRef = useRef(tablePreferences.pinnedColumnIds)
   // Column-move callbacks stay stable while reading visibility from the committed table state.
   useLayoutEffect(() => {
     columnVisibilityRef.current = tablePreferences.columnVisibility
   }, [tablePreferences.columnVisibility])
+  useLayoutEffect(() => {
+    pinnedColumnIdsRef.current = tablePreferences.pinnedColumnIds
+  }, [tablePreferences.pinnedColumnIds])
   const handleColumnMove = useCallback(
     (columnId: string, direction: ColumnMoveDirection) => {
+      if (pinnedColumnIdsRef.current.includes(columnId) === true) {
+        setPinnedColumnIds((currentPinnedColumnIds) => {
+          const visiblePinnedColumnIds = currentPinnedColumnIds.filter(
+            (candidateId) => columnVisibilityRef.current[candidateId] !== false,
+          )
+          return moveColumnInOrder(
+            currentPinnedColumnIds,
+            columnId,
+            direction,
+            visiblePinnedColumnIds,
+          )
+        })
+        return
+      }
       setColumnOrder((currentColumnOrder) => {
         const visibleColumnOrder = currentColumnOrder.filter(
-          (candidateId) => columnVisibilityRef.current[candidateId] !== false,
+          (candidateId) =>
+            columnVisibilityRef.current[candidateId] !== false &&
+            pinnedColumnIdsRef.current.includes(candidateId) === false,
         )
         return moveColumnInOrder(currentColumnOrder, columnId, direction, visibleColumnOrder)
       })
     },
-    [setColumnOrder],
+    [setColumnOrder, setPinnedColumnIds],
   )
 
   const table = useTableGrid({
     cellSelection,
     columnOrder: tablePreferences.columnOrder,
+    pinnedColumnIds: tablePreferences.pinnedColumnIds,
     disabledRowIds,
     rows,
     columns: query.columns,
@@ -477,6 +499,7 @@ export function useTableViewState({
     onColumnMenuOpen: handleColumnActivate,
     onColumnMove: handleColumnMove,
     onColumnOrderChange: setColumnOrder,
+    onPinnedColumnIdsChange: tablePreferences.setPinnedColumnIds,
   })
   const selectedRow = visibleActiveRow ?? activeRow
   const settledActiveRowRef = useRef<{ row: DynamicTableRow; rowId: TableRowId } | null>(null)

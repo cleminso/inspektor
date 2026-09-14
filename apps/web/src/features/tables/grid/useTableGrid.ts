@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react'
 import {
   type CellSelectionState,
   type ColumnOrderState,
+  type ColumnPinningState,
   type ColumnVisibilityState,
   type OnChangeFn,
   type RowSelectionState,
@@ -33,11 +34,13 @@ interface UseTableGridOptions {
   onColumnMenuOpen: (columnId: string) => void
   onColumnMove: (columnId: string, direction: ColumnMoveDirection) => void
   onColumnOrderChange: OnChangeFn<ColumnOrderState>
+  onPinnedColumnIdsChange: OnChangeFn<string[]>
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void
   onCellSelectionChange: OnChangeFn<CellSelectionState>
   onSelectedRowIdsChange: (rowIds: TableRowId[], intentRowId: TableRowId | null) => void
   onSortChange: (columnId: string, direction: TableSortDirection) => void
   onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
+  pinnedColumnIds: string[]
   rows: DynamicTableRow[]
   selectedRowIds: TableRowId[]
   sortColumn: string
@@ -56,11 +59,13 @@ export function useTableGrid({
   onColumnMenuOpen,
   onColumnMove,
   onColumnOrderChange,
+  onPinnedColumnIdsChange,
   onColumnVisibilityChange,
   onCellSelectionChange,
   onSelectedRowIdsChange,
   onSortChange,
   onUndoRowDeletions,
+  pinnedColumnIds,
   rows,
   selectedRowIds,
   sortColumn,
@@ -95,6 +100,10 @@ export function useTableGrid({
     () => [tableGridSelectionColumnId, ...columnOrder],
     [columnOrder],
   )
+  const columnPinning = useMemo<ColumnPinningState>(
+    () => ({ start: [tableGridSelectionColumnId, ...pinnedColumnIds], end: [] }),
+    [pinnedColumnIds],
+  )
 
   return useTable(
     {
@@ -112,6 +121,7 @@ export function useTableGrid({
         cellSelection,
         columnVisibility: columnVisibility as ColumnVisibilityState,
         columnOrder: tableColumnOrder,
+        columnPinning,
         rowSelection,
         sorting,
       },
@@ -122,6 +132,19 @@ export function useTableGrid({
           const nextTableColumnOrder =
             typeof updater === 'function' ? updater(currentTableColumnOrder) : updater
           return nextTableColumnOrder.filter((columnId) => columnId !== tableGridSelectionColumnId)
+        })
+      },
+      onColumnPinningChange: (updater) => {
+        onPinnedColumnIdsChange((currentPinnedColumnIds) => {
+          const currentColumnPinning: ColumnPinningState = {
+            start: [tableGridSelectionColumnId, ...currentPinnedColumnIds],
+            end: [],
+          }
+          const nextColumnPinning =
+            typeof updater === 'function' ? updater(currentColumnPinning) : updater
+          return nextColumnPinning.start.filter(
+            (columnId) => columnId !== tableGridSelectionColumnId,
+          )
         })
       },
       onRowSelectionChange: (updater) => {

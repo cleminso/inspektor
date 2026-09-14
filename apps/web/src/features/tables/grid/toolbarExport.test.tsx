@@ -25,7 +25,10 @@ function ExportMenu({ data }: { data: DynamicTableRow[] }): React.ReactElement {
       { accessorKey: 'name' },
     ],
     data,
-    state: { columnVisibility: { hidden: false } },
+    state: {
+      columnPinning: { start: ['name'], end: [] },
+      columnVisibility: { hidden: false },
+    },
   })
 
   return <DataGridExport table={table} tableColumns={tableColumns} tableName="people" />
@@ -60,7 +63,7 @@ describe('DataGridExport', () => {
     expect(anchor).toMatchObject({ download: 'people.json', href: 'blob:export' })
     expect(click).toHaveBeenCalledOnce()
     expect(blob?.type).toBe('application/json;charset=utf-8')
-    expect(await blob?.text()).toBe('[\n  {\n    "Note": null,\n    "Name": "Ada"\n  }\n]')
+    expect(await blob?.text()).toBe('[\n  {\n    "Name": "Ada",\n    "Note": null\n  }\n]')
     await vi.waitFor(() => expect(revokeObjectURL).toHaveBeenCalledWith('blob:export'))
   })
 })

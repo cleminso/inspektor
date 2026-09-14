@@ -74,6 +74,42 @@ describe('useTablePreferences', () => {
 
     expect(result.current.columnOrder).toEqual(['role', 'id', 'name'])
     expect(result.current.columnVisibility).toEqual({ id: true, name: true, role: false })
+    expect(result.current.pinnedColumnIds).toEqual([])
+  })
+
+  it('restores and persists start-pinned columns in the existing preference record', () => {
+    window.localStorage.setItem(
+      'inspektor-table-preferences:connection%3Aaccounts',
+      JSON.stringify({
+        version: 1,
+        order: ['id', 'name', 'role'],
+        hidden: [],
+        pinned: ['role', 'name'],
+      }),
+    )
+    const { result } = renderHook(() =>
+      useTablePreferences({
+        columnIds: ['id', 'name', 'role'],
+        tableKey: 'connection:accounts',
+      }),
+    )
+
+    expect(result.current.pinnedColumnIds).toEqual(['role', 'name'])
+
+    act(() => {
+      result.current.setPinnedColumnIds(['name', 'role'])
+    })
+
+    expect(
+      JSON.parse(
+        window.localStorage.getItem('inspektor-table-preferences:connection%3Aaccounts') ?? 'null',
+      ),
+    ).toEqual({
+      version: 1,
+      order: ['id', 'name', 'role'],
+      hidden: [],
+      pinned: ['name', 'role'],
+    })
   })
 
   it('retains stored schema-column preferences while verified columns load', () => {
@@ -122,7 +158,7 @@ describe('useTablePreferences', () => {
       JSON.parse(
         window.localStorage.getItem('inspektor-table-preferences:connection%3Aprojects') ?? 'null',
       ),
-    ).toEqual({ version: 1, order: ['status', 'id'], hidden: ['id'] })
+    ).toEqual({ version: 1, order: ['status', 'id'], hidden: ['id'], pinned: [] })
   })
 
   it('persists order and hidden column changes without separate legacy keys', () => {
@@ -142,7 +178,7 @@ describe('useTablePreferences', () => {
       JSON.parse(
         window.localStorage.getItem('inspektor-table-preferences:connection%3Aaccounts') ?? 'null',
       ),
-    ).toEqual({ version: 1, order: ['role', 'id', 'name'], hidden: ['name'] })
+    ).toEqual({ version: 1, order: ['role', 'id', 'name'], hidden: ['name'], pinned: [] })
     expect(window.localStorage.getItem('inspektor:column-order:connection:accounts')).toBeNull()
     expect(
       window.localStorage.getItem('inspektor:column-visibility:connection:accounts'),
@@ -185,7 +221,7 @@ describe('useTablePreferences', () => {
       JSON.parse(
         window.localStorage.getItem('inspektor-table-preferences:connection%3Aaccounts') ?? 'null',
       ),
-    ).toEqual({ version: 1, order: ['id', 'name', 'role'], hidden: ['name'] })
+    ).toEqual({ version: 1, order: ['id', 'name', 'role'], hidden: ['name'], pinned: [] })
   })
 
   it('discards unsupported preference versions', () => {

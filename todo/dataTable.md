@@ -14,6 +14,14 @@
 
 ## Implemented foundation
 
+[14/09/26]
+
+- [x] Render TanStack start- and end-pinned columns with logical sticky offsets and stable column geometry.
+- [x] Keep the row-selection column pinned at logical start and persist user-pinned data columns per table.
+- [x] Reorder pinned data columns within their pinned region while keeping the selection column fixed first.
+- [x] Keep pinned headers and body cells above active or selected columns that scroll beneath them.
+- [x] Keep portalled header menus above the pinned region without adding a dedicated pinned-region boundary.
+
 [26/08/26]
 
 - [x] Derive table scope and schema columns once at the Table View composition root for query, preferences, and mutation state.
@@ -306,6 +314,11 @@
 - [ ] Do not add a selected-range perimeter until product design requires it.
 
 ## Settled implementation decisions
+
+[14/09/26]
+
+- [x] Expose one Pin column action for logical start and restore the underlying column-order position when unpinned.
+- [x] Retain pin state while a column is hidden so showing it restores the pin.
 
 [20/08/26]
 

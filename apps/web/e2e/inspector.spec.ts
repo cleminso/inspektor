@@ -17,6 +17,19 @@ interface FixtureConnection {
 let browserErrors: string[] = []
 let connection: FixtureConnection
 
+async function locatorsOverlap(first: Locator, second: Locator): Promise<boolean> {
+  const [firstBounds, secondBounds] = await Promise.all([
+    first.boundingBox(),
+    second.boundingBox(),
+  ])
+  return (
+    firstBounds !== null &&
+    secondBounds !== null &&
+    secondBounds.x < firstBounds.x + firstBounds.width &&
+    secondBounds.x + secondBounds.width > firstBounds.x
+  )
+}
+
 test.beforeEach(async ({ page }) => {
   connection = fixtureConnection()
   browserErrors = []
@@ -521,7 +534,7 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   await openTable(page, 'columnTypeShowcase')
 
   await page.getByRole('button', { name: 'Open label column menu' }).click()
-  await page.getByRole('menuitem', { name: 'Sort Ascending' }).click()
+  await page.getByRole('menuitem', { name: 'Sort A to Z' }).click()
 
   const table = page.getByRole('table', { name: 'columnTypeShowcase rows' })
   await expect(table.getByRole('row')).toContainText([
@@ -542,6 +555,115 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   ).toBeVisible()
   await expect(table).toContainText('Optional values populated')
   await expect(table).not.toContainText('Optional values null')
+})
+
+test('pins a column across horizontal scrolling and reloads', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 800 })
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  await page.getByRole('button', { name: 'Open label column menu' }).click()
+  await page.getByRole('menuitem', { name: 'Pin column' }).click()
+
+  const labelHeader = page.locator('[data-slot="data-grid-header-cell"][data-column-id="label"]')
+  const labelCell = page.locator('[data-slot="data-grid-cell"][data-column-id="label"]').first()
+  const textHeader = page.locator(
+    '[data-slot="data-grid-header-cell"][data-column-id="textValue"]',
+  )
+  const textCell = page.locator('[data-slot="data-grid-cell"][data-column-id="textValue"]').first()
+  const viewport = page.locator('[data-slot="data-grid-viewport"]')
+  await expect(labelHeader).toHaveAttribute('data-pinned', 'start')
+  const pinnedX = (await labelHeader.boundingBox())?.x
+  expect(pinnedX).toBeDefined()
+
+  await textCell.click()
+  const cellOverlapScrollLeft =
+    (await textCell.evaluate((element) => (element as HTMLElement).offsetLeft)) -
+    (await labelCell.evaluate((element) => (element as HTMLElement).offsetLeft))
+  await viewport.evaluate((element, scrollLeft) => {
+    element.scrollLeft = scrollLeft
+  }, cellOverlapScrollLeft)
+  await expect.poll(() => locatorsOverlap(labelCell, textCell)).toBe(true)
+  await expect
+    .poll(() =>
+      labelCell.evaluate((element) => {
+        const backgroundColor = getComputedStyle(element).backgroundColor
+        return backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)'
+      }),
+    )
+    .toBe(true)
+  await expect
+    .poll(() =>
+      labelCell.evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        return document
+          .elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
+          ?.closest('[data-slot="data-grid-cell"]')
+          ?.getAttribute('data-column-id')
+      }),
+    )
+    .toBe('label')
+
+  await viewport.evaluate((element) => {
+    element.scrollLeft = 0
+  })
+  await textHeader.click({ button: 'right' })
+  const contextMenu = page.locator('[data-slot="context-menu-popup"]')
+  await expect(contextMenu).toBeVisible()
+  await expect
+    .poll(() =>
+      contextMenu.evaluate((element) => ({
+        insideViewport:
+          document.querySelector('[data-slot="data-grid-viewport"]')?.contains(element) === true,
+        zIndex: getComputedStyle(element.parentElement ?? element).zIndex,
+      })),
+    )
+    .toEqual({ insideViewport: false, zIndex: '100' })
+  const headerOverlapScrollLeft =
+    (await textHeader.evaluate((element) => (element as HTMLElement).offsetLeft)) -
+    (await labelHeader.evaluate((element) => (element as HTMLElement).offsetLeft))
+  await viewport.evaluate((element, scrollLeft) => {
+    element.scrollLeft = scrollLeft
+  }, headerOverlapScrollLeft)
+  await expect.poll(() => locatorsOverlap(labelHeader, textHeader)).toBe(true)
+  await expect
+    .poll(() =>
+      labelHeader.evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        return document
+          .elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
+          ?.closest('[data-slot="data-grid-header-cell"]')
+          ?.getAttribute('data-column-id')
+      }),
+    )
+    .toBe('label')
+
+  await viewport.evaluate((element) => {
+    element.scrollLeft = 500
+  })
+  await expect.poll(async () => (await labelHeader.boundingBox())?.x).toBeCloseTo(pinnedX ?? 0, 0)
+
+  await viewport.evaluate((element) => {
+    element.scrollLeft = 0
+  })
+  await page.getByRole('button', { name: 'Open textValue column menu' }).click()
+  await page.getByRole('menuitem', { name: 'Pin column' }).click()
+  await page.getByRole('button', { name: 'Open textValue column menu' }).click()
+  await page.getByRole('menuitem', { name: 'Move' }).press('ArrowRight')
+  await page.getByRole('menuitem', { name: /Move left/ }).click()
+  const getPinnedDataColumnOrder = () =>
+    page
+      .locator('[data-slot="data-grid-header-cell"][data-pinned="start"]')
+      .evaluateAll((headers) =>
+        headers
+          .map((header) => header.getAttribute('data-column-id'))
+          .filter((columnId) => columnId === 'label' || columnId === 'textValue'),
+      )
+  await expect.poll(getPinnedDataColumnOrder).toEqual(['textValue', 'label'])
+
+  await page.reload()
+  await expect(labelHeader).toHaveAttribute('data-pinned', 'start')
+  await expect.poll(getPinnedDataColumnOrder).toEqual(['textValue', 'label'])
 })
 
 test('wraps crowded table toolbar groups without overlap', async ({ page }) => {

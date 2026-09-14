@@ -320,7 +320,7 @@ TanStack Table owns:
 - Row, cell, header, and header-group models.
 - Column size state and constraints.
 - Resize gesture state and event handlers.
-- Column order and sorting state.
+- Column order, column pinning, and sorting state.
 - Logical column offsets and total sizes.
 
 The Data Grid owns:
@@ -330,7 +330,9 @@ The Data Grid owns:
 - Gridline ownership.
 - Active, selected, focused, resizing, and dragging presentation.
 - Sticky positioning and stacking.
+- Pinned-region stacking and logical sticky offsets.
 - Resize and drag hit areas.
+- Region-constrained column reorder gestures that update TanStack column-order or column-pinning state.
 
 TanStack state identifies what is happening; it does not define how borders should be painted.
 
@@ -360,6 +362,7 @@ These rules preserve edge ownership and make overlapping interaction states reso
 18. Preserve border widths but make active elements' owned bottom and inline-end border colors transparent beneath the state ring.
 19. Recolor the active header's owned inline-end border only for resize hover, resize focus, or active resizing.
 20. Keep the active header's structural top border blue so viewport clipping cannot remove the top edge.
+21. Paint pinned headers and body cells above scrolling active or selected cells while keeping portalled popups and drag overlays above the pinned region.
 
 ## Validation scenarios
 
@@ -427,5 +430,6 @@ These source files and TanStack guides define the implementation and upstream be
 - [TanStack Table column sizing guide](https://tanstack.com/table/latest/docs/guide/column-sizing)
 - [TanStack Table column sizing API](https://tanstack.com/table/latest/docs/api/features/column-sizing)
 - [TanStack Table column ordering guide](https://tanstack.com/table/latest/docs/guide/column-ordering)
+- [TanStack Table column pinning guide](https://tanstack.com/table/latest/docs/framework/react/guide/column-pinning)
 
 The product interaction model is documented in [[lat.md/tableExplorerBehaviors#Table Explorer selection and pane behavior]].

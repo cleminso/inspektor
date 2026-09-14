@@ -458,7 +458,7 @@ These user contexts explain the needs that shape the feature.
    - may be surprised that a saved local connection still needs the local runtime/server running
 3. Debugging wrong app
    - sees unexpected rows, missing tables, or no query subscriptions
-    - needs to verify `serverUrl`, `appId`, and `schemaHash`
+   - needs to verify `serverUrl`, `appId`, and `schemaHash`
    - needs confidence that Inspektor is attached to the same app/runtime they are debugging
 
 #### How it works
@@ -728,7 +728,7 @@ State split:
 
 - URL: connection id, schema hash, active table, representation, filters, sort, page, and page size
 - localStorage: connection preferences, open table items, recent table views, item search state, navigator state, and saved
-  data-grid order and visibility preferences
+  data-grid order, visibility, and pinning preferences
 - memory: transient row and cell selection, mutation ledgers, mutation feedback highlights, and row editor focus
 
 Do not add sessionStorage unless a specific table state needs to survive route navigation without surviving a browser restart.
@@ -882,11 +882,12 @@ column-sizing state within constrained minimum and maximum widths. A double-clic
 width. Resized widths remain in the mounted TanStack table state and reset when that table state is recreated.
 
 Data columns can be reordered by dragging their header horizontally. A short movement threshold preserves normal header clicks,
-and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. TanStack column-order
-state is the single rendered-order authority. The drag layer identifies the reorderable subset, shows a detached preview, and
-publishes one complete TanStack order only after a successful drop; canceled and in-progress drags do not publish transient table
-orders. Column order is persisted with the other table preferences and normalized when schema columns are added or removed. The
-checkbox column remains fixed at the leading edge and is not part of the draggable order.
+and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. The drag layer
+identifies independent start, center, and end reorder regions, shows a detached preview, and updates the matching TanStack
+column-pinning array or the center column order only after a successful drop. Cross-region, canceled, and in-progress drags do not
+publish table state. Column order and logical-start pinning are persisted with the other table preferences and normalized when
+schema columns are added or removed. Reordering a pinned column does not change where it returns when unpinned. The checkbox
+column remains fixed at the leading edge and is not part of the draggable order.
 
 Cell context menu:
 
@@ -941,7 +942,7 @@ ID uses a key icon, references use a relation icon, and stored UUID values use `
 | relation icon + `[]` | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
 | `ID`                 | stored UUID                | UUID `string`         | `UUID`              | UUID value without relation metadata.                                 |
 | `E`                  | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
-| `{E}`                | `s.enum({ ...cases })`      | discriminated union   | payload enum        | Selected enum case with a structured payload.                         |
+| `{E}`                | `s.enum({ ...cases })`     | discriminated union   | payload enum        | Selected enum case with a structured payload.                         |
 | `{}`                 | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
 | `{T}`                | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
 | `FX`                 | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |

@@ -26,6 +26,7 @@ export default function AccountsDataGridDemo(): ReactElement {
     columns,
     data: accounts,
     getRowId: (row) => row.id,
+    initialState: { columnPinning: { start: ['id', 'email'], end: [] } },
   })
 
   return (
@@ -36,6 +37,7 @@ export default function AccountsDataGridDemo(): ReactElement {
       <DataGrid.Root
         table={table}
         density="compact"
+        reorderableColumnIds={['id', 'email', 'role']}
       >
         <DataGrid.Viewport>
           <DataGrid.Table aria-label="Accounts">

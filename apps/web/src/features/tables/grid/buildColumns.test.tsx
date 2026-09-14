@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import {
   type ColumnOrderState,
+  type ColumnPinningState,
   type ColumnVisibilityState,
   type SortingState,
   useTable,
@@ -39,6 +40,7 @@ function TestTable({
   disabledRowIds,
   initialColumnSizing,
   initialColumnOrder,
+  initialColumnPinning,
   initialColumnVisibility,
   onColumnMenuOpen,
   onColumnMove,
@@ -51,6 +53,7 @@ function TestTable({
   disabledRowIds?: ReadonlySet<string>
   initialColumnSizing?: Record<string, number>
   initialColumnOrder?: ColumnOrderState
+  initialColumnPinning?: ColumnPinningState
   initialColumnVisibility?: ColumnVisibilityState
   onColumnMenuOpen?: (columnId: string) => void
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]['onColumnMove']
@@ -60,6 +63,9 @@ function TestTable({
 }): React.ReactElement {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(initialColumnOrder ?? [])
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(
+    initialColumnPinning ?? { start: [], end: [] },
+  )
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(
     initialColumnVisibility ?? {},
   )
@@ -90,8 +96,9 @@ function TestTable({
     getRowId: (row) => String(row.id),
     initialState:
       initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
-    state: { columnOrder, columnVisibility, sorting },
+    state: { columnOrder, columnPinning, columnVisibility, sorting },
     onColumnOrderChange: setColumnOrder,
+    onColumnPinningChange: setColumnPinning,
     onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: (updater) => {
       setSorting(updater)
@@ -227,7 +234,7 @@ describe('buildDataGridColumns', () => {
 
     fireEvent.click(menuButton)
     expect(onColumnMenuOpen).toHaveBeenCalledWith('name')
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Sort Ascending' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Sort A to Z' }))
 
     expect(onSortingChange).toHaveBeenCalledOnce()
   })
@@ -237,7 +244,7 @@ describe('buildDataGridColumns', () => {
 
     fireEvent.contextMenu(screen.getByText('Name'))
 
-    expect(screen.getByRole('menuitem', { name: 'Sort Descending' })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: 'Sort Z to A' })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: 'Hide column' })).toBeTruthy()
   })
 
@@ -336,6 +343,30 @@ describe('buildDataGridColumns', () => {
 
     expect(onColumnMove).toHaveBeenCalledWith('name', 'right')
   })
+
+  it.each(['button', 'context'] as const)(
+    'pins and unpins a column from the %s header menu while retaining move actions',
+    (menuType) => {
+      render(<TestTable columns={movableColumns} onColumnMove={vi.fn()} />)
+
+      openColumnMenu(menuType)
+      fireEvent.click(screen.getByRole('menuitem', { name: 'Pin column' }))
+
+      expect(screen.getByRole('columnheader', { name: /Name/ }).getAttribute('data-pinned')).toBe(
+        'start',
+      )
+
+      openColumnMenu(menuType)
+      expect(screen.getByRole('menuitem', { name: 'Move' }).hasAttribute('aria-disabled')).toBe(
+        false,
+      )
+      fireEvent.click(screen.getByRole('menuitem', { name: 'Unpin column' }))
+
+      expect(screen.getByRole('columnheader', { name: /Name/ }).hasAttribute('data-pinned')).toBe(
+        false,
+      )
+    },
+  )
 
   it.each([
     {
@@ -466,6 +497,24 @@ describe('buildDataGridColumns', () => {
     fireEvent.keyDown(moveLeft, { key: 'ArrowLeft', shiftKey: true })
 
     expect(onColumnMove).toHaveBeenCalledWith('name', 'left')
+  })
+
+  it('moves a pinned column with the recorded menu hotkey', async () => {
+    const onColumnMove = vi.fn()
+    render(
+      <TestTable
+        columns={movableColumns}
+        initialColumnPinning={{ start: ['name', 'email'], end: [] }}
+        onColumnMove={onColumnMove}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
+    const moveRight = await screen.findByRole('menuitem', { name: /Move right/ })
+    fireEvent.keyDown(moveRight, { key: 'ArrowRight', shiftKey: true })
+
+    expect(onColumnMove).toHaveBeenCalledWith('name', 'right')
   })
 
   it('hides a column through the header action menu', () => {

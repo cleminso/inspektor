@@ -17,12 +17,15 @@ interface UseTablePreferencesOptions {
 interface TablePreferences {
   hidden: string[]
   order: string[]
+  pinned: string[]
 }
 
 interface UseTablePreferencesResult {
   columnOrder: string[]
   columnVisibility: TableColumnVisibilityState
+  pinnedColumnIds: string[]
   setColumnOrder: OnChangeFn<ColumnOrderState>
+  setPinnedColumnIds: OnChangeFn<string[]>
   setColumnVisibility: (next: TableColumnVisibilityState) => void
 }
 
@@ -37,15 +40,19 @@ function readTablePreferences(
       version?: unknown
       hidden?: unknown
       order?: unknown
+      pinned?: unknown
     } | null
     if (
       parsed?.version !== 1 ||
       Array.isArray(parsed.order) === false ||
       parsed.order.every((value) => typeof value === 'string') === false ||
       Array.isArray(parsed.hidden) === false ||
-      parsed.hidden.every((value) => typeof value === 'string') === false
+      parsed.hidden.every((value) => typeof value === 'string') === false ||
+      (parsed.pinned !== undefined &&
+        (Array.isArray(parsed.pinned) === false ||
+          parsed.pinned.every((value) => typeof value === 'string') === false))
     ) {
-      return { order: [...columnIds], hidden: [...defaultHiddenColumnIds] }
+      return { order: [...columnIds], hidden: [...defaultHiddenColumnIds], pinned: [] }
     }
 
     const storedHidden = parsed.hidden
@@ -53,6 +60,7 @@ function readTablePreferences(
     const knownColumnIds = new Set(storedOrder)
     return {
       order: storedOrder,
+      pinned: parsed.pinned ?? [],
       hidden: [
         ...storedHidden,
         ...defaultHiddenColumnIds.filter(
@@ -62,7 +70,7 @@ function readTablePreferences(
       ],
     }
   } catch {
-    return { order: [...columnIds], hidden: [...defaultHiddenColumnIds] }
+    return { order: [...columnIds], hidden: [...defaultHiddenColumnIds], pinned: [] }
   }
 }
 
@@ -74,6 +82,17 @@ function writeTablePreferences(storageKey: string, preferences: TablePreferences
 
 function arraysMatch(left: readonly string[], right: readonly string[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index])
+}
+
+function normalizePinnedColumnIds(pinned: readonly string[], columnIds: readonly string[]): string[] {
+  const knownColumnIds = new Set(columnIds)
+  const normalized = new Set<string>()
+  for (const columnId of pinned) {
+    if (knownColumnIds.has(columnId) === true) {
+      normalized.add(columnId)
+    }
+  }
+  return [...normalized]
 }
 
 export function useTablePreferences({
@@ -101,6 +120,10 @@ export function useTablePreferences({
   const columnOrder = useMemo(
     () => normalizeColumnOrder(preferences.order, columnIds),
     [columnIds, preferences.order],
+  )
+  const pinnedColumnIds = useMemo(
+    () => normalizePinnedColumnIds(preferences.pinned, columnIds),
+    [columnIds, preferences.pinned],
   )
 
   const setColumnOrder = useCallback<OnChangeFn<ColumnOrderState>>(
@@ -145,12 +168,35 @@ export function useTablePreferences({
             columnIds.includes(columnId) === true && current.order.includes(columnId) === false,
         ),
       ]
-      const next = { order, hidden }
+      const next = { ...current, order, hidden }
       preferencesRef.current = next
       setPreferenceState({ tableKey, preferences: next })
       writeTablePreferences(storageKey, next)
     },
     [columnIds, defaultHiddenColumnIds, storageKey, tableKey],
+  )
+
+  const setPinnedColumnIds = useCallback<OnChangeFn<string[]>>(
+    (updater) => {
+      const current = preferencesRef.current
+      const currentPinned = normalizePinnedColumnIds(current.pinned, columnIds)
+      const candidatePinned = typeof updater === 'function' ? updater(currentPinned) : updater
+      const pinned = normalizePinnedColumnIds(candidatePinned, columnIds)
+      const knownColumnIds = new Set(columnIds)
+      const storedPinned = [
+        ...pinned,
+        ...current.pinned.filter((columnId) => knownColumnIds.has(columnId) === false),
+      ]
+      if (arraysMatch(current.pinned, storedPinned) === true) {
+        return
+      }
+
+      const next = { ...current, pinned: storedPinned }
+      preferencesRef.current = next
+      setPreferenceState({ tableKey, preferences: next })
+      writeTablePreferences(storageKey, next)
+    },
+    [columnIds, storageKey, tableKey],
   )
 
   const columnVisibility = useMemo(() => {
@@ -164,7 +210,9 @@ export function useTablePreferences({
   return {
     columnOrder,
     columnVisibility,
+    pinnedColumnIds,
     setColumnOrder,
+    setPinnedColumnIds,
     setColumnVisibility,
   }
 }

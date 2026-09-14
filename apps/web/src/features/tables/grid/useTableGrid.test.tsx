@@ -1,5 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
-import type { ColumnOrderState, OnChangeFn, SortingState } from '@tanstack/react-table'
+import type {
+  ColumnOrderState,
+  ColumnPinningState,
+  OnChangeFn,
+  SortingState,
+} from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'
 
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
@@ -9,6 +14,7 @@ const doNothing = () => undefined
 const defaultOptions = {
   cellSelection: [],
   columnOrder: ['name', 'role'],
+  pinnedColumnIds: [],
   columnVisibility: { name: true, role: true },
   columns: [
     { accessorKey: 'name', column: null, id: 'name', isSortable: true, label: 'Name' },
@@ -19,6 +25,7 @@ const defaultOptions = {
   onColumnMenuOpen: doNothing,
   onColumnMove: doNothing,
   onColumnOrderChange: doNothing,
+  onPinnedColumnIdsChange: doNothing,
   onColumnVisibilityChange: doNothing,
   onSelectedRowIdsChange: doNothing,
   onSortChange: doNothing,
@@ -74,5 +81,44 @@ describe('useTableGrid', () => {
     })
 
     expect(persistedOrder).toEqual(['role', 'name'])
+  })
+
+  it('keeps the selection column pinned before persisted data columns', () => {
+    let persistedPinning = ['role']
+    const onPinnedColumnIdsChange: OnChangeFn<string[]> = (updater) => {
+      persistedPinning = typeof updater === 'function' ? updater(persistedPinning) : updater
+    }
+    const { result } = renderGrid({
+      pinnedColumnIds: persistedPinning,
+      onPinnedColumnIdsChange,
+    })
+
+    expect(result.current.atoms.columnPinning.get()).toEqual({
+      start: [tableGridSelectionColumnId, 'role'],
+      end: [],
+    })
+
+    act(() => {
+      result.current.setColumnPinning({ start: [tableGridSelectionColumnId, 'name'], end: [] })
+    })
+
+    expect(persistedPinning).toEqual(['name'])
+  })
+
+  it('normalizes functional pinning updates before persistence', () => {
+    const onPinnedColumnIdsChange = vi.fn<OnChangeFn<string[]>>()
+    const { result } = renderGrid({ pinnedColumnIds: ['name'], onPinnedColumnIdsChange })
+    const updater = (current: ColumnPinningState): ColumnPinningState => ({
+      ...current,
+      start: [...current.start, 'role'],
+    })
+
+    act(() => result.current.setColumnPinning(updater))
+
+    const persistedUpdater = onPinnedColumnIdsChange.mock.calls[0]?.[0]
+    expect(typeof persistedUpdater).toBe('function')
+    expect(
+      typeof persistedUpdater === 'function' ? persistedUpdater(['name']) : persistedUpdater,
+    ).toEqual(['name', 'role'])
   })
 })

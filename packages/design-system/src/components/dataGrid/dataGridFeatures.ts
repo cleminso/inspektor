@@ -1,6 +1,7 @@
 import {
   cellSelectionFeature,
   columnOrderingFeature,
+  columnPinningFeature,
   columnResizingFeature,
   columnSizingFeature,
   columnVisibilityFeature,
@@ -14,6 +15,7 @@ import {
 export const dataGridFeatures = tableFeatures({
   cellSelectionFeature,
   columnOrderingFeature,
+  columnPinningFeature,
   columnSizingFeature,
   columnResizingFeature,
   columnVisibilityFeature,

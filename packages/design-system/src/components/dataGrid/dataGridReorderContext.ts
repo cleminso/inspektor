@@ -6,10 +6,13 @@ interface DataGridHeaderSortableState {
   setReorderRef: (element: HTMLTableCellElement | null) => void
 }
 
+export type DataGridColumnRegion = 'center' | 'end' | 'start'
+
 export interface DataGridHeaderSortableProps {
   children: (state: DataGridHeaderSortableState) => ReactNode
   columnId: string
   index: number
+  region: DataGridColumnRegion
 }
 
 export interface DataGridReorderContextValue {

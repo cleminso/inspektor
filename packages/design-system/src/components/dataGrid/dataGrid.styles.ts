@@ -42,8 +42,8 @@ const recentlyInsertedHighlight = stylex.keyframes({
  * disabled, and consumers clear the status after the animation has ended.
  */
 const recentlyAppliedCellHighlight = stylex.keyframes({
-  '0%': { backgroundColor: dataGridColors.recentlyAppliedCellBackground },
-  '100%': { backgroundColor: 'transparent' },
+  '0%': { boxShadow: `inset 0 0 0 9999px ${dataGridColors.recentlyAppliedCellBackground}` },
+  '100%': { boxShadow: 'inset 0 0 0 9999px transparent' },
 })
 
 export const dataGridStyles = stylex.create({
@@ -169,6 +169,9 @@ export const dataGridStyles = stylex.create({
     color: dataGridColors.emphasizedHeaderText,
     zIndex: 3,
   },
+  pinnedHeaderCell: {
+    zIndex: 4,
+  },
   headerCellLayout: {
     paddingLeft: 0,
     paddingRight: 0,
@@ -180,7 +183,7 @@ export const dataGridStyles = stylex.create({
   headerCellDragging: {
     backgroundColor: dataGridColors.draggedHeaderBackground,
     cursor: 'grabbing',
-    zIndex: 4,
+    zIndex: 5,
     borderBottomColor: dataGridColors.emphasizedColumnBorder,
   },
   headerDragContent: {
@@ -196,7 +199,7 @@ export const dataGridStyles = stylex.create({
     whiteSpace: 'nowrap',
     height: '100%',
     paddingLeft: spacing.m,
-    paddingRight: spacing.m,
+    paddingRight: spacing.xs,
     width: '100%',
   },
   headerDragSource: {
@@ -212,6 +215,7 @@ export const dataGridStyles = stylex.create({
     boxSizing: 'border-box',
     pointerEvents: 'none',
     position: 'fixed',
+    zIndex: 5,
   },
   columnDragOverlayContent: {
     backgroundColor: dataGridColors.emphasizedHeaderBackground,
@@ -277,6 +281,22 @@ export const dataGridStyles = stylex.create({
     paddingRight: spacing.m,
     paddingTop: 0,
   },
+  pinnedCellSurface: {
+    backgroundColor: {
+      default: dataGridColors.background,
+      ':hover': dataGridColors.rowHoverBackground,
+    },
+  },
+  pinnedCell: {
+    position: 'sticky',
+    zIndex: 2,
+  },
+  pinnedCellStagedDeletion: {
+    backgroundColor: dataGridColors.stagedDeletionRowBackground,
+  },
+  pinnedCellRecentlyInserted: {
+    backgroundColor: dataGridColors.recentlyInsertedRowBackground,
+  },
   cellColumnActive: {
     backgroundColor: dataGridColors.emphasizedColumnBackground,
   },
@@ -305,7 +325,7 @@ export const dataGridStyles = stylex.create({
     animationFillMode: 'forwards',
     animationName: { default: recentlyAppliedCellHighlight, [reducedMotion]: 'none' },
     animationTimingFunction: 'ease-out',
-    backgroundColor: dataGridColors.recentlyAppliedCellBackground,
+    boxShadow: `inset 0 0 0 9999px ${dataGridColors.recentlyAppliedCellBackground}`,
   },
   cellSelected: {
     backgroundColor: dataGridColors.selectedCellBackground,

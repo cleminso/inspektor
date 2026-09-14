@@ -30,7 +30,7 @@ import { RelationCellLink } from '@tables/grid/relationCellLink'
 import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
-import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
+import { normalizeColumnOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
 import type { TableColumnMeta, TableRowId, TableValuesByRowId, DynamicTableRow } from '@tables/tableTypes'
 
 interface BuildDataGridColumnsOptions {
@@ -437,8 +437,14 @@ function getColumnMoveAvailability(column: Column<DataGridFeatures, DynamicTable
   left: boolean
   right: boolean
 } {
-  const visibleDataColumnIds = column.table
-    .getVisibleLeafColumns()
+  const pinnedPosition = column.getIsPinned()
+  const visibleColumns =
+    pinnedPosition === 'start'
+      ? column.table.getStartVisibleLeafColumns()
+      : pinnedPosition === 'end'
+        ? column.table.getEndVisibleLeafColumns()
+        : column.table.getCenterVisibleLeafColumns()
+  const visibleDataColumnIds = visibleColumns
     .filter((candidate) => candidate.id !== tableGridSelectionColumnId)
     .map((candidate) => candidate.id)
   const columnIndex = visibleDataColumnIds.indexOf(column.id)
@@ -531,17 +537,12 @@ function hasCustomColumnOrder(
   column: Column<DataGridFeatures, DynamicTableRow, unknown>,
   defaultColumnOrder: readonly string[],
 ): boolean {
-  const defaultColumnIds = new Set(defaultColumnOrder)
-  const currentColumnOrder = (column.table.options.state?.columnOrder ?? []).filter((columnId) =>
-    defaultColumnIds.has(columnId),
+  const currentColumnOrder = normalizeColumnOrder(
+    column.table.options.state?.columnOrder ?? [],
+    defaultColumnOrder,
   )
-  const currentColumnIds = new Set(currentColumnOrder)
-  const normalizedColumnOrder = [
-    ...currentColumnOrder,
-    ...defaultColumnOrder.filter((columnId) => currentColumnIds.has(columnId) === false),
-  ]
 
-  return normalizedColumnOrder.some((columnId, index) => columnId !== defaultColumnOrder[index])
+  return currentColumnOrder.some((columnId, index) => columnId !== defaultColumnOrder[index])
 }
 
 function MenuColumnActions({
@@ -555,6 +556,7 @@ function MenuColumnActions({
 }): React.ReactElement {
   const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder)
   const canResetColumnWidth = column.getSize() !== column.columnDef.size
+  const pinnedPosition = column.getIsPinned()
 
   return (
     <>
@@ -562,22 +564,26 @@ function MenuColumnActions({
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(false)}
       >
-        Sort Ascending
+        Sort A to Z
       </Menu.Item>
       <Menu.Item
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(true)}
       >
-        Sort Descending
+        Sort Z to A
+      </Menu.Item>
+      <Menu.Separator />
+      <Menu.Item
+        disabled={column.getCanPin() === false}
+        onClick={() => column.pin(pinnedPosition === false ? 'start' : false)}
+      >
+        {pinnedPosition === false ? 'Pin column' : 'Unpin column'}
       </Menu.Item>
       {onMove === undefined ? null : (
-        <>
-          <Menu.Separator />
-          <MenuMoveActions
-            column={column}
-            onMove={onMove}
-          />
-        </>
+        <MenuMoveActions
+          column={column}
+          onMove={onMove}
+        />
       )}
       <Menu.Separator />
       <Menu.Item
@@ -661,6 +667,7 @@ function ContextColumnActions({
 }): React.ReactElement {
   const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder)
   const canResetColumnWidth = column.getSize() !== column.columnDef.size
+  const pinnedPosition = column.getIsPinned()
 
   return (
     <>
@@ -668,22 +675,26 @@ function ContextColumnActions({
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(false)}
       >
-        Sort Ascending
+        Sort A to Z
       </ContextMenu.Item>
       <ContextMenu.Item
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(true)}
       >
-        Sort Descending
+        Sort Z to A
+      </ContextMenu.Item>
+      <ContextMenu.Separator />
+      <ContextMenu.Item
+        disabled={column.getCanPin() === false}
+        onClick={() => column.pin(pinnedPosition === false ? 'start' : false)}
+      >
+        {pinnedPosition === false ? 'Pin column' : 'Unpin column'}
       </ContextMenu.Item>
       {onMove === undefined ? null : (
-        <>
-          <ContextMenu.Separator />
-          <ContextMoveActions
-            column={column}
-            onMove={onMove}
-          />
-        </>
+        <ContextMoveActions
+          column={column}
+          onMove={onMove}
+        />
       )}
       <ContextMenu.Separator />
       <ContextMenu.Item
@@ -840,6 +851,7 @@ export function buildDataGridColumns({
     minSize: 36,
     maxSize: 36,
     enableHiding: false,
+    enablePinning: false,
     enableCellSelection: false,
     enableResizing: false,
     enableSorting: false,

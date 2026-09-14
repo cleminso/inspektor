@@ -31,7 +31,10 @@ import { Spinner } from '../spinner/spinner'
 import { dataGridStyles } from './dataGrid.styles'
 import { DataGridContext, type DataGridContextValue, useDataGridContext } from './dataGridContext'
 import type { DataGridFeatures, DataGridTable } from './dataGridFeatures'
-import { useDataGridReorderContext } from './dataGridReorderContext'
+import {
+  useDataGridReorderContext,
+  type DataGridColumnRegion,
+} from './dataGridReorderContext'
 
 export type DataGridDensity = 'compact' | 'default'
 export type DataGridRowRendering = 'all' | 'virtual'
@@ -41,6 +44,7 @@ export type DataGridCellStatus = 'default' | 'stagedUpdate' | 'recentlyApplied'
 const defaultColumnMinSize = 20
 const defaultColumnMaxSize = Number.MAX_SAFE_INTEGER
 const keyboardColumnResizeStep = 10
+const emptyColumnOrder: readonly string[] = []
 
 /**
  * Why: importing DND from this static module pulled the shared sortable chunk into the initial
@@ -144,7 +148,7 @@ interface DataGridRootBaseProps<TData extends RowData> {
 interface ReorderableDataGridRootProps {
   /** Renders the inert visual shown while a column header is dragged. */
   columnDragPreview?: (columnId: string) => ReactNode
-  /** Leaf column ids that can be reordered. TanStack table state owns their current order. */
+  /** Leaf column ids that can be reordered within their current TanStack pin region. */
   reorderableColumnIds: readonly string[]
 }
 
@@ -337,29 +341,26 @@ function moveColumnByOffset(
   columnId: string,
   offset: -1 | 1,
 ): string[] {
-  const currentIndex = columnOrder.indexOf(columnId)
   const visibleIndex = visibleColumnOrder.indexOf(columnId)
   const nextVisibleIndex = visibleIndex + offset
   if (
-    currentIndex < 0 ||
+    columnOrder.includes(columnId) === false ||
     visibleIndex < 0 ||
     nextVisibleIndex < 0 ||
     nextVisibleIndex >= visibleColumnOrder.length
   ) {
     return [...columnOrder]
   }
-  const targetColumnId = visibleColumnOrder[nextVisibleIndex]
-  if (targetColumnId === undefined) {
-    return [...columnOrder]
-  }
-  const nextIndex = columnOrder.indexOf(targetColumnId)
-
-  const nextColumnOrder = [...columnOrder]
-  const [column] = nextColumnOrder.splice(currentIndex, 1)
+  const nextVisibleColumnOrder = [...visibleColumnOrder]
+  const [column] = nextVisibleColumnOrder.splice(visibleIndex, 1)
   if (column !== undefined) {
-    nextColumnOrder.splice(nextIndex, 0, column)
+    nextVisibleColumnOrder.splice(nextVisibleIndex, 0, column)
   }
-  return nextColumnOrder
+  return mergeReorderableColumnOrder(
+    columnOrder,
+    new Set(visibleColumnOrder),
+    nextVisibleColumnOrder,
+  )
 }
 
 function mergeReorderableColumnOrder(
@@ -379,7 +380,53 @@ function mergeReorderableColumnOrder(
   })
 }
 
-function DataGridRoot<TData extends RowData>({
+function normalizeCompleteColumnOrder(
+  configuredColumnOrder: readonly string[],
+  definedColumnOrder: readonly string[],
+): string[] {
+  const definedColumnIds = new Set(definedColumnOrder)
+  const includedColumnIds = new Set<string>()
+  const completeColumnOrder: string[] = []
+
+  for (const columnId of configuredColumnOrder) {
+    if (definedColumnIds.has(columnId) === true && includedColumnIds.has(columnId) === false) {
+      includedColumnIds.add(columnId)
+      completeColumnOrder.push(columnId)
+    }
+  }
+  for (const columnId of definedColumnOrder) {
+    if (includedColumnIds.has(columnId) === false) {
+      includedColumnIds.add(columnId)
+      completeColumnOrder.push(columnId)
+    }
+  }
+  return completeColumnOrder
+}
+
+function getColumnRegion(pinnedPosition: false | 'end' | 'start'): DataGridColumnRegion {
+  return pinnedPosition === false ? 'center' : pinnedPosition
+}
+
+function DataGridRoot<TData extends RowData>(props: DataGridRootProps<TData>) {
+  if (props.reorderableColumnIds === undefined) {
+    return <DataGridRootImplementation {...props} />
+  }
+
+  return (
+    <Subscribe
+      source={props.table.store}
+      selector={(state) => ({
+        columnOrder: state.columnOrder,
+        columnPinning: state.columnPinning,
+        columnVisibility: state.columnVisibility,
+      })}
+    >
+      {() => <DataGridRootImplementation {...props} />}
+    </Subscribe>
+  )
+}
+
+function DataGridRootImplementation<TData extends RowData>({
   activeColumnId = null,
   activeRowId = null,
   children,
@@ -419,22 +466,55 @@ function DataGridRoot<TData extends RowData>({
   ) {
     throw new Error('DataGrid reorderableColumnIds values must be unique')
   }
-  const completeColumnOrder = useMemo(
-    () => table.getAllLeafColumns().map((column) => column.id),
-    [table],
+  const definedColumns = table.getAllLeafColumns()
+  const definedColumnOrder = useMemo(
+    () => definedColumns.map((column) => column.id),
+    [definedColumns],
   )
-  const columnOrder = useMemo(
-    () => completeColumnOrder.filter((columnId) => reorderableColumnIdSet.has(columnId)),
-    [completeColumnOrder, reorderableColumnIdSet],
+  const tableState = table.store.state
+  const completeColumnOrder = useMemo(
+    () => normalizeCompleteColumnOrder(tableState.columnOrder, definedColumnOrder),
+    [definedColumnOrder, tableState.columnOrder],
+  )
+  const pinnedStartColumnOrder = tableState.columnPinning?.start ?? emptyColumnOrder
+  const pinnedEndColumnOrder = tableState.columnPinning?.end ?? emptyColumnOrder
+  const completeColumnOrders = useMemo<Record<DataGridColumnRegion, readonly string[]>>(() => {
+    const pinnedColumnIds = new Set([...pinnedStartColumnOrder, ...pinnedEndColumnOrder])
+    return {
+      start: pinnedStartColumnOrder,
+      center: completeColumnOrder.filter((columnId) => pinnedColumnIds.has(columnId) === false),
+      end: pinnedEndColumnOrder,
+    }
+  }, [completeColumnOrder, pinnedEndColumnOrder, pinnedStartColumnOrder])
+  const visibleReorderableColumnOrders = useMemo<
+    Record<DataGridColumnRegion, readonly string[]>
+  >(
+    () => {
+      const isVisibleReorderableColumn = (columnId: string) =>
+        reorderableColumnIdSet.has(columnId) === true &&
+        tableState.columnVisibility?.[columnId] !== false
+      return {
+        start: completeColumnOrders.start.filter(isVisibleReorderableColumn),
+        center: completeColumnOrders.center.filter(isVisibleReorderableColumn),
+        end: completeColumnOrders.end.filter(isVisibleReorderableColumn),
+      }
+    },
+    [completeColumnOrders, reorderableColumnIdSet, tableState.columnVisibility],
   )
   const columnReorderIndices = useMemo(
-    () => new Map(columnOrder.map((columnId, index) => [columnId, index])),
-    [columnOrder],
+    () =>
+      new Map(
+        (['start', 'center', 'end'] as const).flatMap((region) =>
+          visibleReorderableColumnOrders[region].map(
+            (columnId, index) => [columnId, index] as const,
+          ),
+        ),
+      ),
+    [visibleReorderableColumnOrders],
   )
 
   const columnReorderConfigured = reorderableColumnIds !== undefined
-  const columnReorderReady = ReorderComponent !== null
-  const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true
+  const columnReorderEnabled = columnReorderConfigured === true && ReorderComponent !== null
   const canClearActiveColumn = onColumnActivate !== undefined
   const clearActiveColumn = useEffectEvent(() => {
     onColumnActivate?.(null)
@@ -489,24 +569,31 @@ function DataGridRoot<TData extends RowData>({
           if (reorderableColumnIds === undefined) {
             return
           }
-          const visibleColumnOrder = table
-            .getVisibleLeafColumns()
-            .map((column) => column.id)
-            .filter((candidateId) => columnReorderIndices.has(candidateId))
+          const column = table.getColumn(columnId)
+          if (column === undefined) {
+            return
+          }
+          const region = getColumnRegion(column.getIsPinned())
+          const visibleColumnOrder = visibleReorderableColumnOrders[region]
+          const completeRegionColumnOrder =
+            region === 'center' ? completeColumnOrder : completeColumnOrders[region]
           const nextColumnOrder = moveColumnByOffset(
-            columnOrder,
+            completeRegionColumnOrder,
             visibleColumnOrder,
             columnId,
             offset,
           )
-          if (nextColumnOrder.some((value, index) => value !== columnOrder[index])) {
-            table.setColumnOrder(
-              mergeReorderableColumnOrder(
-                completeColumnOrder,
-                reorderableColumnIdSet,
-                nextColumnOrder,
-              ),
-            )
+          if (
+            nextColumnOrder.some((value, index) => value !== completeRegionColumnOrder[index])
+          ) {
+            if (region === 'center') {
+              table.setColumnOrder(nextColumnOrder)
+            } else {
+              table.setColumnPinning((currentColumnPinning) => ({
+                ...currentColumnPinning,
+                [region]: nextColumnOrder,
+              }))
+            }
           }
         },
         registerCellElement,
@@ -519,7 +606,7 @@ function DataGridRoot<TData extends RowData>({
       activeRowId,
       columnReorderEnabled,
       columnReorderIndices,
-      columnOrder,
+      completeColumnOrders,
       completeColumnOrder,
       density,
       focusFocusedCell,
@@ -534,10 +621,10 @@ function DataGridRoot<TData extends RowData>({
       onRowActivate,
       onRowContextMenu,
       onRowContextMenuTouchStart,
-      reorderableColumnIdSet,
       reorderableColumnIds,
       registerCellElement,
       table,
+      visibleReorderableColumnOrders,
       viewportElement,
     ],
   )
@@ -673,17 +760,33 @@ function DataGridRoot<TData extends RowData>({
     </DataGridContext.Provider>
   )
 
-  if (columnReorderEnabled === false || reorderableColumnIds === undefined) {
+  if (columnReorderEnabled === false) {
     return root
   }
 
   return (
     <ReorderComponent
-      columnOrder={columnOrder}
-      onColumnOrderChange={(nextColumnOrder) => {
-        table.setColumnOrder(
-          mergeReorderableColumnOrder(completeColumnOrder, reorderableColumnIdSet, nextColumnOrder),
-        )
+      columnOrders={visibleReorderableColumnOrders}
+      onColumnOrderChange={(region, nextColumnOrder) => {
+        const visibleRegionReorderableColumnIds = new Set(visibleReorderableColumnOrders[region])
+        if (region === 'center') {
+          table.setColumnOrder(
+            mergeReorderableColumnOrder(
+              completeColumnOrder,
+              visibleRegionReorderableColumnIds,
+              nextColumnOrder,
+            ),
+          )
+          return
+        }
+        table.setColumnPinning((currentColumnPinning) => ({
+          ...currentColumnPinning,
+          [region]: mergeReorderableColumnOrder(
+            completeColumnOrders[region],
+            visibleRegionReorderableColumnIds,
+            nextColumnOrder,
+          ),
+        }))
       }}
       overlayProps={stylex.props(dataGridStyles.columnDragOverlay)}
       rootRef={rootRef}
@@ -766,12 +869,21 @@ function DataGridTable(props: DataGridTableProps) {
       source={table.store}
       selector={(state) => ({
         columnOrder: state.columnOrder,
+        columnPinning: state.columnPinning,
         columnVisibility: state.columnVisibility,
       })}
     >
       {() => <DataGridTableImplementation {...props} />}
     </Subscribe>
   )
+}
+
+function getVisibleDataGridColumns<TData extends RowData>(table: DataGridTable<TData>) {
+  return [
+    ...table.getStartVisibleLeafColumns(),
+    ...table.getCenterVisibleLeafColumns(),
+    ...table.getEndVisibleLeafColumns(),
+  ]
 }
 
 function DataGridTableImplementation({
@@ -783,9 +895,10 @@ function DataGridTableImplementation({
   const { density, table } = useDataGridContext()
   const scrollSurfaceRef = useRef<HTMLDivElement>(null)
   const tableRef = useRef<HTMLTableElement>(null)
-  const columnGeometry = table
-    .getVisibleLeafColumns()
-    .map((column) => ({ id: column.id, size: column.getSize() }))
+  const columnGeometry = getVisibleDataGridColumns(table).map((column) => ({
+    id: column.id,
+    size: column.getSize(),
+  }))
   const tableWidth = columnGeometry.reduce((width, column) => width + column.size, 0)
 
   useLayoutEffect(() => {
@@ -796,7 +909,7 @@ function DataGridTableImplementation({
         return
       }
 
-      const visibleColumns = table.getVisibleLeafColumns()
+      const visibleColumns = getVisibleDataGridColumns(table)
       const columnElements = tableElement.querySelectorAll<HTMLTableColElement>('col')
       let width = 0
       for (const [index, column] of visibleColumns.entries()) {
@@ -809,6 +922,17 @@ function DataGridTableImplementation({
       }
       scrollSurface.style.width = `${width}px`
       tableElement.style.width = `${width}px`
+      for (const pinnedElement of tableElement.querySelectorAll<HTMLElement>(
+        '[data-pinned][data-column-id]',
+      )) {
+        const columnId = pinnedElement.dataset.columnId
+        const column = columnId === undefined ? undefined : table.getColumn(columnId)
+        if (column !== undefined && pinnedElement.dataset.pinned === 'start') {
+          pinnedElement.style.insetInlineStart = `${column.getStart('start')}px`
+        } else if (column !== undefined && pinnedElement.dataset.pinned === 'end') {
+          pinnedElement.style.insetInlineEnd = `${column.getAfter('end')}px`
+        }
+      }
     }
 
     const subscription = table.atoms.columnSizing.subscribe(writeColumnGeometry)
@@ -961,6 +1085,7 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
   const columnReorderIndex = getColumnReorderIndex(header.column.id)
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0
   const sortDirection = header.column.getIsSorted()
+  const pinnedPosition = header.column.getIsPinned()
   const ariaSort =
     header.column.getCanSort() === false
       ? undefined
@@ -998,6 +1123,7 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
       event.ctrlKey === false &&
       event.metaKey === false &&
       columnReorderable === true &&
+      event.target === event.currentTarget &&
       (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
     ) {
       event.preventDefault()
@@ -1046,6 +1172,7 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
           dataGridStyles.headerCellLayout,
           isActive === true && dataGridStyles.activeTarget,
           isActive === true && dataGridStyles.headerCellActive,
+          pinnedPosition !== false && dataGridStyles.pinnedHeaderCell,
           columnReorderable === true && dataGridStyles.headerCellReorderable,
           isDragVisual === true && dataGridStyles.headerCellDragging,
         )}
@@ -1059,12 +1186,20 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
         data-active={isActive === true ? '' : undefined}
         data-column-id={header.column.id}
         data-dragging={isDragVisual === true ? '' : undefined}
+        data-pinned={pinnedPosition === false ? undefined : pinnedPosition}
         data-reorderable={columnReorderable === true ? '' : undefined}
         data-slot="data-grid-header-cell"
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         onKeyDown={handleKeyDown}
         scope="col"
+        style={
+          pinnedPosition === 'start'
+            ? { insetInlineStart: `${header.column.getStart('start')}px` }
+            : pinnedPosition === 'end'
+              ? { insetInlineEnd: `${header.column.getAfter('end')}px` }
+              : undefined
+        }
         tabIndex={
           header.column.getCanSort() === true ||
           columnReorderable === true ||
@@ -1166,6 +1301,7 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
       <SortableHeader
         columnId={header.column.id}
         index={columnReorderIndex}
+        region={getColumnRegion(pinnedPosition)}
       >
         {renderHeaderCell}
       </SortableHeader>
@@ -1454,6 +1590,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     activeColumnId === target.columnId
   const isRowActive = activeRowId === target.rowId
   const isSelected = cell.row.getIsSelected()
+  const pinnedPosition = cell.column.getIsPinned()
   const isFirstVisibleCell = cell.row.getVisibleCells()[0]?.id === cell.id
   const isCellSelected = cell.getIsSelected()
   const selectionEdges = isCellSelected === true ? cell.getSelectionEdges() : undefined
@@ -1591,6 +1728,15 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         dataGridStyles.focusTarget,
         density === 'compact' && dataGridStyles.compactCell,
         density === 'compact' && dataGridStyles.compactCellInlinePadding,
+        pinnedPosition !== false && dataGridStyles.pinnedCellSurface,
+        pinnedPosition !== false &&
+          rowStatus === 'stagedDeletion' &&
+          dataGridStyles.pinnedCellStagedDeletion,
+        pinnedPosition !== false &&
+          rowStatus === 'recentlyInserted' &&
+          isSelected === false &&
+          isRowActive === false &&
+          dataGridStyles.pinnedCellRecentlyInserted,
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
         isSelected === true &&
@@ -1624,10 +1770,12 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
           isActive === false &&
           isColumnActive === false &&
           dataGridStyles.cellRecentlyApplied,
+        pinnedPosition !== false && dataGridStyles.pinnedCell,
       )}
       data-active={isActive === true ? '' : undefined}
       data-cell-selected={isCellSelected === true ? '' : undefined}
       data-column-id={target.columnId}
+      data-pinned={pinnedPosition === false ? undefined : pinnedPosition}
       data-column-active={isColumnActive === true ? '' : undefined}
       data-row-active={isRowActive === true ? '' : undefined}
       data-selection-edges={
@@ -1642,6 +1790,13 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       data-slot="data-grid-cell"
       data-typography="mono"
       ref={registerCell}
+      style={
+        pinnedPosition === 'start'
+          ? { insetInlineStart: `${cell.column.getStart('start')}px` }
+          : pinnedPosition === 'end'
+            ? { insetInlineEnd: `${cell.column.getAfter('end')}px` }
+            : undefined
+      }
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onDoubleClick={handleDoubleClick}

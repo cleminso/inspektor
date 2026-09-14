@@ -25,15 +25,15 @@ describe('moveColumnInOrder', () => {
     const visibleOrder = ['id', 'name', 'role']
 
     expect(moveColumnInOrder(order, 'id', 'right', visibleOrder)).toEqual([
-      'hidden',
       'name',
+      'hidden',
       'id',
       'role',
     ])
     expect(moveColumnInOrder(order, 'role', 'start', visibleOrder)).toEqual([
       'role',
-      'id',
       'hidden',
+      'id',
       'name',
     ])
   })

@@ -9,14 +9,17 @@ import { useTableViewState as useTableViewStateImpl } from '@tables/workspace/us
 
 const insertRow = vi.fn()
 const setPage = vi.fn()
-const { focusRowEditorField, useTableRowByIdMock } = vi.hoisted(() => ({
+const { focusRowEditorField, moveColumnInOrderMock, useTableRowByIdMock } = vi.hoisted(() => ({
   focusRowEditorField: vi.fn(),
+  moveColumnInOrderMock: vi.fn(),
   useTableRowByIdMock: vi.fn(),
 }))
 const columnOrderState = {
   columnOrder: ['id', 'name'],
   columnVisibility: { id: true, name: true },
+  pinnedColumnIds: [] as string[],
   setColumnOrder: vi.fn(),
+  setPinnedColumnIds: vi.fn(),
   setColumnVisibility: vi.fn(),
 }
 const searchState = {
@@ -81,8 +84,9 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeSchema: () => runtimeState.schema,
 }))
 
-vi.mock('@tables/grid/useColumnOrder', () => ({
-  moveColumnInOrder: vi.fn(),
+vi.mock('@tables/grid/useColumnOrder', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tables/grid/useColumnOrder')>()),
+  moveColumnInOrder: moveColumnInOrderMock,
 }))
 
 vi.mock('@tables/grid/useTablePreferences', () => ({
@@ -129,6 +133,9 @@ beforeEach(() => {
   focusRowEditorField.mockClear()
   setPage.mockReset()
   searchState.setFilters.mockReset()
+  moveColumnInOrderMock.mockReset()
+  columnOrderState.setColumnOrder.mockReset()
+  columnOrderState.setPinnedColumnIds.mockReset()
   useTableRowByIdMock.mockReset()
   useTableRowByIdMock.mockReturnValue({ status: 'idle', row: null })
   searchState.filters = []
@@ -142,6 +149,7 @@ beforeEach(() => {
     { id: 'row-2', name: 'Grace' },
   ]
   columnOrderState.columnOrder = ['id', 'name']
+  columnOrderState.pinnedColumnIds = []
   tableColumns[1]!.column = {
     name: 'name',
     column_type: { type: 'Text' },
@@ -201,6 +209,33 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('keeps pinned data columns reorderable and moves them within the pinned order', async () => {
+    columnOrderState.pinnedColumnIds = ['id', 'name']
+    columnOrderState.setPinnedColumnIds.mockImplementation((updater) => {
+      if (typeof updater === 'function') {
+        updater(columnOrderState.pinnedColumnIds)
+      }
+    })
+    moveColumnInOrderMock.mockReturnValue(['name', 'id'])
+    const { result, unmount } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.reorderableColumnIds).toEqual(['id', 'name'])
+    unmount()
+    render(<TableViewInteractionHarness />)
+    fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
+    fireEvent.click(await screen.findByRole('menuitem', { name: /Move left/ }))
+
+    expect(moveColumnInOrderMock).toHaveBeenCalledWith(
+      ['id', 'name'],
+      'name',
+      'left',
+      ['id', 'name'],
+    )
+    expect(columnOrderState.setPinnedColumnIds).toHaveBeenCalledOnce()
+    expect(columnOrderState.setColumnOrder).not.toHaveBeenCalled()
+  })
+
   it('moves a single checked row through the loaded grid rows', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {

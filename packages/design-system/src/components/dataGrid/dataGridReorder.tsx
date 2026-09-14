@@ -12,7 +12,11 @@ import { useSortable } from '@dnd-kit/react/sortable'
 import { SortableKeyboardPlugin } from '@dnd-kit/dom/sortable'
 import { useMemo, type CSSProperties, type ReactNode, type RefObject } from 'react'
 
-import { DataGridReorderContext, type DataGridHeaderSortableProps } from './dataGridReorderContext'
+import {
+  DataGridReorderContext,
+  type DataGridColumnRegion,
+  type DataGridHeaderSortableProps,
+} from './dataGridReorderContext'
 
 interface DataGridDragSource {
   element?: Element | null
@@ -44,8 +48,8 @@ function getColumnIdFromHeaderSortableId(sortableId: string | number): string | 
 
 export interface DataGridReorderProps {
   children: ReactNode
-  columnOrder: readonly string[]
-  onColumnOrderChange: (columnIds: string[]) => void
+  columnOrders: Readonly<Record<DataGridColumnRegion, readonly string[]>>
+  onColumnOrderChange: (region: DataGridColumnRegion, columnIds: string[]) => void
   overlayProps: { className?: string; style?: CSSProperties }
   renderOverlay: (source: DataGridDragSource) => ReactNode
   rootRef: RefObject<HTMLDivElement | null>
@@ -75,9 +79,28 @@ const dataGridSortableTransition = { duration: 0 }
 
 // Keep sortable ownership declarative: this ref belongs to the header that renders it.
 // Do not replace this with DOM discovery; that makes reorder behavior depend on private markup.
-function DataGridSortableHeader({ children, columnId, index }: DataGridHeaderSortableProps) {
+function getRegionFromColumnSortableType(type: unknown): DataGridColumnRegion | null {
+  if (type === 'column:start') {
+    return 'start'
+  }
+  if (type === 'column:center') {
+    return 'center'
+  }
+  if (type === 'column:end') {
+    return 'end'
+  }
+  return null
+}
+
+function DataGridSortableHeader({
+  children,
+  columnId,
+  index,
+  region,
+}: DataGridHeaderSortableProps) {
+  const sortableType = `column:${region}`
   const sortable = useSortable({
-    accept: 'column',
+    accept: sortableType,
     id: getDataGridHeaderSortableId(columnId),
     index,
     disabled: {
@@ -86,7 +109,7 @@ function DataGridSortableHeader({ children, columnId, index }: DataGridHeaderSor
     },
     plugins: dataGridSortablePlugins,
     transition: dataGridSortableTransition,
-    type: 'column',
+    type: sortableType,
   })
 
   return children({
@@ -104,7 +127,7 @@ const reorderContext = { Header: DataGridSortableHeader }
 
 export function DataGridReorder({
   children,
-  columnOrder,
+  columnOrders,
   onColumnOrderChange,
   overlayProps,
   renderOverlay,
@@ -128,10 +151,30 @@ export function DataGridReorder({
           AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
         ]}
         onDragEnd={(event) => {
-          if (event.canceled === true || event.operation.source?.type !== 'column') {
+          const source = event.operation.source
+          const target = event.operation.target
+          const region = getRegionFromColumnSortableType(source?.type)
+          if (
+            event.canceled === true ||
+            source === null ||
+            target === null ||
+            region === null ||
+            target.type !== source.type
+          ) {
             return
           }
 
+          const columnOrder = columnOrders[region]
+          const sourceColumnId = getColumnIdFromHeaderSortableId(source.id)
+          const targetColumnId = getColumnIdFromHeaderSortableId(target.id)
+          if (
+            sourceColumnId === null ||
+            targetColumnId === null ||
+            columnOrder.includes(sourceColumnId) === false ||
+            columnOrder.includes(targetColumnId) === false
+          ) {
+            return
+          }
           const sortableColumnOrder = columnOrder.map(getDataGridHeaderSortableId)
           const nextSortableColumnOrder = move(sortableColumnOrder, event)
           const nextColumnOrder = nextSortableColumnOrder.flatMap((sortableId) => {
@@ -139,7 +182,7 @@ export function DataGridReorder({
             return columnId === null ? [] : [columnId]
           })
           if (areColumnOrdersEqual(columnOrder, nextColumnOrder) === false) {
-            onColumnOrderChange(nextColumnOrder)
+            onColumnOrderChange(region, nextColumnOrder)
           }
         }}
       >

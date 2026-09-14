@@ -177,7 +177,12 @@ export function DataGridExport({
   const handleExport = (format: DataExportFormat) => {
     const exportRows = table.getRowModel().rows.map((row) => row.original)
     const columnsById = new Map(tableColumns.map((column) => [column.id, column]))
-    const exportColumns = table.getVisibleLeafColumns().flatMap((column) => {
+    const visibleColumns = [
+      ...table.getStartVisibleLeafColumns(),
+      ...table.getCenterVisibleLeafColumns(),
+      ...table.getEndVisibleLeafColumns(),
+    ]
+    const exportColumns = visibleColumns.flatMap((column) => {
       const tableColumn = columnsById.get(column.id)
       return tableColumn === undefined
         ? []

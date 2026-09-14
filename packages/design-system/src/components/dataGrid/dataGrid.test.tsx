@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import {
   createColumnHelper,
   type CellSelectionState,
+  type ColumnPinningState,
   type RowSelectionState,
   type SortingState,
   useTable,
@@ -21,6 +22,53 @@ let dragOverlaySource: { element?: Element | null; id: string } = {
   id: getDataGridHeaderSortableId('name'),
 }
 let droppingSortableId: string | null = null
+type TestColumnRegion = 'center' | 'end' | 'start'
+
+async function waitForColumnReorder(): Promise<void> {
+  await waitFor(() => {
+    expect(onDataGridDragEnd).toBeTypeOf('function')
+  })
+}
+
+function dragColumn(
+  sourceColumnId: string,
+  targetColumnId: string,
+  {
+    canceled = false,
+    sourceIndex = 1,
+    sourceRegion = 'center',
+    targetIndex = 0,
+    targetRegion = sourceRegion,
+  }: {
+    canceled?: boolean
+    sourceIndex?: number
+    sourceRegion?: TestColumnRegion
+    targetIndex?: number
+    targetRegion?: TestColumnRegion
+  } = {},
+): void {
+  act(() => {
+    onDataGridDragEnd?.({
+      canceled,
+      operation: {
+        source: {
+          id: getDataGridHeaderSortableId(sourceColumnId),
+          initialIndex: sourceIndex,
+          index: sourceIndex,
+          sortable: true,
+          type: `column:${sourceRegion}`,
+        },
+        target: {
+          id: getDataGridHeaderSortableId(targetColumnId),
+          index: targetIndex,
+          sortable: true,
+          type: `column:${targetRegion}`,
+        },
+      },
+    })
+  })
+}
+
 const virtualizerScrollToIndex = vi.hoisted(() => vi.fn())
 vi.mock('@tanstack/react-virtual', () => ({
   useVirtualizer: () => ({
@@ -101,6 +149,10 @@ const columnsWithFixedId = columnHelper.columns([
   columnHelper.accessor('name', { header: 'Name' }),
   columnHelper.accessor('role', { header: 'Role' }),
 ])
+const columnsWithInteractiveHeader = columnHelper.columns([
+  columnHelper.accessor('name', { header: () => <button type="button">Name menu</button> }),
+  columnHelper.accessor('role', { header: 'Role' }),
+])
 const interactiveCellColumns = columnHelper.columns([
   columnHelper.accessor('name', {
     header: 'Name',
@@ -152,6 +204,7 @@ interface TestDataGridProps {
     row: { id: string }
   }) => 'default' | 'recentlyApplied' | 'stagedUpdate'
   initialCellSelection?: CellSelectionState
+  initialColumnPinning?: ColumnPinningState
   loading?: boolean
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
   onCellEditRequest?: (target: { columnId: string; rowId: string }) => void
@@ -176,6 +229,7 @@ function TestDataGrid({
   getCellStatus,
   getRowStatus,
   initialCellSelection = [],
+  initialColumnPinning,
   loading = false,
   onCellActivate,
   onCellEditRequest,
@@ -198,6 +252,7 @@ function TestDataGrid({
     data,
     enableCellSelection: (cell) => disabledCellRowIds.has(cell.row.id) === false,
     getRowId: (row) => row.id,
+    initialState: { columnPinning: initialColumnPinning },
     state: {
       cellSelection,
       columnResizing: {
@@ -596,29 +651,51 @@ function KeyboardResizableDataGrid() {
 function ReorderableDataGrid({
   columnDragPreview,
   initialColumnOrder = ['name', 'role'],
+  initialColumnPinning = { start: [], end: [] },
+  initialColumnVisibility = {},
   includeFixedId = false,
+  includeInteractiveHeader = false,
   onColumnOrderChange,
+  onColumnPinningChange = () => undefined,
   reorderableColumnIds = ['name', 'role'],
 }: {
   columnDragPreview?: (columnId: string) => ReactNode
   initialColumnOrder?: string[]
+  initialColumnPinning?: ColumnPinningState
+  initialColumnVisibility?: Record<string, boolean>
   includeFixedId?: boolean
+  includeInteractiveHeader?: boolean
   onColumnOrderChange: (columnIds: string[]) => void
+  onColumnPinningChange?: (columnPinning: ColumnPinningState) => void
   reorderableColumnIds?: string[]
 }) {
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
+  const [columnPinning, setColumnPinning] = useState(initialColumnPinning)
   const table = useTable({
     features: dataGridFeatures,
-    columns: includeFixedId === true ? columnsWithFixedId : columns,
+    columns:
+      includeFixedId === true
+        ? columnsWithFixedId
+        : includeInteractiveHeader === true
+          ? columnsWithInteractiveHeader
+          : columns,
     data: rows,
     getRowId: (row) => row.id,
-    state: { columnOrder },
+    state: { columnOrder, columnPinning, columnVisibility: initialColumnVisibility },
     onColumnOrderChange: (updater) => {
       setColumnOrder((currentColumnOrder) => {
         const nextColumnOrder =
           typeof updater === 'function' ? updater(currentColumnOrder) : updater
         onColumnOrderChange(nextColumnOrder)
         return nextColumnOrder
+      })
+    },
+    onColumnPinningChange: (updater) => {
+      setColumnPinning((currentColumnPinning) => {
+        const nextColumnPinning =
+          typeof updater === 'function' ? updater(currentColumnPinning) : updater
+        onColumnPinningChange(nextColumnPinning)
+        return nextColumnPinning
       })
     },
   })
@@ -697,6 +774,31 @@ describe('DataGrid', () => {
     expect(screen.getAllByRole('columnheader')).toHaveLength(2)
     expect(screen.getAllByRole('row')).toHaveLength(3)
     expect(screen.getByRole('cell', { name: 'Ada' })).toBeTruthy()
+  })
+
+  it('renders start-pinned headers and cells with logical sticky offsets', () => {
+    const { container } = render(
+      <TestDataGrid initialColumnPinning={{ start: ['role'], end: ['name'] }} />,
+    )
+
+    const headers = screen.getAllByRole('columnheader')
+    const roleHeader = headers[0]
+    const roleCell = screen.getByRole('cell', { name: 'Admiral' })
+    const nameHeader = headers[1]
+
+    expect(headers.map((header) => header.textContent)).toEqual(['Role', 'Name'])
+    expect(roleHeader?.getAttribute('data-pinned')).toBe('start')
+    expect(roleHeader?.getAttribute('style')).toContain('inset-inline-start: 0px')
+    expect(roleCell.getAttribute('data-pinned')).toBe('start')
+    expect(roleCell.getAttribute('style')).toContain('inset-inline-start: 0px')
+    expect(nameHeader?.getAttribute('data-pinned')).toBe('end')
+    expect(nameHeader?.getAttribute('style')).toContain('inset-inline-end: 0px')
+    expect(
+      Array.from(
+        container.querySelectorAll<HTMLTableColElement>('[data-slot="data-grid-table"] col'),
+        (column) => column.style.width,
+      ),
+    ).toEqual(['150px', '150px'])
   })
 
   it('keeps intrinsic, resized, reordered, and hidden column geometry aligned', () => {
@@ -870,6 +972,7 @@ describe('DataGrid', () => {
         getCellStatus={(cell) =>
           cell.row.id === 'person-1' && cell.column.id === 'role' ? 'recentlyApplied' : 'default'
         }
+        initialColumnPinning={{ start: ['role'], end: [] }}
       />,
     )
 
@@ -877,6 +980,7 @@ describe('DataGrid', () => {
     const defaultCell = screen.getByRole('cell', { name: 'Ada' })
 
     expect(appliedCell.getAttribute('data-status')).toBe('recentlyApplied')
+    expect(appliedCell.getAttribute('data-pinned')).toBe('start')
     expect(defaultCell.getAttribute('data-status')).toBe('default')
   })
 
@@ -1308,25 +1412,7 @@ describe('DataGrid', () => {
     const onColumnOrderChange = vi.fn()
     render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />)
 
-    await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf('function')
-    })
-
-    const operation = {
-      source: {
-        id: getDataGridHeaderSortableId('role'),
-        initialIndex: 1,
-        index: 1,
-        sortable: true,
-        type: 'column',
-      },
-      target: {
-        id: getDataGridHeaderSortableId('name'),
-        index: 0,
-        sortable: true,
-        type: 'column',
-      },
-    }
+    await waitForColumnReorder()
 
     expect(onColumnOrderChange).not.toHaveBeenCalled()
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
@@ -1334,9 +1420,7 @@ describe('DataGrid', () => {
       'Role',
     ])
 
-    act(() => {
-      onDataGridDragEnd?.({ canceled: false, operation })
-    })
+    dragColumn('role', 'name')
 
     expect(onColumnOrderChange).toHaveBeenCalledWith(['role', 'name'])
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
@@ -1355,30 +1439,8 @@ describe('DataGrid', () => {
       />,
     )
 
-    await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf('function')
-    })
-
-    act(() => {
-      onDataGridDragEnd?.({
-        canceled: false,
-        operation: {
-          source: {
-            id: getDataGridHeaderSortableId('role'),
-            initialIndex: 1,
-            index: 1,
-            sortable: true,
-            type: 'column',
-          },
-          target: {
-            id: getDataGridHeaderSortableId('name'),
-            index: 0,
-            sortable: true,
-            type: 'column',
-          },
-        },
-      })
-    })
+    await waitForColumnReorder()
+    dragColumn('role', 'name')
 
     expect(onColumnOrderChange).toHaveBeenCalledWith(['id', 'role', 'name'])
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
@@ -1404,6 +1466,199 @@ describe('DataGrid', () => {
 
     expect(onColumnOrderChange).toHaveBeenCalledWith(['role', 'name'])
     expect(document.activeElement).toBe(screen.getByRole('columnheader', { name: 'Name' }))
+  })
+
+  it('does not move a column from a nested header control', async () => {
+    const onColumnOrderChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        includeInteractiveHeader
+        onColumnOrderChange={onColumnOrderChange}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Name menu' })).toBeTruthy()
+    })
+    const menuButton = screen.getByRole('button', { name: 'Name menu' })
+    menuButton.focus()
+    fireEvent.keyDown(menuButton, { key: 'ArrowRight', shiftKey: true })
+
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+  })
+
+  it('moves a pinned header within its region while preserving fixed pinned columns', async () => {
+    const onColumnOrderChange = vi.fn()
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        includeFixedId
+        initialColumnOrder={['id', 'name', 'role']}
+        initialColumnPinning={{ start: ['id', 'name', 'role'], end: [] }}
+        onColumnOrderChange={onColumnOrderChange}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' })
+    nameHeader.focus()
+    fireEvent.keyDown(nameHeader, { key: 'ArrowRight', shiftKey: true })
+
+    expect(onColumnPinningChange).toHaveBeenCalledWith({
+      start: ['id', 'role', 'name'],
+      end: [],
+    })
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'ID',
+      'Role',
+      'Name',
+    ])
+  })
+
+  it('commits a pinned header drag to column pinning', async () => {
+    const onColumnOrderChange = vi.fn()
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        initialColumnPinning={{ start: ['name', 'role'], end: [] }}
+        onColumnOrderChange={onColumnOrderChange}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    )
+
+    await waitForColumnReorder()
+    dragColumn('role', 'name', { sourceRegion: 'start' })
+
+    expect(onColumnPinningChange).toHaveBeenCalledWith({ start: ['role', 'name'], end: [] })
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+  })
+
+  it('retains hidden pinned columns when visible pinned headers move', async () => {
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        includeFixedId
+        initialColumnOrder={['id', 'name', 'role']}
+        initialColumnPinning={{ start: ['name', 'id', 'role'], end: [] }}
+        initialColumnVisibility={{ id: false }}
+        onColumnOrderChange={() => undefined}
+        onColumnPinningChange={onColumnPinningChange}
+        reorderableColumnIds={['id', 'name', 'role']}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
+    fireEvent.keyDown(screen.getByRole('columnheader', { name: 'Name' }), {
+      key: 'ArrowRight',
+      shiftKey: true,
+    })
+
+    expect(onColumnPinningChange).toHaveBeenCalledWith({
+      start: ['role', 'id', 'name'],
+      end: [],
+    })
+  })
+
+  it('merges a pinned drag around hidden reorderable columns', async () => {
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        includeFixedId
+        initialColumnOrder={['id', 'name', 'role']}
+        initialColumnPinning={{ start: ['name', 'id', 'role'], end: [] }}
+        initialColumnVisibility={{ id: false }}
+        onColumnOrderChange={() => undefined}
+        onColumnPinningChange={onColumnPinningChange}
+        reorderableColumnIds={['id', 'name', 'role']}
+      />,
+    )
+
+    await waitForColumnReorder()
+    dragColumn('role', 'name', { sourceRegion: 'start' })
+
+    expect(onColumnPinningChange).toHaveBeenCalledWith({
+      start: ['role', 'id', 'name'],
+      end: [],
+    })
+  })
+
+  it('moves an end-pinned header within the end region', async () => {
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        initialColumnPinning={{ start: [], end: ['name', 'role'] }}
+        onColumnOrderChange={() => undefined}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
+    fireEvent.keyDown(screen.getByRole('columnheader', { name: 'Name' }), {
+      key: 'ArrowRight',
+      shiftKey: true,
+    })
+
+    expect(onColumnPinningChange).toHaveBeenCalledWith({
+      start: [],
+      end: ['role', 'name'],
+    })
+  })
+
+  it('uses the controlled column order when moving a center header', async () => {
+    const onColumnOrderChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        initialColumnOrder={['role', 'name']}
+        onColumnOrderChange={onColumnOrderChange}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Role' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
+    const roleHeader = screen.getByRole('columnheader', { name: 'Role' })
+    roleHeader.focus()
+    fireEvent.keyDown(roleHeader, { key: 'ArrowRight', shiftKey: true })
+
+    expect(onColumnOrderChange).toHaveBeenCalledWith(['name', 'role'])
+  })
+
+  it('rejects a drag between pinned and center regions', async () => {
+    const onColumnOrderChange = vi.fn()
+    const onColumnPinningChange = vi.fn()
+    render(
+      <ReorderableDataGrid
+        initialColumnPinning={{ start: ['name'], end: [] }}
+        onColumnOrderChange={onColumnOrderChange}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    )
+
+    await waitForColumnReorder()
+    dragColumn('name', 'role', {
+      sourceRegion: 'start',
+      sourceIndex: 0,
+      targetRegion: 'center',
+    })
+
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+    expect(onColumnPinningChange).not.toHaveBeenCalled()
   })
 
   it('renders an application-provided drag preview', async () => {
@@ -1470,28 +1725,9 @@ describe('DataGrid', () => {
     const onColumnOrderChange = vi.fn()
     render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />)
 
-    await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf('function')
-    })
-
-    const operation = {
-      source: {
-        id: getDataGridHeaderSortableId('role'),
-        initialIndex: 1,
-        index: 1,
-        sortable: true,
-        type: 'column',
-      },
-      target: {
-        id: getDataGridHeaderSortableId('name'),
-        index: 0,
-        sortable: true,
-        type: 'column',
-      },
-    }
-
-    act(() => {
-      onDataGridDragEnd?.({ canceled: true, operation })
+    await waitForColumnReorder()
+    dragColumn('role', 'name', {
+      canceled: true,
     })
 
     expect(onColumnOrderChange).not.toHaveBeenCalled()

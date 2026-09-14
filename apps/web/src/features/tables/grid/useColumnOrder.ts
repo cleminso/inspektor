@@ -6,9 +6,8 @@ export function moveColumnInOrder(
   direction: ColumnMoveDirection,
   visibleColumnOrder: readonly string[] = columnOrder,
 ): string[] {
-  const currentIndex = columnOrder.indexOf(columnId)
   const visibleIndex = visibleColumnOrder.indexOf(columnId)
-  if (currentIndex < 0 || visibleIndex < 0) {
+  if (columnOrder.includes(columnId) === false || visibleIndex < 0) {
     return [...columnOrder]
   }
 
@@ -25,14 +24,21 @@ export function moveColumnInOrder(
   if (targetColumnId === undefined || targetColumnId === columnId) {
     return [...columnOrder]
   }
-  const nextIndex = columnOrder.indexOf(targetColumnId)
-
-  const nextColumnOrder = [...columnOrder]
-  const [column] = nextColumnOrder.splice(currentIndex, 1)
+  const nextVisibleColumnOrder = [...visibleColumnOrder]
+  const [column] = nextVisibleColumnOrder.splice(visibleIndex, 1)
   if (column !== undefined) {
-    nextColumnOrder.splice(nextIndex, 0, column)
+    nextVisibleColumnOrder.splice(nextVisibleIndex, 0, column)
   }
-  return nextColumnOrder
+  const visibleColumnIds = new Set(visibleColumnOrder)
+  let nextVisibleColumnIndex = 0
+  return columnOrder.map((candidateId) => {
+    if (visibleColumnIds.has(candidateId) === false) {
+      return candidateId
+    }
+    const nextColumnId = nextVisibleColumnOrder[nextVisibleColumnIndex]
+    nextVisibleColumnIndex += 1
+    return nextColumnId ?? candidateId
+  })
 }
 
 export function normalizeColumnOrder(
