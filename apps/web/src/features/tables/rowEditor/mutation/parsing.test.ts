@@ -89,6 +89,52 @@ describe('parseMutationFieldValue', () => {
     )
   })
 
+  it('rejects Integer values outside the signed 32-bit range accepted by Jazz', () => {
+    expect(parseMutationFieldValue({ type: 'Integer' }, '-2147483648')).toBe(-2_147_483_648)
+    expect(parseMutationFieldValue({ type: 'Integer' }, '2147483647')).toBe(2_147_483_647)
+    expect(() => parseMutationFieldValue({ type: 'Integer' }, '2147483648')).toThrow(
+      'Value must be a signed 32-bit integer.',
+    )
+    expect(() => parseMutationFieldValue({ type: 'Integer' }, '-2147483649')).toThrow(
+      'Value must be a signed 32-bit integer.',
+    )
+    expect(() =>
+      parseMutationFieldValue(
+        { type: 'Array', element: { type: 'Integer' } },
+        '[2147483648]',
+      ),
+    ).toThrow('Array must be valid JSON array.')
+    expect(() =>
+      parseMutationFieldValue(
+        {
+          type: 'Row',
+          columns: [
+            { name: 'count', column_type: { type: 'Integer' }, nullable: false },
+          ],
+        },
+        '{"count":-2147483649}',
+      ),
+    ).toThrow('Row value must be a valid JSON object or descriptor-compatible tuple.')
+  })
+
+  it('rejects malformed UUID values at the mutation parsing boundary', () => {
+    expect(() => parseMutationFieldValue({ type: 'Uuid' }, 'sf')).toThrow(
+      'Value must be a UUID.',
+    )
+    expect(() =>
+      parseMutationFieldValue({ type: 'Array', element: { type: 'Uuid' } }, '["sf"]'),
+    ).toThrow('Array must be valid JSON array.')
+  })
+
+  it('accepts the UUID representations accepted by Jazz', () => {
+    expect(
+      parseMutationFieldValue({ type: 'Uuid' }, '03c905ac-d9a6-58b8-8d90-5dc3b9df6038'),
+    ).toBe('03c905ac-d9a6-58b8-8d90-5dc3b9df6038')
+    expect(parseMutationFieldValue({ type: 'Uuid' }, '03C905ACD9A658B88D905DC3B9DF6038')).toBe(
+      '03C905ACD9A658B88D905DC3B9DF6038',
+    )
+  })
+
   it('rejects Integer values that JavaScript cannot preserve exactly', () => {
     expect(() => parseMutationFieldValue({ type: 'Integer' }, '9007199254740993')).toThrow(
       'Value must be within JavaScript safe integer range.',
@@ -111,6 +157,18 @@ describe('parseMutationFieldValue', () => {
     expect(() => parseMutationFieldValue({ type: 'Json' }, 'null')).toThrow(
       'JSON null is not supported. Use the NULL field mode for SQL NULL.',
     )
+  })
+
+  it.each([
+    [{ type: 'Array', element: { type: 'Text' } }, 'null', 'Array must be valid JSON array.'],
+    [{ type: 'Array', element: { type: 'Text' } }, '[null]', 'Array must be valid JSON array.'],
+    [
+      rowType,
+      'null',
+      'Row value must be a valid JSON object or descriptor-compatible tuple.',
+    ],
+  ] satisfies [ColumnType, string, string][])('rejects structured NULL value %s', (type, value, error) => {
+    expect(() => parseMutationFieldValue(type, value)).toThrow(error)
   })
 
   it.each(['["Ada"]', '["Ada","37"]'])('rejects incompatible Row tuple %s', (value) => {

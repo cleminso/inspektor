@@ -45,6 +45,11 @@ const statusColumn = {
   column_type: { type: 'Enum', variants: ['active', 'archived', 'draft'] },
   nullable: true,
 } satisfies ColumnDescriptor
+const sessionIdColumn = {
+  name: 'sessionId',
+  column_type: { type: 'Uuid' },
+  nullable: false,
+} satisfies ColumnDescriptor
 
 function TestLedgerProvider({
   children,
@@ -82,6 +87,7 @@ function FieldEditorHarness({
     count: 1,
     settings: initialSettings,
     status: null,
+    sessionId: '03c905ac-d9a6-58b8-8d90-5dc3b9df6038',
   }
   return (
     <>
@@ -100,6 +106,11 @@ function FieldEditorHarness({
       <output aria-label="Pending name">
         {mutations.ledger.entries[0]?.kind === 'update'
           ? String(mutations.ledger.entries[0].fields.name ?? '')
+          : ''}
+      </output>
+      <output aria-label="Pending sessionId">
+        {mutations.ledger.entries[0]?.kind === 'update'
+          ? String(mutations.ledger.entries[0].fields.sessionId ?? '')
           : ''}
       </output>
     </>
@@ -209,6 +220,37 @@ describe('FieldEditorMutationWidget', () => {
 
     expect(await screen.findByText('Value must be an integer.')).toBeTruthy()
     expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it('shows a malformed UUID beside the field instead of staging it', async () => {
+    const onComplete = vi.fn()
+    render(
+      <TestLedgerProvider schemaColumns={[sessionIdColumn]}>
+        <FieldEditorHarness
+          column={sessionIdColumn}
+          onClose={vi.fn()}
+          onComplete={onComplete}
+        />
+      </TestLedgerProvider>,
+    )
+    const input = screen.getByRole('textbox', { name: 'SessionId' })
+    fireEvent.change(input, { target: { value: 'sf' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByText('Value must be a UUID.')).toBeTruthy()
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('')
+    expect(onComplete).not.toHaveBeenCalled()
+
+    fireEvent.change(input, { target: { value: '13c905ac-d9a6-58b8-8d90-5dc3b9df6038' } })
+    expect(screen.queryByText('Value must be a UUID.')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('sessionId')
+    expect(screen.getByLabelText('Pending sessionId').textContent).toBe(
+      '13c905ac-d9a6-58b8-8d90-5dc3b9df6038',
+    )
+    expect(onComplete).toHaveBeenCalledWith('enter')
   })
 
   it('waits until Save to explain an empty nullable Enum value', async () => {

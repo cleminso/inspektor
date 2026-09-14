@@ -9,6 +9,13 @@ import type { ColumnType } from 'jazz-tools'
 
 import { normalizeTimestampValue, parseBooleanValue } from '@tables/valueParsing'
 
+const INTEGER_MIN = -2_147_483_648
+const INTEGER_MAX = 2_147_483_647
+
+function isUuidValue(value: string): boolean {
+  return /^[0-9a-fA-F]{32}$/.test(value.replaceAll('-', ''))
+}
+
 /**
  * Converts integer input to the exact `Number` representation accepted by the installed Jazz
  * runtime, rejecting values that would lose precision at that boundary.
@@ -51,10 +58,6 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
     }
     return value
   }
-  if (value === null || value === undefined) {
-    return null
-  }
-
   switch (columnType.type) {
     case 'Boolean':
       if (typeof value !== 'boolean') throw new Error('Expected a boolean value.')
@@ -62,6 +65,9 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
     case 'Integer':
       if (typeof value !== 'number' || Number.isSafeInteger(value) === false) {
         throw new Error('Expected an integer value.')
+      }
+      if (value < INTEGER_MIN || value > INTEGER_MAX) {
+        throw new Error('Expected a signed 32-bit integer value.')
       }
       return value
     case 'Double':
@@ -82,8 +88,12 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
       return parsedValue
     }
     case 'Text':
-    case 'Uuid':
       if (typeof value !== 'string') throw new Error('Expected a text value.')
+      return value
+    case 'Uuid':
+      if (typeof value !== 'string' || isUuidValue(value) === false) {
+        throw new Error('Expected a UUID value.')
+      }
       return value
     case 'Enum':
       if (typeof value !== 'string' || columnType.variants.includes(value) === false) {
@@ -116,7 +126,12 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
           if ((fieldValue === null || fieldValue === undefined) && column.nullable === false) {
             throw new Error(`Row field ${column.name} is required.`)
           }
-          return [column.name, normalizeNestedMutationValue(column.column_type, fieldValue)]
+          return [
+            column.name,
+            fieldValue === null || fieldValue === undefined
+              ? null
+              : normalizeNestedMutationValue(column.column_type, fieldValue),
+          ]
         }),
       )
     }
@@ -156,6 +171,9 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
           throw new Error('Value must be within JavaScript safe integer range.')
         }
         throw new Error('Value must be an integer.')
+      }
+      if (parsedValue < INTEGER_MIN || parsedValue > INTEGER_MAX) {
+        throw new Error('Value must be a signed 32-bit integer.')
       }
       return parsedValue
     }
@@ -231,8 +249,12 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
         throw new Error(`Expected one of: ${columnType.variants.join(', ')}`)
       }
       return valueText
-    case 'Text':
     case 'Uuid':
+      if (isUuidValue(valueText) === false) {
+        throw new Error('Value must be a UUID.')
+      }
+      return valueText
+    case 'Text':
     default:
       return valueText
   }

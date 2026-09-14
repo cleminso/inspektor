@@ -12,6 +12,14 @@
 
 ## Implemented foundation
 
+[14/09/26]
+
+### Mutation-compatible scalar validation
+
+- [x] Reject malformed UUID input on inline Save with colocated field feedback before it enters staged changes.
+- [x] Constrain top-level and nested Integer input to Jazz's signed 32-bit mutation range.
+- [x] Keep structured JSON `null` values out of Array and Row mutations so SQL NULL remains an explicit field mode.
+
 [28/08/26]
 
 ### Interaction-owned structured editor loading
@@ -347,6 +355,12 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 - [x] Keep table cells schema-driven without embedding Jazz mutation rules in cell renderers.
 
 ## Open product work
+
+[14/09/26]
+
+### Payload enum editing
+
+- [ ] Define schema-aware rendering, parsing, and validation for payload enum fields before treating them as editable.
 
 [14/08/26]
 
