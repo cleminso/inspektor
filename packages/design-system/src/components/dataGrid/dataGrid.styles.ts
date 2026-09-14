@@ -225,10 +225,11 @@ export const dataGridStyles = stylex.create({
     borderBottomWidth: 1,
   },
   row: {
-    backgroundColor: {
+    [dataGridVars.rowSurface]: {
       default: dataGridColors.background,
       ':hover': dataGridColors.rowHoverBackground,
     },
+    backgroundColor: dataGridVars.rowSurface,
   },
   rowScrollTarget: {
     scrollMarginBottom: `calc(${spatial['collection-row-height-xl']} * 2)`,
@@ -282,10 +283,7 @@ export const dataGridStyles = stylex.create({
     paddingTop: 0,
   },
   pinnedCellSurface: {
-    backgroundColor: {
-      default: dataGridColors.background,
-      ':hover': dataGridColors.rowHoverBackground,
-    },
+    backgroundColor: dataGridVars.rowSurface,
   },
   pinnedCell: {
     position: 'sticky',

@@ -18,10 +18,7 @@ let browserErrors: string[] = []
 let connection: FixtureConnection
 
 async function locatorsOverlap(first: Locator, second: Locator): Promise<boolean> {
-  const [firstBounds, secondBounds] = await Promise.all([
-    first.boundingBox(),
-    second.boundingBox(),
-  ])
+  const [firstBounds, secondBounds] = await Promise.all([first.boundingBox(), second.boundingBox()])
   return (
     firstBounds !== null &&
     secondBounds !== null &&
@@ -567,9 +564,7 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
 
   const labelHeader = page.locator('[data-slot="data-grid-header-cell"][data-column-id="label"]')
   const labelCell = page.locator('[data-slot="data-grid-cell"][data-column-id="label"]').first()
-  const textHeader = page.locator(
-    '[data-slot="data-grid-header-cell"][data-column-id="textValue"]',
-  )
+  const textHeader = page.locator('[data-slot="data-grid-header-cell"][data-column-id="textValue"]')
   const textCell = page.locator('[data-slot="data-grid-cell"][data-column-id="textValue"]').first()
   const viewport = page.locator('[data-slot="data-grid-viewport"]')
   await expect(labelHeader).toHaveAttribute('data-pinned', 'start')

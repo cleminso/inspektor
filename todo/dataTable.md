@@ -16,6 +16,7 @@
 
 [14/09/26]
 
+- [x] Keep the body-row hover surface continuous across pinned selection and data cells.
 - [x] Render TanStack start- and end-pinned columns with logical sticky offsets and stable column geometry.
 - [x] Keep the row-selection column pinned at logical start and persist user-pinned data columns per table.
 - [x] Reorder pinned data columns within their pinned region while keeping the selection column fixed first.
