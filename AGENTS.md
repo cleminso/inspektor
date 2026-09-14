@@ -34,7 +34,7 @@ Before editing files for a substantial task that changes TanStack behavior or di
 - Before broad repository searches, run `lat search` for relevant architecture, ownership, behavior, decisions, and implementation paths. Read useful matches with `lat section`.
 - Treat Lat as navigation, not proof. Verify implementation claims against source, tests, manifests, generated output, or runtime behavior as applicable. Report conflicts.
 - When a change alters documented behavior, architecture, tests, or accepted decisions, update the relevant current-state Lat sections and run `lat check`.
-- Keep implementation work in `todo/`, accepted plans in `specs/`, and supporting evidence in `research/`. Do not use `lat.md/` as a changelog or task ledger.
+- Keep long-lived component checklists in `todo/`, bounded lifecycle plans in `specs/<camelCase>/plan.md`, optional plan detail beside them, and supporting evidence in `research/`. Spec folders without `plan.md` are legacy accepted specifications, not lifecycle plans. Do not use `lat.md/` as a changelog or task ledger.
 
 ## Skill routing
 

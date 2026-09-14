@@ -18,7 +18,7 @@ import { createInspectorAdminClient } from 'jazz-tools/_dev/inspector-client'
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
-import { getJazzWasmPreparation } from '@app/runtime/jazzWasmPreparation'
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import type { StoredConnection } from '@app/connections/connections'
 import {
   useInspectorSessionContext,
@@ -81,26 +81,36 @@ function RuntimeAdminClient({
     let active = true
     let ownedClient: JazzClient | null = null
     setClient(null)
-    void createInspectorAdminClient({
-      appId: connection.appId,
-      serverUrl: connection.serverUrl,
-      env: connection.env,
-      adminSecret: connection.adminSecret,
-    }).then(
-      (createdClient) => {
+    void prepareJazzWasm()
+      .then(() => {
         if (active === false) {
-          void createdClient.shutdown()
-          return
+          return null
         }
-        ownedClient = createdClient
-        setClient(createdClient)
-      },
-      (error: unknown) => {
-        if (active === true) {
-          runtime.publishClientError(error)
-        }
-      },
-    )
+        return createInspectorAdminClient({
+          appId: connection.appId,
+          serverUrl: connection.serverUrl,
+          env: connection.env,
+          adminSecret: connection.adminSecret,
+        })
+      })
+      .then(
+        (createdClient) => {
+          if (createdClient === null) {
+            return
+          }
+          if (active === false) {
+            void createdClient.shutdown()
+            return
+          }
+          ownedClient = createdClient
+          setClient(createdClient)
+        },
+        (error: unknown) => {
+          if (active === true) {
+            runtime.publishClientError(error)
+          }
+        },
+      )
 
     return () => {
       active = false
@@ -169,25 +179,6 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext()
   const [retryGeneration, retryRuntime] = useReducer((generation: number) => generation + 1, 0)
-  const wasmPreparation = getJazzWasmPreparation()
-  const [settledWasmPreparation, setSettledWasmPreparation] = useState<Promise<void> | null>(null)
-  const canStartJazzProvider =
-    wasmPreparation === null || settledWasmPreparation === wasmPreparation
-  useEffect(() => {
-    if (wasmPreparation === null) {
-      return
-    }
-
-    let active = true
-    void wasmPreparation.then(() => {
-      if (active === true) {
-        setSettledWasmPreparation(wasmPreparation)
-      }
-    })
-    return () => {
-      active = false
-    }
-  }, [wasmPreparation])
   const initialSchemaCatalogue =
     initialRuntimeTarget?.connectionId === session.currentConnectionId
       ? initialRuntimeTarget.schemaCatalogue
@@ -225,7 +216,7 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
 
   return (
     <InspectorRuntimeContext.Provider value={runtimeContext}>
-      {session.activeConnection === null || canStartJazzProvider === false ? null : (
+      {session.activeConnection === null ? null : (
         <RuntimeAdminClient
           key={`${clientIdentity ?? 'unknown'}:${retryGeneration}`}
           connection={session.activeConnection}

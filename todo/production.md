@@ -49,6 +49,7 @@ This checklist records production asset-delivery requirements that cannot be val
 - Production performance decisions use built application traces rather than Vite development traces.
 - Hashed assets may use immutable caching because a content change creates a different URL.
 - The HTML entry point must remain revalidated so deployments can reference new asset hashes.
+- Production loads the version-matched Jazz WASM binary from a content-addressed R2 object on `assets.inspektor.dev`; Workers Static Assets excludes only its oversized bundled fallback.
 
 ## Open deployment decisions
 

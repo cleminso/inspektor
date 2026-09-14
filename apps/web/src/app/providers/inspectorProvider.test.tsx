@@ -16,7 +16,7 @@ interface FakeClient {
 const runtimeHolder = vi.hoisted(() => ({ current: null as unknown }))
 const runtimeOptionsHolder = vi.hoisted(() => ({ current: null as unknown }))
 const sessionHolder = vi.hoisted(() => ({ current: null as unknown }))
-const wasmPreparationHolder = vi.hoisted(() => ({ current: null as Promise<void> | null }))
+const wasmPreparationMocks = vi.hoisted(() => ({ prepare: vi.fn() }))
 const adminClientMocks = vi.hoisted(() => ({ create: vi.fn() }))
 
 const runtime = {
@@ -61,7 +61,7 @@ vi.mock('@app/providers/inspectorSessionProvider', () => ({
 }))
 
 vi.mock('@app/runtime/jazzWasmPreparation', () => ({
-  getJazzWasmPreparation: () => wasmPreparationHolder.current,
+  prepareJazzWasm: wasmPreparationMocks.prepare,
 }))
 
 vi.mock('jazz-tools/_dev/inspector-client', () => ({
@@ -100,6 +100,8 @@ function deferred<T>(): {
 
 beforeEach(() => {
   adminClientMocks.create.mockReset()
+  wasmPreparationMocks.prepare.mockReset()
+  wasmPreparationMocks.prepare.mockResolvedValue(undefined)
 })
 
 afterEach(() => {
@@ -119,15 +121,16 @@ afterEach(() => {
   session.currentSchemaHash = 'schema-1'
   runtimeHolder.current = runtime
   runtimeOptionsHolder.current = null
-  wasmPreparationHolder.current = null
 })
 
 describe('InspectorProvider runtime projections', () => {
   it('does not create the admin client until accepted-intent WASM preparation settles', async () => {
     let settlePreparation!: () => void
-    wasmPreparationHolder.current = new Promise((resolve) => {
-      settlePreparation = resolve
-    })
+    wasmPreparationMocks.prepare.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        settlePreparation = resolve
+      }),
+    )
     session.activeConnection = connection()
     adminClientMocks.create.mockResolvedValue(client())
 
@@ -193,6 +196,7 @@ describe('InspectorProvider runtime projections', () => {
     session.activeConnection = connection({ id: 'connection-a', appId: 'app-a' })
     const replacementRuntime = { ...runtime, clearClient: vi.fn(), publishClient: vi.fn() }
     const { rerender } = render(<InspectorProvider>Workspace</InspectorProvider>)
+    await waitFor(() => expect(adminClientMocks.create).toHaveBeenCalledOnce())
 
     session.activeConnection = connection({ id: 'connection-b', appId: 'app-b' })
     session.currentConnectionId = 'connection-b'
@@ -241,6 +245,31 @@ describe('InspectorProvider runtime projections', () => {
 
     expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }))
     await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(createdClient))
+  })
+
+  it('publishes a WASM loading failure and retries before creating the client', async () => {
+    const wasmError = new Error('WASM failed')
+    const createdClient = client()
+    session.activeConnection = connection()
+    wasmPreparationMocks.prepare.mockRejectedValueOnce(wasmError).mockResolvedValueOnce(undefined)
+    adminClientMocks.create.mockResolvedValue(createdClient)
+    function RetryControl() {
+      const retryRuntime = useRuntimeRetry()
+      return <button onClick={retryRuntime}>Retry runtime</button>
+    }
+
+    render(
+      <InspectorProvider>
+        <RetryControl />
+      </InspectorProvider>,
+    )
+    await waitFor(() => expect(runtime.publishClientError).toHaveBeenCalledWith(wasmError))
+    expect(adminClientMocks.create).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry runtime' }))
+
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(createdClient))
+    expect(wasmPreparationMocks.prepare).toHaveBeenCalledTimes(2)
   })
 
   it('retains the connection catalogue after the selected schema changes', () => {

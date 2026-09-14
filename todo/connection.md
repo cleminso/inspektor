@@ -321,8 +321,8 @@
 
 [28/08/26]
 
-- [ ] Define and verify the deployed Jazz WASM asset contract.
-  - Serve the hashed WASM asset with `Content-Type: application/wasm`, Brotli or gzip compression, and immutable caching.
+- [ ] Verify the deployed Jazz WASM asset contract.
+  - Serve the content-addressed R2 object with `Content-Type: application/wasm`, transfer compression, and immutable caching.
   - Revalidate HTML separately so deployments can reference a new hashed asset without leaving stale entry documents behind.
   - Confirm one WASM transfer, streaming instantiation, the expected content encoding, and cache reuse in a deployed production trace.
 

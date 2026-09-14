@@ -551,7 +551,9 @@ Accepted connection entry starts one shared Jazz WASM preparation attempt.
 
 Accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved connection exists and before schema-catalogue discovery. This covers saved actions, accepted add or edit flows, direct URLs, refreshes, and history navigation while avoiding work for unknown connection IDs.
 
-`jazzWasmPreparation.ts` owns one application-wide promise. It calls Jazz's public `loadWasmModule()` API and shares the same attempt across repeated accepted actions and React remounts. `InspectorProvider` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version.
+`jazzWasmPreparation.ts` owns one application-wide promise. Development uses Jazz's bundled WASM resolution. Production calls Jazz's public `loadWasmModule()` API with the exact alpha.54 artifact stored under a content-addressed `assets.inspektor.dev` URL. Repeated accepted actions and React remounts share the same attempt. A failed attempt is cleared so retry can fetch it again. `RuntimeAdminClient` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version and publishing remote asset failures through the existing runtime error boundary.
+
+The R2 object is public runtime code, not application data or a credential. Its path includes the package version and SHA-256 digest, and its object metadata enables immutable browser caching. Production deployment excludes only Vite's oversized `jazz_wasm_bg-*.wasm` fallback through `public/.assetsignore`; development retains the bundled fallback. The remote bytes must remain exactly paired with the installed `jazz-wasm` package.
 
 Add and edit validation hand their resolved target to the matching route loader. The handoff is single-use and accepted only when connection ID, credentials, branch, and schema hash still match persisted state. This avoids repeating schema and permissions-head requests while keeping the route loader authoritative. `InspectorRuntimeBoundary` session synchronization does not start preparation.
 
@@ -563,8 +565,8 @@ Startup proceeds from connection intent through schema verification to the first
 2. The parent connection route confirms the saved connection, starts the same preparation, and resolves the local branch label and schema catalogue. It consumes a matching validated target handoff or performs discovery. Discovery must succeed before the route commits the runtime target.
 3. `InspectorRuntimeBoundary` synchronizes the route-resolved connection, branch label, and schema hash with session state before mounting `InspectorProvider`.
 4. `useInspectorRuntime(...)` starts stored-schema verification and optional permissions loading as sibling work.
-5. `InspectorProvider` joins existing WASM preparation, then mounts `RuntimeAdminClient`.
-6. `RuntimeAdminClient` calls `createInspectorAdminClient`, which creates the in-memory admin client.
+5. `RuntimeAdminClient` joins or starts WASM preparation.
+6. After WASM preparation succeeds, `RuntimeAdminClient` calls `createInspectorAdminClient`, which creates the in-memory admin client.
    Jazz owns URL resolution, WASM initialization, client acquisition, and shutdown.
 7. `RuntimeAdminClient` publishes the client only after stored-schema verification succeeds.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
@@ -582,7 +584,7 @@ Each startup failure has one owner and a defined effect on the active session.
 - Stored schema fetch failure is fatal for the active session.
 - Schema hash fetch failure blocks schema-switching context.
 - Permissions fetch failure is non-fatal; the UI can continue without permission hints.
-- Early WASM preparation is best effort. `jazzWasmPreparation.ts` owns the shared preparation promise. `RuntimeAdminClient` owns client acquisition and shutdown, while `InspectorProvider` owns the visible runtime error and retry flow.
+- Early WASM preparation is speculative, but its result is authoritative for client creation. `jazzWasmPreparation.ts` owns the shared retryable preparation promise. `RuntimeAdminClient` joins it and publishes a preparation or client-acquisition failure, while `InspectorProvider` owns the visible runtime error and retry flow.
 - When the user changes connection, local branch label, or schema hash, `useInspectorRuntime` ignores stale schema and permissions work. Replacing or unmounting `RuntimeAdminClient` shuts down the previous client.
 
 #### Runtime implementation map
@@ -591,7 +593,7 @@ These source modules own the runtime bootstrap stages.
 
 - `apps/web/src/app/providers/inspectorSessionProvider.tsx`: accepts connection intent, applies runtime-scope blocking, starts WASM preparation, and requests navigation.
 - `apps/web/src/features/onboarding/useConnectionFormFlow.ts`: validates connection input and joins accepted add or edit flows to the same preparation boundary.
-- `apps/web/src/app/runtime/jazzWasmPreparation.ts`: owns the shared best-effort `loadWasmModule()` promise.
+- `apps/web/src/app/runtime/jazzWasmPreparation.ts`: owns the shared retryable `loadWasmModule()` promise and production R2 artifact identity.
 - `apps/web/src/routes/conn/$connectionId.tsx`: starts valid-route preparation and resolves the route-owned runtime target before mounting runtime code.
 - `apps/web/src/app/runtime/inspectorRuntimeBoundary.tsx`: synchronizes the resolved target with session state without starting preparation.
 - `apps/web/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `RuntimeAdminClient`, and publishes the verified client.
