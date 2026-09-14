@@ -2,10 +2,12 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { createSchemaCatalogueLoadError } from '@app/connections/connectionValidation'
+
 const routeOptions = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
-const router = vi.hoisted(() => ({ invalidate: vi.fn() }))
 const resolveStoredRuntimeTarget = vi.hoisted(() => vi.fn())
 const prepareJazzWasm = vi.hoisted(() => vi.fn())
+const connectionRecovery = vi.hoisted(() => ({ begin: vi.fn(), reload: vi.fn() }))
 const storedConnections = vi.hoisted(() => ({ connections: [{ id: 'connection-1' }] }))
 let resolvedTheme = 'light'
 
@@ -23,7 +25,6 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
     }
   },
   Outlet: () => null,
-  useRouter: () => router,
   useRouterState: ({ select }: { select: (state: unknown) => unknown }) =>
     select({ location: { pathname: '/conn/connection-1/live-queries' } }),
 }))
@@ -40,6 +41,10 @@ vi.mock('@app/connections/connections', () => ({
 }))
 
 vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
+vi.mock('@app/connections/connectionRecovery', () => ({
+  beginAutomaticConnectionRecovery: connectionRecovery.begin,
+  reloadConnectionPage: connectionRecovery.reload,
+}))
 
 vi.mock('next-themes', () => ({
   useTheme: () => ({ resolvedTheme }),
@@ -54,6 +59,12 @@ vi.mock('@app/shell/layout', () => ({
 }))
 
 vi.mock('@inspektor/ds', () => ({
+  Accordion: Object.assign(({ children }: { children: React.ReactNode }) => <div>{children}</div>, {
+    Header: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+    Item: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    Panel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    Trigger: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
+  }),
   Box: ({
     'aria-atomic': ariaAtomic,
     'aria-label': ariaLabel,
@@ -74,6 +85,7 @@ vi.mock('@inspektor/ds', () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
+  CopyButton: ({ label }: { label: string }) => <button>{label}</button>,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }))
 
@@ -84,7 +96,9 @@ afterEach(() => {
   cleanup()
   resolveStoredRuntimeTarget.mockReset()
   prepareJazzWasm.mockReset()
-  router.invalidate.mockReset()
+  connectionRecovery.begin.mockReset()
+  connectionRecovery.begin.mockReturnValue(false)
+  connectionRecovery.reload.mockReset()
   resolvedTheme = 'light'
 })
 
@@ -98,16 +112,23 @@ describe('connection route', () => {
     }
     resolveStoredRuntimeTarget.mockResolvedValueOnce(target)
     const loader = routeOptions.current?.loader as (options: {
+      abortController: AbortController
       deps: { schemaHash: string | undefined }
       params: { connectionId: string }
     }) => Promise<unknown>
+    const abortController = new AbortController()
 
     await expect(
-      loader({ deps: { schemaHash: 'schema-1' }, params: { connectionId: 'connection-1' } }),
+      loader({
+        abortController,
+        deps: { schemaHash: 'schema-1' },
+        params: { connectionId: 'connection-1' },
+      }),
     ).resolves.toBe(target)
     expect(resolveStoredRuntimeTarget).toHaveBeenCalledWith({
       connectionId: 'connection-1',
       schemaHashOverride: 'schema-1',
+      signal: abortController.signal,
       store: storedConnections,
     })
     expect(prepareJazzWasm).toHaveBeenCalledOnce()
@@ -162,6 +183,7 @@ describe('connection route', () => {
       schemaHash: 'schema-1',
     })
     const loader = routeOptions.current?.loader as (options: {
+      abortController: AbortController
       deps: { schemaHash: string | undefined }
       location: { hash: string; pathname: string; searchStr: string }
       params: { connectionId: string }
@@ -169,6 +191,7 @@ describe('connection route', () => {
 
     await expect(
       loader({
+        abortController: new AbortController(),
         deps: { schemaHash: 'missing-schema' },
         location: {
           hash: 'rows',
@@ -224,7 +247,7 @@ describe('connection route', () => {
     expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
   })
 
-  it('normalizes loader errors and retries through router invalidation', () => {
+  it('sanitizes unclassified errors and offers a reconnect action', () => {
     render(
       <ConnectionRouteError
         error={new Error('secret server detail')}
@@ -234,7 +257,96 @@ describe('connection route', () => {
     )
 
     expect(screen.getByRole('alert').textContent).not.toContain('secret server detail')
-    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
-    expect(router.invalidate).toHaveBeenCalledOnce()
+    expect(screen.getByText('Connection interrupted')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Reconnect' }))
+    expect(connectionRecovery.begin).toHaveBeenCalledTimes(2)
+    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
+  })
+
+  it('automatically reloads an unclassified connection error once', () => {
+    connectionRecovery.begin.mockReturnValueOnce(true)
+
+    render(
+      <ConnectionRouteError
+        error={new Error('stale runtime state')}
+        info={{ componentStack: '' }}
+        reset={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
+    expect(connectionRecovery.begin).toHaveBeenCalledOnce()
+    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
+  })
+
+  it('shows sanitized technical details for schema catalogue failures', () => {
+    const error = createSchemaCatalogueLoadError(
+      new Error(
+        'Schema hashes fetch failed: 503 appId=hidden-app adminSecret=must-not-leak body=private-response',
+      ),
+      { attempts: 3, serverUrl: 'https://v2.sync.jazz.tools/private-path' },
+    )
+
+    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
+
+    expect(screen.getByText('Jazz server is unavailable')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Technical details' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Copy technical details' })).toBeTruthy()
+  })
+
+  it('automatically reloads an exhausted network failure once', () => {
+    connectionRecovery.begin.mockReturnValueOnce(true)
+    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
+      attempts: 3,
+      serverUrl: 'https://v2.sync.jazz.tools',
+    })
+    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
+
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
+    expect(connectionRecovery.begin).toHaveBeenCalledOnce()
+    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
+  })
+
+  it('shows the terminal error after automatic recovery was already attempted', () => {
+    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
+      attempts: 3,
+      serverUrl: 'https://v2.sync.jazz.tools',
+    })
+    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
+
+    expect(screen.getByText('Jazz server connection failed')).toBeTruthy()
+    expect(connectionRecovery.reload).not.toHaveBeenCalled()
+  })
+
+  it('automatically recovers when browser connectivity returns', () => {
+    const online = vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(false)
+    connectionRecovery.begin.mockReturnValueOnce(true)
+    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
+      attempts: 3,
+      serverUrl: 'https://v2.sync.jazz.tools',
+    })
+    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
+
+    expect(connectionRecovery.begin).not.toHaveBeenCalled()
+    online.mockReturnValue(true)
+    fireEvent(window, new Event('online'))
+
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
+    expect(connectionRecovery.begin).toHaveBeenCalledOnce()
+    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
+    online.mockRestore()
+  })
+
+  it('does not automatically recover rejected credentials when connectivity changes', () => {
+    const error = createSchemaCatalogueLoadError(
+      new Error('Schema hashes fetch failed: 403 Forbidden'),
+      { attempts: 1, serverUrl: 'https://v2.sync.jazz.tools' },
+    )
+    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
+
+    fireEvent(window, new Event('online'))
+
+    expect(connectionRecovery.begin).not.toHaveBeenCalled()
+    expect(connectionRecovery.reload).not.toHaveBeenCalled()
   })
 })

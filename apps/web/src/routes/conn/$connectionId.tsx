@@ -42,12 +42,13 @@ export const Route = createFileRoute('/conn/$connectionId')({
     middlewares: [retainSearchParams(['schema'])],
   },
   loaderDeps: ({ search }) => ({ schemaHash: search.schema }),
-  loader: async ({ deps, location, params }) => {
+  loader: async ({ abortController, deps, location, params }) => {
     const store = readStoredConnections()
     if (getConnectionById(store, params.connectionId) !== null) void prepareJazzWasm()
     const target = await resolveStoredRuntimeTarget({
       connectionId: params.connectionId,
       schemaHashOverride: deps.schemaHash,
+      signal: abortController.signal,
       store,
     })
     if (target === null) {

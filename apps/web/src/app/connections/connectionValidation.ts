@@ -8,6 +8,43 @@ export interface ConnectionError {
   field?: ConnectionField
 }
 
+export type SchemaCatalogueFailureReason =
+  | 'authorization'
+  | 'invalid-url'
+  | 'network'
+  | 'not-found'
+  | 'server'
+  | 'unknown'
+
+export interface SchemaCatalogueDiagnostics {
+  stage: 'Schema catalogue'
+  server: string
+  response: string
+  attempts: number
+  browserNetwork: 'Online' | 'Offline' | 'Unavailable'
+}
+
+export class SchemaCatalogueLoadError extends Error {
+  readonly attempts: number
+  readonly reason: SchemaCatalogueFailureReason
+  readonly server: string
+  readonly status: number | null
+
+  constructor({
+    attempts,
+    reason,
+    server,
+    status,
+  }: Omit<SchemaCatalogueLoadError, 'message' | 'name'>) {
+    super('Schema catalogue request failed')
+    this.name = 'SchemaCatalogueLoadError'
+    this.attempts = attempts
+    this.reason = reason
+    this.server = server
+    this.status = status
+  }
+}
+
 type ConnectionValidationResult =
   | { valid: true; value: ConnectionCredentials }
   | { valid: false; error: ConnectionError }
@@ -82,6 +119,28 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
 }
 
 export function normalizeSchemaFetchError(error: unknown): ConnectionError {
+  if (error instanceof SchemaCatalogueLoadError) {
+    if (error.reason === 'invalid-url') {
+      return INVALID_SERVER_URL_ERROR
+    }
+
+    if (error.reason === 'network') {
+      return {
+        title: 'Jazz server connection failed',
+        description:
+          "Inspektor couldn't reach the Jazz server. Check your network connection and that the server is available, then reconnect.",
+      }
+    }
+
+    if (error.reason === 'server') {
+      return {
+        title: 'Jazz server is unavailable',
+        description:
+          'The Jazz server could not load this app. Check the server status, then reconnect.',
+      }
+    }
+  }
+
   const status = getHttpErrorStatus(error)
 
   if (status === 401 || status === 403) {
@@ -113,6 +172,87 @@ export function normalizeSchemaFetchError(error: unknown): ConnectionError {
     title: "Couldn't connect to this app",
     description: 'Check the server URL, app ID, and admin secret.',
   }
+}
+
+export function createSchemaCatalogueLoadError(
+  error: unknown,
+  options: { attempts: number; serverUrl: string },
+): SchemaCatalogueLoadError {
+  const status = getHttpErrorStatus(error)
+  const reason = getSchemaCatalogueFailureReason(error, status)
+  let server = 'Invalid server URL'
+
+  try {
+    server = new URL(options.serverUrl).origin
+  } catch {
+    // The validated connection path normally supplies a URL. Do not expose an invalid raw value.
+  }
+
+  return new SchemaCatalogueLoadError({
+    attempts: options.attempts,
+    reason,
+    server,
+    status,
+  })
+}
+
+export function isSchemaCatalogueNetworkError(error: unknown): boolean {
+  return error instanceof SchemaCatalogueLoadError && error.reason === 'network'
+}
+
+export function getSchemaCatalogueDiagnostics(error: unknown): SchemaCatalogueDiagnostics | null {
+  if (error instanceof SchemaCatalogueLoadError === false) {
+    return null
+  }
+
+  return {
+    stage: 'Schema catalogue',
+    server: error.server,
+    response: error.status === null ? 'No response' : `HTTP ${error.status}`,
+    attempts: error.attempts,
+    browserNetwork:
+      typeof navigator === 'undefined'
+        ? 'Unavailable'
+        : navigator.onLine === true
+          ? 'Online'
+          : 'Offline',
+  }
+}
+
+export function isTransientSchemaFetchError(error: unknown): boolean {
+  const status = getHttpErrorStatus(error)
+  if (status !== null) {
+    return status === 502 || status === 503 || status === 504
+  }
+
+  return isNetworkFetchError(error)
+}
+
+function getSchemaCatalogueFailureReason(
+  error: unknown,
+  status: number | null,
+): SchemaCatalogueFailureReason {
+  if (status === 401 || status === 403) return 'authorization'
+  if (status === 404) return 'not-found'
+  if (status !== null && status >= 500) return 'server'
+  if (error instanceof TypeError && error.message.toLowerCase().includes('invalid url')) {
+    return 'invalid-url'
+  }
+  if (isNetworkFetchError(error)) return 'network'
+  return 'unknown'
+}
+
+function isNetworkFetchError(error: unknown): boolean {
+  if (error instanceof TypeError === false) return false
+
+  const message = error.message.toLowerCase()
+  return [
+    'failed to fetch',
+    'fetch failed',
+    'load failed',
+    'network request failed',
+    'networkerror',
+  ].some((signature) => message.includes(signature))
 }
 
 function invalidServerUrl(): ConnectionValidationResult {

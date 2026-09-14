@@ -20,6 +20,7 @@ import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import type { StoredConnection } from '@app/connections/connections'
+import { clearAutomaticConnectionRecovery } from '@app/connections/connectionRecovery'
 import {
   useInspectorSessionContext,
   type InspectorSessionContextValue,
@@ -35,6 +36,7 @@ interface InspectorRuntimeContextValue {
 const InspectorContext = createContext<InspectorContextValue | null>(null)
 const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | null>(null)
 const connectionIdentityTokens = new WeakMap<object, number>()
+const RUNTIME_RECONNECT_HIDDEN_MS = 5 * 60 * 1000
 let nextConnectionIdentityToken = 0
 
 /** Gives each connection object a remount key so credential changes replace the privileged client. */
@@ -139,6 +141,8 @@ function RuntimeAdminClient({
 
 function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void): void {
   useEffect(() => {
+    let active = true
+    let hiddenAt = document.visibilityState === 'hidden' ? Date.now() : null
     let retryOnResume = document.visibilityState === 'hidden'
     const retryIfNeeded = () => {
       if (
@@ -152,15 +156,37 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
     }
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
+        hiddenAt ??= Date.now()
+        if (runtime.$client.get() !== null && runtime.$error.get() === null) {
+          clearAutomaticConnectionRecovery()
+        }
         retryOnResume = true
-      } else {
-        retryIfNeeded()
+        return
+      }
+
+      const hiddenDuration = hiddenAt === null ? null : Date.now() - hiddenAt
+      hiddenAt = null
+      retryIfNeeded()
+      if (
+        hiddenDuration !== null &&
+        hiddenDuration >= RUNTIME_RECONNECT_HIDDEN_MS &&
+        runtime.$error.get() === null
+      ) {
+        const client = runtime.$client.get()
+        if (client !== null) {
+          void client.db.reconnect().catch((error: unknown) => {
+            if (active === true && runtime.$client.get() === client) {
+              runtime.publishClientError(error)
+            }
+          })
+        }
       }
     }
 
     const unsubscribeFromError = runtime.$error.subscribe(retryIfNeeded)
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
+      active = false
       unsubscribeFromError()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }

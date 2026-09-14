@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeSchemaFetchError, validateConnectionInput } from './connectionValidation'
+import {
+  createSchemaCatalogueLoadError,
+  getSchemaCatalogueDiagnostics,
+  isTransientSchemaFetchError,
+  normalizeSchemaFetchError,
+  validateConnectionInput,
+} from './connectionValidation'
 
 const validInput = {
   serverUrl: 'https://self-hosted.example.com',
@@ -97,6 +103,51 @@ describe('validateConnectionInput', () => {
 })
 
 describe('normalizeSchemaFetchError', () => {
+  it('describes exhausted route network failures without blaming credentials', () => {
+    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
+      attempts: 3,
+      serverUrl: 'https://v2.sync.jazz.tools/path',
+    })
+
+    expect(normalizeSchemaFetchError(error)).toEqual({
+      title: 'Jazz server connection failed',
+      description:
+        "Inspektor couldn't reach the Jazz server. Check your network connection and that the server is available, then reconnect.",
+    })
+    expect(getSchemaCatalogueDiagnostics(error)).toEqual({
+      stage: 'Schema catalogue',
+      server: 'https://v2.sync.jazz.tools',
+      response: 'No response',
+      attempts: 3,
+      browserNetwork: expect.stringMatching(/^(Online|Offline|Unavailable)$/),
+    })
+  })
+
+  it('keeps route diagnostics free of credentials and raw server details', () => {
+    const error = createSchemaCatalogueLoadError(
+      new Error('Schema hashes fetch failed: 503 - adminSecret=must-not-leak'),
+      { attempts: 3, serverUrl: 'https://v2.sync.jazz.tools' },
+    )
+    const serialized = JSON.stringify(getSchemaCatalogueDiagnostics(error))
+
+    expect(serialized).toContain('HTTP 503')
+    expect(serialized).not.toContain('must-not-leak')
+    expect(serialized).not.toContain('adminSecret')
+  })
+
+  it.each([
+    [new TypeError('Failed to fetch'), true],
+    [new Error('Schema hashes fetch failed: 502 Bad Gateway'), true],
+    [new Error('Schema hashes fetch failed: 503 Service Unavailable'), true],
+    [new Error('Schema hashes fetch failed: 504 Gateway Timeout'), true],
+    [new Error('Schema hashes fetch failed: 403 Forbidden'), false],
+    [new Error('Schema hashes fetch failed: 500 Internal Server Error'), false],
+    [new TypeError('Invalid URL'), false],
+    [new TypeError('Cannot read properties of undefined'), false],
+  ])('classifies transient schema discovery failures', (error, expected) => {
+    expect(isTransientSchemaFetchError(error)).toBe(expected)
+  })
+
   it.each([401, 403])('normalizes direct authorization status %s', (status) => {
     expect(normalizeSchemaFetchError({ status })).toEqual({
       title: 'The server rejected this connection',

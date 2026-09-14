@@ -317,11 +317,12 @@ function getFirstSelectableCell<TData extends RowData>(
 function getCellSelectionRowRenderState<TData extends RowData>(
   table: DataGridTable<TData>,
   row: Row<DataGridFeatures, TData>,
+  firstSelectableCell: Cell<DataGridFeatures, TData, unknown> | undefined,
 ) {
   const rows = table.getRowModel().rows
   const rowIndex = row.getDisplayIndex()
   const focusedCell = table.getFocusedCell()
-  const entryCell = focusedCell ?? getFirstSelectableCell(table)
+  const entryCell = focusedCell ?? firstSelectableCell
   const selectedCells = rows
     .slice(Math.max(rowIndex - 1, 0), rowIndex + 2)
     .flatMap((candidateRow) => candidateRow.getVisibleCells())
@@ -408,10 +409,6 @@ function getColumnRegion(pinnedPosition: false | 'end' | 'start'): DataGridColum
 }
 
 function DataGridRoot<TData extends RowData>(props: DataGridRootProps<TData>) {
-  if (props.reorderableColumnIds === undefined) {
-    return <DataGridRootImplementation {...props} />
-  }
-
   return (
     <Subscribe
       source={props.table.store}
@@ -515,6 +512,7 @@ function DataGridRootImplementation<TData extends RowData>({
 
   const columnReorderConfigured = reorderableColumnIds !== undefined
   const columnReorderEnabled = columnReorderConfigured === true && ReorderComponent !== null
+  const firstSelectableCell = getFirstSelectableCell(table)
   const canClearActiveColumn = onColumnActivate !== undefined
   const clearActiveColumn = useEffectEvent(() => {
     onColumnActivate?.(null)
@@ -561,6 +559,7 @@ function DataGridRootImplementation<TData extends RowData>({
         onRowContextMenu,
         onRowContextMenuTouchStart,
         columnReorderEnabled,
+        firstSelectableCell,
         focusFocusedCell,
         getCellStatus,
         getRowStatus,
@@ -609,6 +608,7 @@ function DataGridRootImplementation<TData extends RowData>({
       completeColumnOrders,
       completeColumnOrder,
       density,
+      firstSelectableCell,
       focusFocusedCell,
       getCellStatus,
       getRowStatus,
@@ -1452,7 +1452,7 @@ function DataGridRow<TData extends RowData>(props: DataGridRowProps<TData>) {
 function DataGridSubscribedRow<TData extends RowData>(
   props: DataGridRowProps<TData> & { ariaRowIndex?: number; rowRef?: Ref<HTMLTableRowElement> },
 ) {
-  const { table } = useDataGridContext<TData>()
+  const { firstSelectableCell, table } = useDataGridContext<TData>()
 
   return (
     <Subscribe
@@ -1462,7 +1462,7 @@ function DataGridSubscribedRow<TData extends RowData>(
       {() => (
         <Subscribe
           source={table.atoms.cellSelection}
-          selector={() => getCellSelectionRowRenderState(table, props.row)}
+          selector={() => getCellSelectionRowRenderState(table, props.row, firstSelectableCell)}
         >
           {() => <DataGridRowImplementation {...props} />}
         </Subscribe>
@@ -1571,6 +1571,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     activeColumnId,
     activeRowId,
     density,
+    firstSelectableCell,
     focusFocusedCell,
     getCellStatus,
     getRowStatus,
@@ -1585,9 +1586,9 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   } = useDataGridContext<TData>()
   const target = { rowId: cell.row.id, columnId: cell.column.id }
   const isColumnActive =
-    cell.getCanSelect() === true &&
+    activeColumnId === target.columnId &&
     table.getFocusedCell() === undefined &&
-    activeColumnId === target.columnId
+    cell.getCanSelect() === true
   const isRowActive = activeRowId === target.rowId
   const isSelected = cell.row.getIsSelected()
   const pinnedPosition = cell.column.getIsPinned()
@@ -1598,7 +1599,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const rowStatus = getRowStatus?.(cell.row) ?? 'default'
   const status = rowStatus === 'stagedDeletion' ? 'default' : (getCellStatus?.(cell) ?? 'default')
   const hasMultiCellSelection = table.getSelectedCellCount() > 1
-  const bodyCellEntryId = table.getFocusedCell()?.id ?? getFirstSelectableCell(table)?.id ?? null
+  const bodyCellEntryId = table.getFocusedCell()?.id ?? firstSelectableCell?.id ?? null
   const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
   const registerCell = useCallback(
     (element: HTMLTableCellElement | null) => {

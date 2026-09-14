@@ -4,6 +4,7 @@ import {
   createEmptyConnectionStore,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
+import { SchemaCatalogueLoadError } from '@app/connections/connectionValidation'
 import {
   buildSchemaCatalogue,
   handoffStoredRuntimeTarget,
@@ -26,6 +27,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  vi.useRealTimers()
   fetchSchemaHashes.mockReset()
   fetchPermissionsHead.mockReset()
   vi.unstubAllGlobals()
@@ -237,7 +239,7 @@ describe('resolveStoredRuntimeTarget', () => {
     })
   })
 
-  it('preserves discovery failures when a remembered schema cannot be verified', async () => {
+  it('wraps non-transient discovery failures when a remembered schema cannot be verified', async () => {
     const error = new Error('Network unavailable')
     fetchSchemaHashes.mockRejectedValueOnce(error)
 
@@ -246,7 +248,68 @@ describe('resolveStoredRuntimeTarget', () => {
         connectionId: 'connection-1',
         store: createStore('schema-1'),
       }),
-    ).rejects.toBe(error)
+    ).rejects.toMatchObject({
+      attempts: 1,
+      reason: 'unknown',
+    } satisfies Partial<SchemaCatalogueLoadError>)
+    expect(fetchSchemaHashes).toHaveBeenCalledOnce()
+  })
+
+  it('retries transient route discovery failures before resolving the target', async () => {
+    vi.useFakeTimers()
+    fetchSchemaHashes
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockRejectedValueOnce(new Error('Schema hashes fetch failed: 503 Service Unavailable'))
+      .mockResolvedValueOnce({
+        hashes: ['schema-1'],
+        schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+      })
+
+    const target = resolveStoredRuntimeTarget({
+      connectionId: 'connection-1',
+      store: createStore('schema-1'),
+    })
+    await vi.runAllTimersAsync()
+
+    await expect(target).resolves.toMatchObject({ schemaHash: 'schema-1' })
+    expect(fetchSchemaHashes).toHaveBeenCalledTimes(3)
+  })
+
+  it('reports exhausted transient route discovery attempts', async () => {
+    vi.useFakeTimers()
+    fetchSchemaHashes.mockRejectedValue(new TypeError('Failed to fetch'))
+
+    const target = resolveStoredRuntimeTarget({
+      connectionId: 'connection-1',
+      store: createStore('schema-1'),
+    })
+    const expectation = expect(target).rejects.toMatchObject({
+      attempts: 3,
+      reason: 'network',
+      status: null,
+    } satisfies Partial<SchemaCatalogueLoadError>)
+    await vi.runAllTimersAsync()
+
+    await expectation
+    expect(fetchSchemaHashes).toHaveBeenCalledTimes(3)
+  })
+
+  it('stops retry recovery when navigation aborts during schema discovery', async () => {
+    vi.useFakeTimers()
+    fetchSchemaHashes.mockReturnValueOnce(new Promise(() => undefined))
+    const abortController = new AbortController()
+    const target = resolveStoredRuntimeTarget({
+      connectionId: 'connection-1',
+      signal: abortController.signal,
+      store: createStore('schema-1'),
+    })
+    const expectation = expect(target).rejects.toMatchObject({ name: 'AbortError' })
+
+    await vi.waitFor(() => expect(fetchSchemaHashes).toHaveBeenCalledOnce())
+    abortController.abort()
+
+    await expectation
+    expect(vi.getTimerCount()).toBe(0)
     expect(fetchSchemaHashes).toHaveBeenCalledOnce()
   })
 
@@ -273,18 +336,6 @@ describe('resolveStoredRuntimeTarget', () => {
         { hash: 'schema-2', publishedAt: 2 },
       ],
     })
-  })
-
-  it('preserves discovery failures when no schema preference exists', async () => {
-    const error = new Error('Network unavailable')
-    fetchSchemaHashes.mockRejectedValueOnce(error)
-
-    await expect(
-      resolveStoredRuntimeTarget({
-        connectionId: 'connection-1',
-        store: createStore(null),
-      }),
-    ).rejects.toBe(error)
   })
 })
 

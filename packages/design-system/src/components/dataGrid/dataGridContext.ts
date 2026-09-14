@@ -29,6 +29,7 @@ export interface DataGridContextValue<TData extends RowData> {
   onRowContextMenu?: DataGridRowContextMenuHandler
   onRowContextMenuTouchStart?: DataGridRowContextMenuTouchStartHandler
   columnReorderEnabled: boolean
+  firstSelectableCell?: Cell<DataGridFeatures, TData, unknown>
   getColumnReorderIndex: (columnId: string) => number
   moveColumn: (columnId: string, offset: -1 | 1) => void
   focusFocusedCell: () => void

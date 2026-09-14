@@ -528,6 +528,22 @@ When resolving `/conn/:connectionId`, Inspektor fetches the available schema has
 succeed before the route commits a runtime target. Runtime bootstrap can still fail if the server cannot return the selected
 schema or create the admin client.
 
+Saved-route schema discovery retries opaque network failures and HTTP 502, 503, and 504 responses with bounded backoff while
+the route loading surface remains visible. Authorization, missing-app, invalid-URL, and unknown failures remain single-attempt
+failures. An exhausted network failure automatically reloads the current document once when the browser is online or later
+reports restored connectivity. Unclassified errors caught by the connection route use the same recovery because that boundary
+also owns runtime and descendant failures that route invalidation cannot fully replace. A per-location session marker prevents
+reload loops. After successful admin-client publication, the next healthy visible-to-hidden transition clears the marker for a
+later return-from-inactivity interruption; publication alone does not clear it because a descendant can still fail immediately.
+Post-publication transport recovery remains runtime-owned. Jazz does not expose public WebSocket health, and local-first query
+subscriptions can retain stale fulfilled state after transport failure. When a published client returns from at least five minutes
+hidden, `InspectorProvider` calls the public `db.reconnect()` once for that hidden episode. This replaces the transport while
+preserving the in-memory client, subscriptions, local writes, and mounted workspace. A reconnect rejection enters the existing
+runtime error retry path, which recreates the scoped client rather than reloading the document.
+If automatic recovery is unavailable or has already run, a viewport-centered route error offers an explicit `Reconnect` action. The error
+includes collapsed, copyable diagnostics limited to the request stage, server origin, response status, attempt count, and browser
+network state; credentials, app IDs, URL paths, and raw upstream details remain hidden.
+
 UI representation:
 
 - Surface: connection list, add/edit connection form, schema switcher in the app shell.
@@ -568,7 +584,9 @@ Startup proceeds from connection intent through schema verification to the first
 5. `RuntimeAdminClient` joins or starts WASM preparation.
 6. After WASM preparation succeeds, `RuntimeAdminClient` calls `createInspectorAdminClient`, which creates the in-memory admin client.
    Jazz owns URL resolution, WASM initialization, client acquisition, and shutdown.
-7. `RuntimeAdminClient` publishes the client only after stored-schema verification succeeds.
+7. `RuntimeAdminClient` publishes the client only after stored-schema verification succeeds. While that verified client remains
+   healthy, the next visible-to-hidden transition clears any one-shot document-recovery marker so the next return from inactivity
+   starts a separate recovery episode.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
 
 The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. The loading surface centers the theme-appropriate Inspektor wordmark while retaining an accessible loading status. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
@@ -583,8 +601,15 @@ Each startup failure has one owner and a defined effect on the active session.
 - Client creation failure is fatal for the active session.
 - Stored schema fetch failure is fatal for the active session.
 - Schema hash fetch failure blocks schema-switching context.
+- Saved-route schema hash discovery retries only opaque network and HTTP 502, 503, and 504 failures before publishing a route
+  error. When navigation supersedes the load, the route abort signal stops awaiting a pending schema request and cancels pending
+  backoff. The Jazz schema helper does not accept an `AbortSignal`, so its underlying browser request may still settle after the
+  route has stopped awaiting it.
 - Permissions fetch failure is non-fatal; the UI can continue without permission hints.
 - Early WASM preparation is speculative, but its result is authoritative for client creation. `jazzWasmPreparation.ts` owns the shared retryable preparation promise. `RuntimeAdminClient` joins it and publishes a preparation or client-acquisition failure, while `InspectorProvider` owns the visible runtime error and retry flow.
+- A qualifying hidden-to-visible transition proactively reconnects the published client's Jazz transport because neither local-first
+  query state nor the public Jazz API provides an authoritative passive WebSocket-health signal. Reconnect rejection is published
+  through the runtime error projection and consumes the existing scoped retry path.
 - When the user changes connection, local branch label, or schema hash, `useInspectorRuntime` ignores stale schema and permissions work. Replacing or unmounting `RuntimeAdminClient` shuts down the previous client.
 
 #### Runtime implementation map

@@ -8,8 +8,15 @@ import {
   useRuntimeSchema,
 } from '@app/providers/inspectorProvider'
 import type { StoredConnection } from '@app/connections/connections'
+import {
+  beginAutomaticConnectionRecovery,
+  clearAutomaticConnectionRecovery,
+} from '@app/connections/connectionRecovery'
 
 interface FakeClient {
+  db: {
+    reconnect: ReturnType<typeof vi.fn>
+  }
   shutdown: ReturnType<typeof vi.fn>
 }
 
@@ -21,7 +28,7 @@ const adminClientMocks = vi.hoisted(() => ({ create: vi.fn() }))
 
 const runtime = {
   $client: atom(null),
-  $error: atom<string | null>(null),
+  $error: atom<unknown>(null),
   $isWasmSchemaLoading: atom(false),
   $schemaCatalogue: atom<Array<{ hash: string; publishedAt: number | null }>>([]),
   $storedPermissions: atom<unknown>(null),
@@ -81,7 +88,10 @@ function connection(overrides: Partial<StoredConnection> = {}): StoredConnection
 }
 
 function client(): FakeClient {
-  return { shutdown: vi.fn().mockResolvedValue(undefined) }
+  return {
+    db: { reconnect: vi.fn().mockResolvedValue(undefined) },
+    shutdown: vi.fn().mockResolvedValue(undefined),
+  }
 }
 
 function deferred<T>(): {
@@ -98,13 +108,28 @@ function deferred<T>(): {
   return { promise, resolve, reject }
 }
 
+async function renderPublishedClient() {
+  session.activeConnection = connection()
+  const createdClient = client()
+  adminClientMocks.create.mockResolvedValue(createdClient)
+  const view = render(<InspectorProvider>Workspace</InspectorProvider>)
+  await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(createdClient))
+  return { createdClient, view }
+}
+
 beforeEach(() => {
+  clearAutomaticConnectionRecovery()
+  runtime.$client.set(null)
+  runtime.publishClient.mockImplementation((publishedClient) => {
+    runtime.$client.set(publishedClient)
+  })
   adminClientMocks.create.mockReset()
   wasmPreparationMocks.prepare.mockReset()
   wasmPreparationMocks.prepare.mockResolvedValue(undefined)
 })
 
 afterEach(() => {
+  clearAutomaticConnectionRecovery()
   cleanup()
   vi.restoreAllMocks()
   runtime.$schemaCatalogue.set([])
@@ -142,6 +167,7 @@ describe('InspectorProvider runtime projections', () => {
   })
 
   it('creates and publishes a privileged client without a global branch configuration', async () => {
+    expect(beginAutomaticConnectionRecovery()).toBe(true)
     session.activeConnection = connection()
     const createdClient = client()
     adminClientMocks.create.mockResolvedValue(createdClient)
@@ -149,12 +175,19 @@ describe('InspectorProvider runtime projections', () => {
     render(<InspectorProvider>Workspace</InspectorProvider>)
 
     await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(createdClient))
+    expect(beginAutomaticConnectionRecovery()).toBe(false)
     expect(adminClientMocks.create).toHaveBeenCalledWith({
       appId: 'app-1',
       serverUrl: 'https://example.com',
       env: 'dev',
       adminSecret: 'secret',
     })
+
+    const visibilityState = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+
+    expect(beginAutomaticConnectionRecovery()).toBe(true)
+    visibilityState.mockRestore()
   })
 
   it('creates the client while the selected stored schema is verified but withholds publication', async () => {
@@ -310,6 +343,90 @@ describe('InspectorProvider runtime projections', () => {
     await waitFor(() =>
       expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 })),
     )
+  })
+
+  it('reconnects a published client once after a qualifying hidden period', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    const visibilityState = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+    const { createdClient } = await renderPublishedClient()
+
+    visibilityState.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    now.mockReturnValue(5 * 60 * 1000 - 1)
+    visibilityState.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+    expect(createdClient.db.reconnect).not.toHaveBeenCalled()
+
+    visibilityState.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    now.mockReturnValue(10 * 60 * 1000 - 1)
+    visibilityState.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+    fireEvent(document, new Event('visibilitychange'))
+
+    expect(createdClient.db.reconnect).toHaveBeenCalledOnce()
+  })
+
+  it('retries the runtime when resume reconnection fails', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    const visibilityState = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+    const reconnectError = new Error('Reconnect failed')
+    runtime.publishClientError.mockImplementationOnce((error) => runtime.$error.set(error))
+    const { createdClient } = await renderPublishedClient()
+    createdClient.db.reconnect.mockRejectedValue(reconnectError)
+
+    visibilityState.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    now.mockReturnValue(5 * 60 * 1000)
+    visibilityState.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+
+    await waitFor(() => expect(runtime.publishClientError).toHaveBeenCalledWith(reconnectError))
+    expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }))
+  })
+
+  it('ignores a resume reconnection failure after the provider unmounts', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    const visibilityState = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+    const reconnect = deferred<void>()
+    const { createdClient, view } = await renderPublishedClient()
+    createdClient.db.reconnect.mockReturnValue(reconnect.promise)
+
+    visibilityState.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    now.mockReturnValue(5 * 60 * 1000)
+    visibilityState.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+    view.unmount()
+    reconnect.reject(new Error('Late reconnect failure'))
+    await reconnect.promise.catch(() => undefined)
+
+    expect(runtime.publishClientError).not.toHaveBeenCalled()
+  })
+
+  it('ignores a reconnect failure from a replaced client', async () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    const visibilityState = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+    const reconnect = deferred<void>()
+    const { createdClient, view } = await renderPublishedClient()
+    createdClient.db.reconnect.mockReturnValue(reconnect.promise)
+
+    visibilityState.mockReturnValue('hidden')
+    fireEvent(document, new Event('visibilitychange'))
+    now.mockReturnValue(5 * 60 * 1000)
+    visibilityState.mockReturnValue('visible')
+    fireEvent(document, new Event('visibilitychange'))
+
+    const replacementClient = client()
+    adminClientMocks.create.mockResolvedValue(replacementClient)
+    session.activeConnection = connection({ adminSecret: 'replacement-secret' })
+    view.rerender(<InspectorProvider>Workspace</InspectorProvider>)
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(replacementClient))
+
+    reconnect.reject(new Error('Obsolete reconnect failure'))
+    await reconnect.promise.catch(() => undefined)
+
+    expect(runtime.publishClientError).not.toHaveBeenCalled()
   })
 
   it('does not rerender a schema consumer when permissions resolve', () => {

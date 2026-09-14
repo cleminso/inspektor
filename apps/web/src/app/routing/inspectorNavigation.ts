@@ -9,6 +9,10 @@ import { redirect } from '@tanstack/react-router'
 
 import { matchesConnectionCredentials } from '@app/connections/connectionIdentity'
 import {
+  createSchemaCatalogueLoadError,
+  isTransientSchemaFetchError,
+} from '@app/connections/connectionValidation'
+import {
   getConnectionById,
   getConnectionPreferences,
   readStoredConnections,
@@ -57,6 +61,7 @@ interface ResolveStoredRuntimeTargetOptions {
   branchOverride?: string | null
   schemaHashOverride?: string | null
   store?: StoredConnectionsStore
+  signal?: AbortSignal
 }
 
 interface RuntimeTargetHandoff {
@@ -65,6 +70,7 @@ interface RuntimeTargetHandoff {
 }
 
 let handedOffRuntimeTarget: RuntimeTargetHandoff | null = null
+const schemaCatalogueRetryDelays = [250, 750] as const
 
 /** Places the deployed schema first while preserving the advertised order of every other schema. */
 export function buildSchemaCatalogue(
@@ -123,6 +129,71 @@ export async function fetchConnectionSchemaCatalogue(
     fetchConnectionLatestSchemaHash(connection).catch(() => null),
   ])
   return buildSchemaCatalogue(response, latestSchemaHash)
+}
+
+async function fetchConnectionSchemaCatalogueForRoute(
+  connection: ConnectionCredentials,
+  signal?: AbortSignal,
+): Promise<readonly SchemaCatalogueRecord[]> {
+  let attempts = 0
+
+  while (true) {
+    signal?.throwIfAborted()
+    attempts += 1
+
+    try {
+      return await waitForRouteRequest(fetchConnectionSchemaCatalogue(connection), signal)
+    } catch (error) {
+      signal?.throwIfAborted()
+      const retryDelay = schemaCatalogueRetryDelays[attempts - 1]
+      if (retryDelay === undefined || isTransientSchemaFetchError(error) === false) {
+        throw createSchemaCatalogueLoadError(error, {
+          attempts,
+          serverUrl: connection.serverUrl,
+        })
+      }
+      await waitForRetry(retryDelay, signal)
+    }
+  }
+}
+
+function waitForRouteRequest<T>(request: Promise<T>, signal?: AbortSignal): Promise<T> {
+  signal?.throwIfAborted()
+  if (signal === undefined) return request
+
+  return new Promise((resolve, reject) => {
+    const handleAbort = () => reject(signal.reason)
+    const clearAbort = () => signal.removeEventListener('abort', handleAbort)
+
+    signal.addEventListener('abort', handleAbort, { once: true })
+    void request.then(
+      (value) => {
+        clearAbort()
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearAbort()
+        reject(error)
+      },
+    )
+  })
+}
+
+function waitForRetry(delay: number, signal?: AbortSignal): Promise<void> {
+  signal?.throwIfAborted()
+  return new Promise((resolve, reject) => {
+    const handleComplete = () => {
+      signal?.removeEventListener('abort', handleAbort)
+      resolve()
+    }
+    const timeout = setTimeout(handleComplete, delay)
+    const handleAbort = () => {
+      clearTimeout(timeout)
+      reject(signal?.reason)
+    }
+
+    signal?.addEventListener('abort', handleAbort, { once: true })
+  })
 }
 
 /** Hands validated form discovery to the matching route entry without repeating remote requests. */
@@ -192,6 +263,7 @@ export async function resolveStoredRuntimeTarget({
   branchOverride,
   schemaHashOverride,
   store,
+  signal,
 }: ResolveStoredRuntimeTargetOptions): Promise<ResolvedRuntimeTarget | null> {
   const resolvedStore = store ?? readStoredConnections()
   const connection = getConnectionById(resolvedStore, connectionId)
@@ -212,7 +284,7 @@ export async function resolveStoredRuntimeTarget({
   ) {
     return handoff.target
   }
-  const schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)
+  const schemaCatalogue = await fetchConnectionSchemaCatalogueForRoute(connection, signal)
 
   const schemaHash = resolveDefaultSchemaHash(schemaCatalogue, schemaHashOverride)
   return schemaHash === null ? null : { connectionId, branch, schemaHash, schemaCatalogue }

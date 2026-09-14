@@ -206,6 +206,7 @@ interface TestDataGridProps {
   initialCellSelection?: CellSelectionState
   initialColumnPinning?: ColumnPinningState
   loading?: boolean
+  onCellSelectionCheck?: () => void
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
   onCellEditRequest?: (target: { columnId: string; rowId: string }) => void
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void
@@ -231,6 +232,7 @@ function TestDataGrid({
   initialCellSelection = [],
   initialColumnPinning,
   loading = false,
+  onCellSelectionCheck,
   onCellActivate,
   onCellEditRequest,
   onCellContextMenu,
@@ -250,7 +252,10 @@ function TestDataGrid({
     features: dataGridFeatures,
     columns,
     data,
-    enableCellSelection: (cell) => disabledCellRowIds.has(cell.row.id) === false,
+    enableCellSelection: (cell) => {
+      onCellSelectionCheck?.()
+      return disabledCellRowIds.has(cell.row.id) === false
+    },
     getRowId: (row) => row.id,
     initialState: { columnPinning: initialColumnPinning },
     state: {
@@ -339,6 +344,24 @@ describe('DataGrid scrollbar', () => {
     expect(container.querySelector('[data-slot="data-grid-viewport"]')).toBe(viewport)
     expect(viewport.scrollLeft).toBe(0)
     expect(viewport.scrollTop).toBe(0)
+  })
+})
+
+describe('DataGrid rendering work', () => {
+  it('does not resolve the fallback body entry cell for every rendered cell', () => {
+    const onCellSelectionCheck = vi.fn()
+    const data = createPeople(20)
+    const cellCount = data.length * columns.length
+
+    render(
+      <TestDataGrid
+        data={data}
+        disabledCellRowIds={new Set(data.map((row) => row.id))}
+        onCellSelectionCheck={onCellSelectionCheck}
+      />,
+    )
+
+    expect(onCellSelectionCheck.mock.calls.length).toBeLessThanOrEqual(cellCount * 5)
   })
 })
 
@@ -834,6 +857,8 @@ describe('DataGrid', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Move role first' }))
 
+    expect(screen.getByRole('cell', { name: 'Engineer' }).tabIndex).toBe(0)
+    expect(screen.getByRole('cell', { name: 'Ada' }).tabIndex).toBe(-1)
     expect(
       Array.from(reorderedTable.querySelectorAll('col'), (column) => column.style.width),
     ).toEqual(['180px', '120px'])
@@ -841,6 +866,7 @@ describe('DataGrid', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Hide role' }))
 
+    expect(screen.getByRole('cell', { name: 'Ada' }).tabIndex).toBe(0)
     expect(
       Array.from(reorderedTable.querySelectorAll('col'), (column) => column.style.width),
     ).toEqual(['120px'])
@@ -1471,10 +1497,7 @@ describe('DataGrid', () => {
   it('does not move a column from a nested header control', async () => {
     const onColumnOrderChange = vi.fn()
     render(
-      <ReorderableDataGrid
-        includeInteractiveHeader
-        onColumnOrderChange={onColumnOrderChange}
-      />,
+      <ReorderableDataGrid includeInteractiveHeader onColumnOrderChange={onColumnOrderChange} />,
     )
 
     await waitFor(() => {

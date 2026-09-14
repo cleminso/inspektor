@@ -11,6 +11,16 @@
 
 ## Implemented foundation
 
+[14/09/26]
+
+### Saved-route connection recovery
+
+- [x] Retry transient schema-catalogue network and gateway failures before showing a terminal route error.
+- [x] Retry an exhausted network failure once when browser connectivity returns.
+- [x] Keep authorization, missing-app, invalid-URL, and unknown failures out of automatic retry.
+- [x] Center the terminal error in the viewport with actionable copy and collapsed, copyable diagnostics that exclude credentials and raw server details.
+- [x] Reconnect a published Jazz transport once when its page returns after at least five minutes hidden.
+
 [13/09/26]
 
 ### Branded connection loading
@@ -365,6 +375,16 @@
 
 ## Settled interaction decisions
 
+[14/09/26]
+
+- Saved-route schema discovery retries opaque network failures and HTTP 502, 503, and 504 responses with bounded backoff while retaining the route loading surface.
+- This bounded recovery supersedes the automatic-retry exclusion recorded under [24/08/26]; schema-catalogue caching, caller-owned metadata fetch replacement, and upstream Jazz `AbortSignal` support remain outside scope.
+- An exhausted network error automatically reloads the current document once when the browser is online or reports restored connectivity. Unclassified connection-route errors use the same recovery because the parent boundary can receive stale router, runtime, or descendant state that route invalidation does not replace. Recovery remains bounded by a per-location session marker.
+- After successful admin-client publication, the next healthy visible-to-hidden transition clears the recovery marker so returning from a later inactive period can recover independently without allowing immediate descendant failures to create a reload loop. Other terminal error classes require explicit user action, and the final `Reconnect` action consumes the same allowance before performing a full-document recovery.
+- Jazz exposes no public WebSocket-health signal, and local-first subscriptions can remain fulfilled with stale data after transport failure. A page that returns after at least five minutes hidden proactively calls `db.reconnect()` once for that hidden episode, preserving the client and local writes. Reconnect rejection uses the existing runtime retry path.
+- The terminal route error is viewport-centered and distinguishes network, server, authorization, missing-app, invalid-URL, and unknown failures without exposing raw upstream details.
+- Collapsed technical details identify the schema-catalogue stage, server origin, response status, attempt count, and browser network state. They never include the admin secret, app ID, URL path, or upstream response body.
+
 [13/09/26]
 
 - Initial connection and table entry use one centered, static Inspektor wordmark until the first rows query settles.
@@ -536,6 +556,15 @@
 - None.
 
 ## Validation checklist
+
+[14/09/26]
+
+- [x] Cover transient recovery, exhausted retries, non-retryable failures, restored-connectivity recovery, centered presentation, and diagnostic redaction.
+- [x] Cover resume transport reconnection, the hidden-duration threshold, one-shot episode behavior, and reconnect rejection.
+- [x] Verify from the supplied recording that route invalidation issued successful schema requests without replacing the visible error, then automatically perform the bounded full-document recovery that restored the dashboard.
+- [x] Verify the terminal route error, details disclosure, copy action, keyboard focus, narrow-viewport reflow, light theme, and dark theme in a production browser build.
+- [x] Run Inspektor lint, typecheck, build, package-wide tests, and Lat checks.
+- [ ] Run the automated browser suite after the isolated fixture accepts its seeded stored scalar values.
 
 [11/09/26]
 
