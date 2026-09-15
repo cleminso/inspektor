@@ -759,6 +759,7 @@ function ComboboxItemInner<Value>(
   const generatedLabelId = ariaLabel === undefined && labelledBy === undefined ? labelId : undefined
   const stateStyles = createStateStyleProps<BaseCombobox.Item.State>((state) => [
     comboboxStyles.item,
+    indicator === 'check' && comboboxStyles.itemWithIndicator,
     comboboxStyles.itemInteractive,
     state.highlighted === true && comboboxStyles.itemHighlighted,
     state.selected === true && comboboxStyles.itemSelected,

@@ -284,11 +284,13 @@ export const comboboxStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
-    gridTemplateColumns: `minmax(0, 1fr) ${spatial['icon-size-m']}`,
     lineHeight: lineHeights.ui,
     userSelect: 'none',
     minHeight: spatial['collection-row-height-s'],
     width: 'auto',
+  },
+  itemWithIndicator: {
+    gridTemplateColumns: `minmax(0, 1fr) ${spatial['icon-size-m']}`,
   },
   itemInteractive: {
     backgroundColor: {

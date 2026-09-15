@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[15/09/26]
+
+- [x] Reserve the trailing indicator track only for items that render the standard check indicator.
+- [x] Let items without indicators determine content-width popup geometry without empty trailing space.
+
 [04/09/26]
 
 - [x] Use the focused border for the search input group without adding an outer focus ring.
@@ -29,6 +34,10 @@ None.
 
 ## Settled interaction decisions
 
+[15/09/26]
+
+- Check-bearing item collections reserve a stable indicator column; indicator-free collections do not.
+
 [04/09/26]
 
 - The compound search input communicates focus through its border rather than an additional outer ring.
@@ -43,6 +52,11 @@ None.
 None.
 
 ## Validation checklist
+
+[15/09/26]
+
+- [x] Run focused StyleX lint and affected component checks.
+- [x] Verify check-bearing and indicator-free item geometry in both color schemes in a fresh browser context.
 
 [04/09/26]
 
