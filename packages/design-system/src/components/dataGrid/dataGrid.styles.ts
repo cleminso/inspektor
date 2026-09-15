@@ -35,6 +35,12 @@ const recentlyInsertedHighlight = stylex.keyframes({
   },
 })
 
+const recentlyInsertedPinnedCellHighlight = stylex.keyframes({
+  '0%': { backgroundColor: dataGridColors.recentlyInsertedRowBackground },
+  '65%': { backgroundColor: dataGridColors.recentlyInsertedRowBackground },
+  '100%': { backgroundColor: dataGridVars.rowSurface },
+})
+
 /**
  * Releases the applied-cell tint in one continuous motion from the moment the staged treatment is
  * withdrawn, so the staged border removal and the background drain read as a single event instead
@@ -269,7 +275,9 @@ export const dataGridStyles = stylex.create({
     boxShadow: `inset ${dataGridVars.selectedRowMarker}, inset ${dataGridVars.selectionEdgeTop}, inset ${dataGridVars.selectionEdgeRight}, inset ${dataGridVars.selectionEdgeBottom}, inset ${dataGridVars.selectionEdgeLeft}`,
     boxSizing: 'border-box',
     fontFamily: fontFamilies.mono,
+    position: 'relative',
     whiteSpace: 'nowrap',
+    zIndex: 0,
     borderBottomColor: dataGridColors.cellBorder,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
@@ -293,6 +301,10 @@ export const dataGridStyles = stylex.create({
     backgroundColor: dataGridColors.stagedDeletionRowBackground,
   },
   pinnedCellRecentlyInserted: {
+    animationDuration: '1200ms',
+    animationFillMode: 'forwards',
+    animationName: { default: recentlyInsertedPinnedCellHighlight, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease-in-out',
     backgroundColor: dataGridColors.recentlyInsertedRowBackground,
   },
   cellColumnActive: {

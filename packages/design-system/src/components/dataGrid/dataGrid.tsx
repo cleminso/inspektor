@@ -18,7 +18,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ForwardedRef,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -31,10 +30,7 @@ import { Spinner } from '../spinner/spinner'
 import { dataGridStyles } from './dataGrid.styles'
 import { DataGridContext, type DataGridContextValue, useDataGridContext } from './dataGridContext'
 import type { DataGridFeatures, DataGridTable } from './dataGridFeatures'
-import {
-  useDataGridReorderContext,
-  type DataGridColumnRegion,
-} from './dataGridReorderContext'
+import { useDataGridReorderContext, type DataGridColumnRegion } from './dataGridReorderContext'
 
 export type DataGridDensity = 'compact' | 'default'
 export type DataGridRowRendering = 'all' | 'virtual'
@@ -485,19 +481,16 @@ function DataGridRootImplementation<TData extends RowData>({
   }, [completeColumnOrder, pinnedEndColumnOrder, pinnedStartColumnOrder])
   const visibleReorderableColumnOrders = useMemo<
     Record<DataGridColumnRegion, readonly string[]>
-  >(
-    () => {
-      const isVisibleReorderableColumn = (columnId: string) =>
-        reorderableColumnIdSet.has(columnId) === true &&
-        tableState.columnVisibility?.[columnId] !== false
-      return {
-        start: completeColumnOrders.start.filter(isVisibleReorderableColumn),
-        center: completeColumnOrders.center.filter(isVisibleReorderableColumn),
-        end: completeColumnOrders.end.filter(isVisibleReorderableColumn),
-      }
-    },
-    [completeColumnOrders, reorderableColumnIdSet, tableState.columnVisibility],
-  )
+  >(() => {
+    const isVisibleReorderableColumn = (columnId: string) =>
+      reorderableColumnIdSet.has(columnId) === true &&
+      tableState.columnVisibility?.[columnId] !== false
+    return {
+      start: completeColumnOrders.start.filter(isVisibleReorderableColumn),
+      center: completeColumnOrders.center.filter(isVisibleReorderableColumn),
+      end: completeColumnOrders.end.filter(isVisibleReorderableColumn),
+    }
+  }, [completeColumnOrders, reorderableColumnIdSet, tableState.columnVisibility])
   const columnReorderIndices = useMemo(
     () =>
       new Map(
@@ -582,9 +575,7 @@ function DataGridRootImplementation<TData extends RowData>({
             columnId,
             offset,
           )
-          if (
-            nextColumnOrder.some((value, index) => value !== completeRegionColumnOrder[index])
-          ) {
+          if (nextColumnOrder.some((value, index) => value !== completeRegionColumnOrder[index])) {
             if (region === 'center') {
               table.setColumnOrder(nextColumnOrder)
             } else {
@@ -809,17 +800,6 @@ function DataGridRootImplementation<TData extends RowData>({
   )
 }
 
-function setForwardedViewportRef(
-  ref: ForwardedRef<HTMLDivElement>,
-  element: HTMLDivElement | null,
-): void {
-  if (typeof ref === 'function') {
-    ref(element)
-  } else if (ref !== null) {
-    ref.current = element
-  }
-}
-
 const DataGridViewport = forwardRef<HTMLDivElement, DataGridViewportProps>(
   function DataGridViewport({ children, scrollResetKey, ...props }, forwardedRef) {
     const { density, setViewportElement } = useDataGridContext()
@@ -828,7 +808,11 @@ const DataGridViewport = forwardRef<HTMLDivElement, DataGridViewportProps>(
       (element: HTMLDivElement | null) => {
         viewportRef.current = element
         setViewportElement(element)
-        setForwardedViewportRef(forwardedRef, element)
+        if (typeof forwardedRef === 'function') {
+          forwardedRef(element)
+        } else if (forwardedRef !== null) {
+          forwardedRef.current = element
+        }
       },
       [forwardedRef, setViewportElement],
     )
@@ -1598,6 +1582,15 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const isActive = cell.getIsFocused()
   const rowStatus = getRowStatus?.(cell.row) ?? 'default'
   const status = rowStatus === 'stagedDeletion' ? 'default' : (getCellStatus?.(cell) ?? 'default')
+  const showPinnedRecentlyInserted =
+    pinnedPosition !== false &&
+    rowStatus === 'recentlyInserted' &&
+    isSelected === false &&
+    isRowActive === false &&
+    isColumnActive === false &&
+    isCellSelected === false &&
+    isActive === false &&
+    status === 'default'
   const hasMultiCellSelection = table.getSelectedCellCount() > 1
   const bodyCellEntryId = table.getFocusedCell()?.id ?? firstSelectableCell?.id ?? null
   const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
@@ -1733,11 +1726,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         pinnedPosition !== false &&
           rowStatus === 'stagedDeletion' &&
           dataGridStyles.pinnedCellStagedDeletion,
-        pinnedPosition !== false &&
-          rowStatus === 'recentlyInserted' &&
-          isSelected === false &&
-          isRowActive === false &&
-          dataGridStyles.pinnedCellRecentlyInserted,
+        showPinnedRecentlyInserted === true && dataGridStyles.pinnedCellRecentlyInserted,
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
         isSelected === true &&

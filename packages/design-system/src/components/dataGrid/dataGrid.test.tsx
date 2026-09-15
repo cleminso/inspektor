@@ -198,7 +198,9 @@ interface TestDataGridProps {
     requestId: number
     target: { columnId: string; rowId: string }
   } | null
-  getRowStatus?: (row: { id: string }) => 'default' | 'recentlyInserted' | 'stagedDeletion'
+  getRowStatus?: (row: {
+    id: string
+  }) => 'default' | 'recentlyInserted' | 'stagedDeletion'
   getCellStatus?: (cell: {
     column: { id: string }
     row: { id: string }
@@ -329,7 +331,9 @@ describe('DataGrid scrollbar', () => {
   })
 
   it('resets viewport scroll without remounting table content', () => {
-    const { container, rerender } = render(<TestDataGrid scrollResetKey="page-1" />)
+    const { container, rerender } = render(
+      <TestDataGrid scrollResetKey="page-1" />,
+    )
     const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
 
     expect(viewport).not.toBeNull()
@@ -345,6 +349,7 @@ describe('DataGrid scrollbar', () => {
     expect(viewport.scrollLeft).toBe(0)
     expect(viewport.scrollTop).toBe(0)
   })
+
 })
 
 describe('DataGrid rendering work', () => {

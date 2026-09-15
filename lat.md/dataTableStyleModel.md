@@ -108,7 +108,7 @@ The rendering model has five layers:
 
 No table-wide measured gridline overlay is needed. Cell-local rendering naturally follows scrolling, sticky positioning, column sizing, and drag transforms.
 
-Each body row exposes its current default or hover surface through a shared style variable. Pinned cells consume that variable as their opaque base surface, so hovering any cell paints one continuous row while cell-owned state backgrounds retain their precedence.
+Each body row exposes its current default or hover surface through a shared style variable. Pinned cells consume that variable as their opaque base surface, so hovering any cell paints one continuous row while cell-owned state backgrounds retain their precedence. Recently inserted pinned cells animate back to that opaque surface with the same timing as the row highlight.
 
 ## Edge ownership
 

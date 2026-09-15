@@ -8,6 +8,9 @@ Use TanStack column-pinning state to keep important columns visible during horiz
 The Data Grid renders logical `start` and `end` regions with direction-aware sticky offsets.
 Reorderable columns move only within their current pin region, and pinned moves update TanStack
 column-pinning state without changing the column's unpinned order.
+Pinned body cells paint above scrolling selected and active cells.
+Use `getRowStatus` to project semantic row states. Change `scrollResetKey` on `DataGrid.Viewport`
+when a new query scope should reset both scroll axes.
 
 <ComponentDemo source={accountsSource}>
   <AccountsDemo />
