@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[15/09/26]
+
+- [x] Size the connection switcher popup to its widest content instead of the medium fixed width.
+
 [14/09/26]
 
 ### Saved-route connection recovery

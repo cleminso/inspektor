@@ -98,7 +98,7 @@ export function ConnectionSwitcher({
               {resolvedTriggerLabel}
             </Text>
           </ContextSwitcher.Trigger>
-          <ContextSwitcher.Content>
+          <ContextSwitcher.Content width="content">
             {connections.length > 5 ? (
               <ContextSwitcher.Search
                 label="Search connections"
