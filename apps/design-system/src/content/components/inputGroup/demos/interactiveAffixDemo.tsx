@@ -1,5 +1,5 @@
 import { Box, Icon, Input, InputGroup } from '@inspektor/ds'
-import { Eye, EyeOff } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 
 export default function InputGroupInteractiveAffixDemo(): ReactElement {
@@ -44,6 +44,20 @@ export default function InputGroupInteractiveAffixDemo(): ReactElement {
         >
           NULL
         </InputGroup.Checkbox>
+      </InputGroup>
+      <InputGroup fullWidth>
+        <Input
+          aria-label="Referenced record"
+          defaultValue="room_01JY3H8V6M"
+          font="mono"
+          readOnly
+        />
+        <InputGroup.Link
+          href="#interactive-affixes"
+          label="Open referenced table"
+        >
+          <Icon artwork={ArrowRight} />
+        </InputGroup.Link>
       </InputGroup>
     </Box>
   )

@@ -83,7 +83,7 @@ export const textColors = stylex.defineVars({
   disabled: `light-dark(${palette.gray400}, ${palette.neutral600})`,
   accent: `light-dark(${palette.blue700}, ${palette.yellow400})`,
   link: `light-dark(${palette.blue600}, ${palette.blue400})`,
-  success: `light-dark(${palette.green700}, ${palette.green400})`,
+  success: `light-dark(${palette.green600}, ${palette.green500})`,
   warning: `light-dark(${palette.orange700}, ${palette.orange400})`,
   danger: `light-dark(${palette.red700}, ${palette.red500})`,
   onAccent: palette.gray50,

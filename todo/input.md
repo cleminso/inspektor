@@ -16,6 +16,10 @@ This checklist tracks the reusable Input component.
 
 ## Implemented foundation
 
+[14/09/26]
+
+- [x] Let the selected input variant own read-only background treatment.
+
 [11/08/26]
 
 - [x] Share one token-backed focus-visible outline across Input, Select, and Input Group, switching to danger only for focus-visible invalid state.
@@ -45,6 +49,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[14/09/26]
+
+- [x] Use read-only state for interaction semantics without changing the selected surface.
+
 [11/08/26]
 
 - [x] Supersede pointer-focused outlines with focus-visible outlines so pointer interaction does not retain keyboard-focus presentation.
@@ -65,6 +73,10 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[14/09/26]
+
+- [x] Verify default read-only and editable inputs use the same background in both color schemes.
 
 [06/08/26]
 

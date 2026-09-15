@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { textColors } from '../../tokens/semantics.stylex'
-import { fontFamilies, fontSizes, lineHeights } from '../../tokens/value.stylex'
+import { fontFamilies, fontSizes, lineHeights, spacing } from '../../tokens/value.stylex'
 
 export const binaryValueStyles = stylex.create({
   preview: {
@@ -15,6 +15,12 @@ export const binaryValueStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
+  },
+  copyTriggerContent: {
+    gap: spacing.xxs,
+    paddingInline: spacing.xs,
+    alignItems: 'center',
+    display: 'inline-flex',
   },
   visuallyHidden: {
     padding: 0,

@@ -1,5 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
+import { ArrowRight } from 'lucide-react'
 import type { ReactElement } from 'react'
+import { Icon } from '../icon/icon'
 import { MiddleTruncate } from '../middleTruncate/middleTruncate'
 import { TextLink } from '../textLink/textLink'
 import { relationValueStyles } from './relationValue.styles'
@@ -13,18 +15,6 @@ export interface RelationValueProps {
   id: string
   /** Optional target navigation without coupling the component to an application router. */
   navigation?: RelationValueNavigation
-}
-
-function ArrowIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 12 12"
-      {...stylex.props(relationValueStyles.arrow)}
-    >
-      <path d="M2 6h7M6.5 2.5 10 6 6.5 9.5" />
-    </svg>
-  )
 }
 
 export function RelationValue(props: RelationValueProps) {
@@ -56,7 +46,10 @@ export function RelationValue(props: RelationValueProps) {
                 data-slot="relation-value-navigation-icon"
                 {...stylex.props(relationValueStyles.compactNavigationIcon)}
               >
-                <ArrowIcon />
+                <Icon
+                  artwork={ArrowRight}
+                  size="xs"
+                />
               </span>
             </span>
           </TextLink>

@@ -15,7 +15,19 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 }))
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children }: React.ComponentProps<'a'>) => <a href="/relation">{children}</a>,
+  Link: ({
+    children,
+    'aria-label': ariaLabel,
+    'data-slot': dataSlot,
+  }: React.ComponentProps<'a'> & { 'data-slot'?: string }) => (
+    <a
+      aria-label={ariaLabel}
+      data-slot={dataSlot}
+      href="/relation"
+    >
+      {children}
+    </a>
+  ),
 }))
 
 afterEach(cleanup)
@@ -73,6 +85,7 @@ describe('MutationField', () => {
     const input = screen.getByRole('textbox', { name: 'RoomId' })
     const targetLink = screen.getByRole('link', { name: 'Open referenced table' })
     expect(input.closest('[data-slot="input-group"]')?.contains(targetLink)).toBe(true)
+    expect(targetLink.getAttribute('data-slot')).toBe('input-group-link')
     expect(input.getAttribute('data-font')).toBe('mono')
     expect(screen.queryByRole('link', { name: 'Show' })).toBeNull()
   })

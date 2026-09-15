@@ -1,10 +1,15 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { createRef, type ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Input } from '../input/input'
-import { InputGroup } from './inputGroup'
+import { InputGroup, type InputGroupLinkProps } from './inputGroup'
 
 afterEach(cleanup)
+
+function RouterLink({ to, ...props }: { to: string } & ComponentProps<'a'>) {
+  return <a href={to} {...props} />
+}
 
 describe('InputGroup', () => {
   it('projects group context onto every interactive member', () => {
@@ -104,5 +109,81 @@ describe('InputGroup', () => {
     expect(screen.getByRole('button', { name: 'Hide password' }).getAttribute('data-pressed')).toBe(
       '',
     )
+  })
+
+  it('composes a full input-group member onto a router link', () => {
+    const ref = createRef<HTMLAnchorElement>()
+
+    render(
+      <InputGroup size="l">
+        <Input aria-label="Relation ID" />
+        <InputGroup.Link
+          ref={ref}
+          label="Open referenced table"
+          render={<RouterLink to="/tables/rooms" />}
+        >
+          <svg data-testid="relation-arrow" />
+        </InputGroup.Link>
+      </InputGroup>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Open referenced table' })
+
+    expect(link.getAttribute('href')).toBe('/tables/rooms')
+    expect(link.getAttribute('data-slot')).toBe('input-group-link')
+    expect(link.contains(screen.getByTestId('relation-arrow'))).toBe(true)
+    expect(ref.current).toBe(link)
+  })
+
+  it('requires a link destination and rejects runtime styling overrides', () => {
+    // @ts-expect-error InputGroup.Link requires href or render.
+    const missingDestination = <InputGroup.Link label="Open source">open</InputGroup.Link>
+    const unsafeProps = {
+      className: 'unsafe-class',
+      color: 'red',
+      href: '/source',
+      style: { color: 'red' },
+    } as unknown as InputGroupLinkProps
+
+    render(
+      <InputGroup>
+        <Input aria-label="Source" />
+        <InputGroup.Link
+          {...unsafeProps}
+          label="Open source"
+        >
+          open
+        </InputGroup.Link>
+      </InputGroup>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Open source' })
+    expect(link.classList.contains('unsafe-class')).toBe(false)
+    expect(link.hasAttribute('color')).toBe(false)
+    expect(link.getAttribute('style')).toBeNull()
+    expect(missingDestination).toBeTruthy()
+  })
+
+  it('prevents disabled group links from receiving focus or activating', () => {
+    const onClick = vi.fn()
+
+    render(
+      <InputGroup disabled>
+        <Input aria-label="Source" />
+        <InputGroup.Link
+          href="/source"
+          label="Open source"
+          onClick={onClick}
+        >
+          open
+        </InputGroup.Link>
+      </InputGroup>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Open source' })
+    expect(link.getAttribute('aria-disabled')).toBe('true')
+    expect(link.getAttribute('tabindex')).toBe('-1')
+    expect(fireEvent.click(link)).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
   })
 })

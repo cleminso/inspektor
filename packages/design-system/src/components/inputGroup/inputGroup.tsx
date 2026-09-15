@@ -1,7 +1,16 @@
 import { Button as BaseButton } from '@base-ui/react/button'
 import { Field as BaseField } from '@base-ui/react/field'
+import { mergeProps } from '@base-ui/react/merge-props'
+import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
-import { forwardRef, useContext, useState, type ComponentRef, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useContext,
+  useState,
+  type ComponentRef,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { Checkbox } from '../checkbox/checkbox'
@@ -60,6 +69,34 @@ export interface InputGroupActionProps extends Omit<
   /** Decorative action content. */
   children: ReactNode
 }
+
+type BaseInputGroupLinkProps = Omit<
+  useRender.ComponentProps<'a'>,
+  'aria-label' | 'children' | 'className' | 'color' | 'href' | 'render' | 'style'
+>
+
+interface InputGroupLinkSharedProps {
+  /** Accessible name for the icon-only navigation link. */
+  label: string
+  /** Decorative link content. */
+  children: ReactNode
+}
+
+type InputGroupLinkDestination =
+  | {
+      /** Identifies the native anchor destination. */
+      href: NonNullable<useRender.ComponentProps<'a'>['href']>
+      render?: never
+    }
+  | {
+      href?: never
+      /** Composes link presentation onto a router link component. */
+      render: NonNullable<useRender.ComponentProps<'a'>['render']>
+    }
+
+export type InputGroupLinkProps = BaseInputGroupLinkProps &
+  InputGroupLinkSharedProps &
+  InputGroupLinkDestination
 
 export interface InputGroupCheckboxProps {
   /** Accessible name that identifies the value controlled by the checkbox. */
@@ -206,6 +243,52 @@ const InputGroupAction = forwardRef<ComponentRef<typeof BaseButton>, InputGroupA
   },
 )
 
+const InputGroupLink = forwardRef<HTMLAnchorElement, InputGroupLinkProps>(function InputGroupLink(
+  { label, render, children, ...props },
+  forwardedRef,
+) {
+  const context = useContext(InputGroupContext)
+  const size = context?.size ?? 'm'
+  const disabled = context?.disabled === true
+  const styleProps = stylex.props(
+    inputGroupStyles.action,
+    inputGroupStyles.link,
+    actionSizeStyles[size],
+    disabled === true && inputGroupStyles.memberDisabled,
+  )
+  const defaultProps = {
+    ...styleProps,
+    'aria-label': label,
+    'aria-disabled': disabled === true ? true : undefined,
+    children,
+    'data-disabled': disabled === true ? '' : undefined,
+    'data-slot': 'input-group-link',
+    onClick:
+      disabled === true
+        ? (event: MouseEvent<HTMLAnchorElement>) => {
+            event.preventDefault()
+          }
+        : undefined,
+    tabIndex: disabled === true ? -1 : undefined,
+  } as useRender.ElementProps<'a'>
+  const domProps = Object.fromEntries(
+    Object.entries(props).filter(
+      ([key]) =>
+        key !== 'className' &&
+        key !== 'color' &&
+        key !== 'style' &&
+        (disabled === false || key !== 'onClick'),
+    ),
+  ) as useRender.ComponentProps<'a'>
+
+  return useRender({
+    defaultTagName: 'a',
+    render,
+    ref: forwardedRef,
+    props: mergeProps<'a'>(domProps, defaultProps),
+  })
+})
+
 function InputGroupCheckbox({
   label,
   checked,
@@ -273,5 +356,6 @@ export const InputGroup = Object.assign(InputGroupRoot, {
   Prefix: InputGroupPrefix,
   Suffix: InputGroupSuffix,
   Action: InputGroupAction,
+  Link: InputGroupLink,
   Checkbox: InputGroupCheckbox,
 })

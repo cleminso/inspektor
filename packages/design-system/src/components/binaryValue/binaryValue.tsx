@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
+import { ChevronDown, Copy } from 'lucide-react'
 import { useState } from 'react'
 
+import { Icon } from '../icon/icon'
 import { Input } from '../input/input'
 import { InputGroup } from '../inputGroup/inputGroup'
 import { Menu } from '../menu/menu'
@@ -92,7 +94,7 @@ export function BinaryDetails({ byteLength, onCopy, onDownload }: BinaryDetailsP
     >
       <InputGroup
         fullWidth
-        size="s"
+        size="l"
       >
         <Input
           aria-label="Binary value"
@@ -102,7 +104,18 @@ export function BinaryDetails({ byteLength, onCopy, onDownload }: BinaryDetailsP
         />
         {isValidByteCount === true ? (
           <Menu.Root>
-            <Menu.Trigger>Copy as</Menu.Trigger>
+            <Menu.Trigger
+              render={
+                <InputGroup.Action label="Copy as">
+                  <span
+                    {...stylex.props(binaryValueStyles.copyTriggerContent)}
+                  >
+                    <Icon artwork={Copy} />
+                    <Icon artwork={ChevronDown} />
+                  </span>
+                </InputGroup.Action>
+              }
+            />
             <Menu.Content align="end">
               <Menu.Item onClick={() => void copyAs('hex')}>Hex</Menu.Item>
               <Menu.Item onClick={() => void copyAs('base64')}>Base64</Menu.Item>

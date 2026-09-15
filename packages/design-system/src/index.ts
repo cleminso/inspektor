@@ -285,6 +285,7 @@ export { InputGroup } from './components/inputGroup/inputGroup'
 export type {
   InputGroupActionProps,
   InputGroupCheckboxProps,
+  InputGroupLinkProps,
   InputGroupPrefixProps,
   InputGroupRootProps,
   InputGroupSuffixProps,

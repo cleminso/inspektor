@@ -16,6 +16,10 @@ This checklist tracks the reusable relation preview and detail component.
 
 ## Implemented foundation
 
+[14/09/26]
+
+- [x] Use the same arrow artwork for reference-cell and mutation-field navigation.
+
 [03/09/26]
 
 - [x] Let navigable relation identifiers and their arrow inherit one shared hover and focus color from `TextLink`.
@@ -61,6 +65,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[14/09/26]
+
+- [x] Use a right arrow for navigation to a referenced table.
+
 [03/09/26]
 
 - [x] Treat the compact relation identifier and navigation arrow as one link affordance on hover and keyboard focus.
@@ -81,6 +89,11 @@ No open product work is recorded.
 - [ ] Decide whether `Open target` should expose the target collection as supplementary tooltip text.
 
 ## Validation checklist
+
+[14/09/26]
+
+- [x] Cover the shared arrow presence in reference values and mutation fields with focused tests.
+- [x] Verify arrow sizing and alignment in grid cells and mutation fields in the browser.
 
 [03/09/26]
 

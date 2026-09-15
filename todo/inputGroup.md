@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[14/09/26]
+
+- [x] Let the complete checkbox-label segment drive the nested checkbox hover border.
+- [x] Add a full-segment icon-only navigation member for native and composed links.
+
 [03/09/26]
 
 - [x] Register checkbox tooltip guidance as the checkbox description.
@@ -25,6 +30,11 @@ None.
 
 ## Settled interaction decisions
 
+[14/09/26]
+
+- Icon-only navigation uses anchor semantics and makes the complete trailing segment interactive.
+- Input-group action segments remain transparent while their nested control affordances show hover state.
+
 [03/09/26]
 
 - Tooltip content is visual duplication and does not repeat the registered accessible description.
@@ -34,6 +44,11 @@ None.
 None.
 
 ## Validation checklist
+
+[14/09/26]
+
+- [x] Cover router-link composition and accessible naming with a focused component test.
+- [x] Verify checkbox-label hover, navigation hit area, and focus visibility in the browser.
 
 [03/09/26]
 

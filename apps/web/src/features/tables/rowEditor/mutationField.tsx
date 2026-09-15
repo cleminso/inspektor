@@ -2,6 +2,7 @@ import { useMemo, useState, type RefCallback } from 'react'
 
 import { Link } from '@tanstack/react-router'
 import type { ColumnDescriptor } from 'jazz-tools'
+import { ArrowRight } from 'lucide-react'
 
 import {
   BinaryDetails,
@@ -9,12 +10,12 @@ import {
   CodeEditor,
   DatePicker,
   Field,
+  Icon,
   Input,
   InputGroup,
   JsonView,
   Select,
   Text,
-  TextLink,
   TimestampValue,
   ToggleGroup,
   type CodeEditorLayout,
@@ -569,20 +570,19 @@ export function MutationField({
             {relationTarget !== null &&
             column.references !== undefined &&
             currentConnectionId !== null ? (
-              <InputGroup.Suffix>
-                <TextLink
-                  render={
-                    <Link
-                      {...buildRelationTableLink({
-                        connectionId: currentConnectionId,
-                        tableName: column.references,
-                      })}
-                    />
-                  }
-                >
-                  Open referenced table
-                </TextLink>
-              </InputGroup.Suffix>
+              <InputGroup.Link
+                label="Open referenced table"
+                render={
+                  <Link
+                    {...buildRelationTableLink({
+                      connectionId: currentConnectionId,
+                      tableName: column.references,
+                    })}
+                  />
+                }
+              >
+                <Icon artwork={ArrowRight} />
+              </InputGroup.Link>
             ) : null}
           </InputGroup>
         </Box>

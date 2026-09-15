@@ -76,10 +76,7 @@ export const inputStyles = stylex.create({
     },
   },
   readOnly: {
-    backgroundColor: {
-      default: elementColors.default,
-      ':hover': elementColors.default,
-    },
+    backgroundColor: surfaceColors.default,
     cursor: 'default',
   },
   invalid: {

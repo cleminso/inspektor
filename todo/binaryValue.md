@@ -16,6 +16,13 @@ This checklist tracks the reusable binary preview and inspection component.
 
 ## Implemented foundation
 
+[14/09/26]
+
+- [x] Replace the copy-menu text trigger with a copy glyph and disclosure chevron.
+- [x] Match the read-only byte-count surface to default editable inputs.
+- [x] Keep 2px between the copy and disclosure glyphs.
+- [x] Add token-backed extra-small inline padding around the paired copy controls.
+
 [05/08/26]
 
 - [x] Keep byte-count values compact by joining the number and unit without a space in grid and inspection presentations.
@@ -50,6 +57,13 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[14/09/26]
+
+- [x] Keep the copy glyph and disclosure chevron inside one menu trigger.
+- [x] Keep copy-trigger glyph spacing local instead of changing every menu trigger.
+- [x] Compose the menu trigger through the input-group action so hover and open states stay transparent.
+- [x] Use muted glyphs at rest and default foreground on hover.
+
 [05/08/26]
 
 - [x] Format binary sizes as compact values such as `27B` and `3.5KB`.
@@ -65,6 +79,13 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[14/09/26]
+
+- [x] Cover the icon-only copy trigger's accessible name and menu behavior with focused tests.
+- [x] Verify the trigger geometry, hover, focus, and open states in the browser.
+- [x] Verify byte-count background parity and 2px glyph spacing in both color schemes.
+- [x] Verify the copy action stays transparent while idle, hovered, and open, with muted-to-default foreground feedback.
 
 [05/08/26]
 

@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
+import { interactiveControlVars } from '../../primitives/interactiveControlVars.stylex'
 import {
   borderColors,
   elementColors,
@@ -90,18 +91,18 @@ export const inputGroupStyles = stylex.create({
     padding: 0,
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: {
-      default: 'transparent',
-      ':hover': ghostElementColors.hover,
-      ':active': ghostElementColors.pressed,
-    },
+    backgroundColor: 'transparent',
     borderBlockEndWidth: 0,
     borderBlockStartWidth: 0,
     borderInlineEndWidth: 0,
     borderInlineStartColor: borderColors.subtle,
     borderInlineStartStyle: 'solid',
     borderInlineStartWidth: 1,
-    color: textColors.muted,
+    boxSizing: 'border-box',
+    color: {
+      default: textColors.muted,
+      ':hover:not([data-disabled])': textColors.default,
+    },
     cursor: 'pointer',
     display: 'inline-flex',
     flexShrink: 0,
@@ -115,25 +116,28 @@ export const inputGroupStyles = stylex.create({
     },
   },
   actionPressed: {
-    backgroundColor: {
-      default: ghostElementColors.selected,
-      ':hover': ghostElementColors.hover,
-      ':active': ghostElementColors.pressed,
-    },
+    backgroundColor: ghostElementColors.selected,
+  },
+  link: {
+    textDecorationLine: 'none',
   },
   actionXS: {
-    width: `calc(${spatial['control-height-xs']} - 2px)`,
+    minWidth: `calc(${spatial['control-height-xs']} - 2px)`,
   },
   actionS: {
-    width: `calc(${spatial['control-height-s']} - 2px)`,
+    minWidth: `calc(${spatial['control-height-s']} - 2px)`,
   },
   actionM: {
-    width: `calc(${spatial['control-height-m']} - 2px)`,
+    minWidth: `calc(${spatial['control-height-m']} - 2px)`,
   },
   actionL: {
-    width: `calc(${spatial['control-height-l']} - 2px)`,
+    minWidth: `calc(${spatial['control-height-l']} - 2px)`,
   },
   checkboxField: {
+    [interactiveControlVars.hoverBorderColor]: {
+      default: borderColors.default,
+      ':hover': borderColors.strong,
+    },
     gap: spacing.s,
     paddingInline: spacing.m,
     alignItems: 'center',

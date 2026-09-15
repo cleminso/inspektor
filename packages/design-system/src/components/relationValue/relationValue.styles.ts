@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { spatial, textColors } from '../../tokens/semantics.stylex'
+import { textColors } from '../../tokens/semantics.stylex'
 import { fontFamilies, fontSizes, lineHeights, spacing } from '../../tokens/value.stylex'
 
 export const relationValueStyles = stylex.create({
@@ -40,15 +40,5 @@ export const relationValueStyles = stylex.create({
     alignItems: 'center',
     display: 'inline-flex',
     flexShrink: 0,
-  },
-  arrow: {
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    strokeWidth: 1.25,
-    display: 'block',
-    height: spatial['icon-size-xs'],
-    width: spatial['icon-size-xs'],
   },
 })
