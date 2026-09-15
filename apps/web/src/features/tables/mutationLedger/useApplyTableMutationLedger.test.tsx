@@ -43,11 +43,13 @@ function TestLedgerProvider({ children }: { children: ReactNode }): React.ReactE
 
 function Harness({
   deleteRow = vi.fn(),
+  insertRow = vi.fn(),
   updateRow,
   onAppliedUpdates,
   onSuccess,
 }: {
   deleteRow?: () => Promise<void>
+  insertRow?: () => Promise<string>
   updateRow: () => Promise<void>
   onAppliedUpdates?: (appliedUpdateFields: TableFieldsByRowId) => void
   onSuccess?: () => void
@@ -58,7 +60,7 @@ function Harness({
     rowId: 'row-1',
   })
   const apply = useApplyTableMutationLedger({
-    executor: { deleteRow, updateRow },
+    executor: { deleteRow, insertRow, updateRow },
     mutations,
     onAppliedUpdates,
     onSuccess,

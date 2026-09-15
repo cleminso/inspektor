@@ -116,6 +116,7 @@ vi.mock('@tables/query/useTableRows', () => ({
     tableRowsOptions = options
     return {
       columns: tableColumns,
+      error: null,
       hasNextPage: queryHasNextPage,
       isInitialLoading: queryIsInitialLoading,
       isRefreshing: false,
@@ -226,12 +227,10 @@ describe('useTableViewState', () => {
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
     fireEvent.click(await screen.findByRole('menuitem', { name: /Move left/ }))
 
-    expect(moveColumnInOrderMock).toHaveBeenCalledWith(
-      ['id', 'name'],
+    expect(moveColumnInOrderMock).toHaveBeenCalledWith(['id', 'name'], 'name', 'left', [
+      'id',
       'name',
-      'left',
-      ['id', 'name'],
-    )
+    ])
     expect(columnOrderState.setPinnedColumnIds).toHaveBeenCalledOnce()
     expect(columnOrderState.setColumnOrder).not.toHaveBeenCalled()
   })

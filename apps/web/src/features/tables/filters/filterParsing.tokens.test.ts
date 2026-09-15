@@ -86,6 +86,14 @@ describe('cell value filter clauses', () => {
     })
   })
 
+  it('builds an exclusion clause through the schema parser', () => {
+    expect(createTableFilterClauseFromValue(integerColumn, 42, 'exclude')).toMatchObject({
+      column: 'age',
+      operator: 'ne',
+      value: 42,
+    })
+  })
+
   it.each([
     [{ type: 'Boolean' }, true, true],
     [{ type: 'Double' }, 1.5, 1.5],
@@ -157,6 +165,11 @@ describe('cell value filter clauses', () => {
       column: 'ownerId',
       operator: 'isNull',
       value: true,
+    })
+    expect(createTableFilterClauseFromValue(nullableColumn, null, 'exclude')).toMatchObject({
+      column: 'ownerId',
+      operator: 'isNull',
+      value: false,
     })
   })
 

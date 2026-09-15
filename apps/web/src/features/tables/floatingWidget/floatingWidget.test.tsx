@@ -323,7 +323,9 @@ describe('TableMutationWidget', () => {
         >
           Stage invalid
         </button>
-        <TableMutationWidget executor={{ deleteRow: vi.fn(), updateRow: vi.fn() }} />
+        <TableMutationWidget
+          executor={{ deleteRow: vi.fn(), insertRow: vi.fn(), updateRow: vi.fn() }}
+        />
       </>
     )
   }
@@ -361,6 +363,40 @@ describe('TableMutationWidget', () => {
     expect(screen.queryByText('2 selected rows')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Undo: long-row-identity-123456789' }))
     expect(screen.queryByText('long-row-identity-123456789')).toBeNull()
+  })
+
+  it('reviews and undoes a duplicated row as a pending insertion', () => {
+    function InsertionHarness(): React.ReactElement {
+      const mutations = useTableMutationLedger()
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => mutations.stageInsert('row-1', { name: 'Ada', count: 1 })}
+          >
+            Duplicate row
+          </button>
+          <TableMutationWidget
+            executor={{ deleteRow: vi.fn(), insertRow: vi.fn(), updateRow: vi.fn() }}
+          />
+        </>
+      )
+    }
+    render(
+      <InspectorFooterCenterProvider>
+        <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
+          <InsertionHarness />
+          <InspectorFooterCenterSlot />
+        </TestLedgerProvider>
+      </InspectorFooterCenterProvider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Review pending changes' }))
+
+    expect(screen.getByRole('button', { name: 'Pending insertions, 1' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Undo: Copy of row-1' }))
+    expect(screen.queryByRole('button', { name: 'Pending changes' })).toBeNull()
   })
 
   it('requires correction when a draft has only invalid input', () => {
@@ -412,7 +448,9 @@ describe('TableMutationWidget', () => {
           <button type="button" onClick={() => mutations.stageDeletions(['row-1'])}>
             Stage deletion
           </button>
-          <TableMutationWidget executor={{ deleteRow, updateRow: vi.fn() }} />
+          <TableMutationWidget
+            executor={{ deleteRow, insertRow: vi.fn(), updateRow: vi.fn() }}
+          />
         </>
       )
     }

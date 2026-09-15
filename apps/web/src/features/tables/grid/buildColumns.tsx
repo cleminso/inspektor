@@ -31,7 +31,12 @@ import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
 import { normalizeColumnOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
-import type { TableColumnMeta, TableRowId, TableValuesByRowId, DynamicTableRow } from '@tables/tableTypes'
+import type {
+  TableColumnMeta,
+  TableRowId,
+  TableValuesByRowId,
+  DynamicTableRow,
+} from '@tables/tableTypes'
 
 interface BuildDataGridColumnsOptions {
   columns: TableColumnMeta[]

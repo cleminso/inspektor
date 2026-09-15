@@ -9,6 +9,13 @@ import type { TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 
 export type TableMutationFields = Readonly<Record<string, unknown>>
 type DeletionOperationId = `delete-operation:${number}`
+export type InsertionOperationId = `insert:${number}`
+
+interface TableInsertMutationEntry {
+  entryId: InsertionOperationId
+  fields: TableMutationFields
+  kind: 'insert'
+}
 
 interface TableUpdateMutationEntry {
   entryId: `update:${string}`
@@ -23,17 +30,28 @@ interface TableDeleteMutationEntry {
   rowId: TableRowId
 }
 
-export type TableMutationEntry = TableUpdateMutationEntry | TableDeleteMutationEntry
+export type TableMutationEntry =
+  | TableInsertMutationEntry
+  | TableUpdateMutationEntry
+  | TableDeleteMutationEntry
 
 interface TableDeletionOperation {
   operationId: DeletionOperationId
   rowIds: readonly TableRowId[]
 }
 
+interface TableInsertionOperation {
+  draft: RowMutationDraft
+  operationId: InsertionOperationId
+  sourceRowId: TableRowId
+}
+
 export interface TableMutationState {
   deletionOperations: readonly TableDeletionOperation[]
   draftsByRowId: Readonly<Record<TableRowId, RowMutationDraft>>
   nextDeletionOperationId: number
+  insertionOperations: readonly TableInsertionOperation[]
+  nextInsertionOperationId: number
 }
 
 export interface TableMutationLedger {
@@ -42,6 +60,11 @@ export interface TableMutationLedger {
 }
 
 export type TableMutationReviewOperation =
+  | {
+      kind: 'insert'
+      operationId: InsertionOperationId
+      sourceRowId: TableRowId
+    }
   | {
       fieldNames: readonly string[]
       kind: 'update'
@@ -68,6 +91,7 @@ export type TableMutationStateAction =
       type: 'setDraft'
     }
   | { rowIds: readonly TableRowId[]; type: 'deleteRows' }
+  | { draft: RowMutationDraft; sourceRowId: TableRowId; type: 'insertRow' }
   | { rowIds: readonly TableRowId[]; type: 'undoDeletions' }
   | { fieldName: string; rowId: TableRowId; type: 'revertUpdateField' }
   | { rowId: TableRowId; type: 'revertRowUpdate' }
@@ -79,7 +103,13 @@ export type TableMutationStateAction =
   | { type: 'discardAll' }
 
 export function createTableMutationState(): TableMutationState {
-  return { deletionOperations: [], draftsByRowId: {}, nextDeletionOperationId: 0 }
+  return {
+    deletionOperations: [],
+    draftsByRowId: {},
+    insertionOperations: [],
+    nextDeletionOperationId: 0,
+    nextInsertionOperationId: 0,
+  }
 }
 
 function selectDeletedRowIds(state: TableMutationState): Set<TableRowId> {
@@ -124,6 +154,20 @@ export function reduceTableMutationState(
       }
       return { ...state, draftsByRowId }
     }
+    case 'insertRow': {
+      if (action.draft.kind !== 'insert') {
+        return state
+      }
+      const operationId: InsertionOperationId = `insert:${state.nextInsertionOperationId}`
+      return {
+        ...state,
+        insertionOperations: [
+          ...state.insertionOperations,
+          { draft: action.draft, operationId, sourceRowId: action.sourceRowId },
+        ],
+        nextInsertionOperationId: state.nextInsertionOperationId + 1,
+      }
+    }
     case 'deleteRows': {
       const deletedRowIds = selectDeletedRowIds(state)
       const rowIds = [...new Set(action.rowIds)].filter(
@@ -137,6 +181,7 @@ export function reduceTableMutationState(
         delete draftsByRowId[rowId]
       }
       return {
+        ...state,
         deletionOperations: [
           ...state.deletionOperations,
           { operationId: `delete-operation:${state.nextDeletionOperationId}`, rowIds },
@@ -174,6 +219,14 @@ export function reduceTableMutationState(
       return { ...state, draftsByRowId }
     }
     case 'undoReviewOperation':
+      if (action.operationId.startsWith('insert:')) {
+        return {
+          ...state,
+          insertionOperations: state.insertionOperations.filter(
+            (operation) => operation.operationId !== action.operationId,
+          ),
+        }
+      }
       if (action.operationId.startsWith('update:')) {
         return reduceTableMutationState(state, {
           type: 'revertRowUpdate',
@@ -189,15 +242,27 @@ export function reduceTableMutationState(
     case 'acknowledgeAppliedEntries': {
       const entryIds = new Set(action.entryIds)
       const draftsByRowId = { ...state.draftsByRowId }
+      const appliedInsertIds = new Set<string>()
       const deletedRowIds = new Set<TableRowId>()
       for (const entryId of entryIds) {
         if (entryId.startsWith('update:')) {
           delete draftsByRowId[entryId.slice('update:'.length)]
+        } else if (entryId.startsWith('insert:')) {
+          appliedInsertIds.add(entryId)
         } else {
           deletedRowIds.add(entryId.slice('delete:'.length))
         }
       }
-      return removeDeletedRows({ ...state, draftsByRowId }, deletedRowIds)
+      return removeDeletedRows(
+        {
+          ...state,
+          draftsByRowId,
+          insertionOperations: state.insertionOperations.filter(
+            (operation) => appliedInsertIds.has(operation.operationId) === false,
+          ),
+        },
+        deletedRowIds,
+      )
     }
     case 'discardAll':
       return createTableMutationState()
@@ -213,6 +278,20 @@ export function selectTableMutationProjection(
   const stagedFieldsByRowId: Record<TableRowId, ReadonlySet<string>> = {}
   const stagedValuesByRowId: Record<TableRowId, Readonly<Record<string, unknown>>> = {}
   let hasInvalidDraft = false
+  for (const operation of state.insertionOperations) {
+    const values = buildRowMutationValueProjection(operation.draft, schemaColumns)
+    hasInvalidDraft ||= Object.keys(values.errors).length > 0
+    entries.push({
+      entryId: operation.operationId,
+      fields: values.submissionValues,
+      kind: 'insert',
+    })
+    operations.push({
+      kind: 'insert',
+      operationId: operation.operationId,
+      sourceRowId: operation.sourceRowId,
+    })
+  }
 
   for (const [rowId, draft] of Object.entries(state.draftsByRowId)) {
     const values = buildRowMutationValueProjection(draft, schemaColumns)

@@ -24,11 +24,13 @@ function OperationRow({
   total: number
 }): React.ReactElement {
   const summary =
-    operation.kind === 'update'
-      ? operation.rowId
-      : operation.rowIds.length === 1
-        ? (operation.rowIds[0] ?? '')
-        : `${operation.rowIds.length} selected rows`
+    operation.kind === 'insert'
+      ? `Copy of ${operation.sourceRowId}`
+      : operation.kind === 'update'
+        ? operation.rowId
+        : operation.rowIds.length === 1
+          ? (operation.rowIds[0] ?? '')
+          : `${operation.rowIds.length} selected rows`
   return (
     <Box
       as="li"
@@ -39,7 +41,6 @@ function OperationRow({
       gap="s"
       height="collection-row-height-xl"
       minWidth={0}
-      paddingLeft="s"
       width="full"
     >
       <Box
@@ -175,6 +176,7 @@ function OperationReview({
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
   const updates = operations.filter((operation) => operation.kind === 'update')
+  const insertions = operations.filter((operation) => operation.kind === 'insert')
   const deletions = operations.filter((operation) => operation.kind === 'delete')
   return (
     <Box
@@ -188,9 +190,17 @@ function OperationReview({
       padding="s"
     >
       <Accordion
-        defaultValue={['updates', 'deletions']}
+        defaultValue={['insertions', 'updates', 'deletions']}
         multiple
       >
+        {insertions.length === 0 ? null : (
+          <ReviewSection
+            label="Pending insertions"
+            operations={insertions}
+            value="insertions"
+            onUndo={onUndo}
+          />
+        )}
         {updates.length === 0 ? null : (
           <ReviewSection
             label="Pending updates"

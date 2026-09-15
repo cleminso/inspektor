@@ -6,7 +6,11 @@ import {
   reduceTableMutationState,
   selectTableMutationProjection,
 } from '@tables/mutationLedger/ledger'
-import { createUpdateRowDraft, setMutationFieldText } from '@tables/rowEditor/mutation/draft'
+import {
+  createInsertRowDraft,
+  createUpdateRowDraft,
+  setMutationFieldText,
+} from '@tables/rowEditor/mutation/draft'
 
 const columns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
@@ -188,5 +192,62 @@ describe('table mutation state', () => {
     expect(projection.stagedValuesByRowId).toEqual({
       'row-1': { name: 'Grace' },
     })
+  })
+
+  it('stages independent insert snapshots and removes them by operation', () => {
+    const sourceValues = { name: 'Grace', age: 37 }
+    let state = reduceTableMutationState(createTableMutationState(), {
+      type: 'insertRow',
+      draft: createInsertRowDraft(sourceValues, columns),
+      sourceRowId: 'row-1',
+    })
+    sourceValues.name = 'Changed later'
+    state = reduceTableMutationState(state, {
+      type: 'insertRow',
+      draft: createInsertRowDraft({ name: 'Grace', age: 37 }, columns),
+      sourceRowId: 'row-1',
+    })
+
+    const projection = selectTableMutationProjection(state, columns)
+    expect(projection.ledger.entries).toEqual([
+      { entryId: 'insert:0', fields: { age: 37, name: 'Grace' }, kind: 'insert' },
+      { entryId: 'insert:1', fields: { age: 37, name: 'Grace' }, kind: 'insert' },
+    ])
+    expect(projection.reviewOperations).toEqual([
+      { kind: 'insert', operationId: 'insert:0', sourceRowId: 'row-1' },
+      { kind: 'insert', operationId: 'insert:1', sourceRowId: 'row-1' },
+    ])
+    state = reduceTableMutationState(state, {
+      type: 'undoReviewOperation',
+      operationId: 'insert:0',
+    })
+    expect(selectTableMutationProjection(state, columns).ledger.entries).toEqual([
+      { entryId: 'insert:1', fields: { age: 37, name: 'Grace' }, kind: 'insert' },
+    ])
+
+    state = reduceTableMutationState(state, {
+      type: 'acknowledgeAppliedEntries',
+      entryIds: ['insert:1'],
+    })
+    expect(selectTableMutationProjection(state, columns).ledger.entries).toEqual([])
+  })
+
+  it('preserves staged inserts when deletion supersedes a row update', () => {
+    let state = reduceTableMutationState(createTableMutationState(), {
+      type: 'insertRow',
+      draft: createInsertRowDraft({ name: 'Duplicate', age: 37 }, columns),
+      sourceRowId: 'row-1',
+    })
+    state = reduceTableMutationState(state, {
+      type: 'setDraft',
+      rowId: 'row-1',
+      draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace' }),
+    })
+    state = reduceTableMutationState(state, { type: 'deleteRows', rowIds: ['row-1'] })
+
+    expect(selectTableMutationProjection(state, columns).ledger.entries).toEqual([
+      { entryId: 'insert:0', fields: { age: 37, name: 'Duplicate' }, kind: 'insert' },
+      { entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' },
+    ])
   })
 })

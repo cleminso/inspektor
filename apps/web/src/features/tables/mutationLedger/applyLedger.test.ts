@@ -7,26 +7,31 @@ const ledger = {
   hasInvalidDraft: false,
   entries: [
     { entryId: 'update:row-1', fields: { name: 'Grace' }, kind: 'update', rowId: 'row-1' },
+    { entryId: 'insert:0', fields: { name: 'Ada copy' }, kind: 'insert' },
     { entryId: 'delete:row-2', kind: 'delete', rowId: 'row-2' },
   ],
 } satisfies TableMutationLedger
 
 describe('applyTableMutationLedger', () => {
-  it('applies updates before deletions', async () => {
+  it('applies updates, inserts, then deletions', async () => {
     const calls: string[] = []
 
     const result = await applyTableMutationLedger(ledger, {
       updateRow: async () => {
         calls.push('update')
       },
+      insertRow: async () => {
+        calls.push('insert')
+        return 'row-copy'
+      },
       deleteRow: async () => {
         calls.push('delete')
       },
     })
 
-    expect(calls).toEqual(['update', 'delete'])
+    expect(calls).toEqual(['update', 'insert', 'delete'])
     expect(result).toEqual({
-      appliedEntryIds: ['update:row-1', 'delete:row-2'],
+      appliedEntryIds: ['update:row-1', 'insert:0', 'delete:row-2'],
       status: 'complete',
     })
   })
@@ -42,12 +47,13 @@ describe('applyTableMutationLedger', () => {
       },
       {
         updateRow: vi.fn().mockResolvedValue(undefined),
+        insertRow: vi.fn().mockResolvedValue('row-copy'),
         deleteRow,
       },
     )
 
     expect(result).toEqual({
-      appliedEntryIds: ['update:row-1'],
+      appliedEntryIds: ['update:row-1', 'insert:0'],
       error,
       status: 'failed',
     })

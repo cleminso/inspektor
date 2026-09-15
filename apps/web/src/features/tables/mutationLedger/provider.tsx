@@ -25,6 +25,7 @@ import {
   type TableMutationStateAction,
 } from '@tables/mutationLedger/ledger'
 import {
+  createInsertRowDraft,
   createUpdateRowDraft,
   rebaseUpdateRowDraft,
   type RowMutationDraft,
@@ -129,12 +130,17 @@ const TableMutationLedgerWorkspaceStateContext = createContext<Readonly<
 > | null>(null)
 
 function hasUnresolvedMutationState(state: TableMutationState): boolean {
-  return state.deletionOperations.length > 0 || Object.keys(state.draftsByRowId).length > 0
+  return (
+    state.deletionOperations.length > 0 ||
+    state.insertionOperations.length > 0 ||
+    Object.keys(state.draftsByRowId).length > 0
+  )
 }
 
 function countUnresolvedMutationState(state: TableMutationState): number {
   return (
     state.deletionOperations.reduce((count, operation) => count + operation.rowIds.length, 0) +
+    state.insertionOperations.length +
     Object.keys(state.draftsByRowId).length
   )
 }
@@ -375,6 +381,17 @@ export function useTableMutationLedger() {
     (rowIds: readonly TableRowId[]) => recover({ type: 'deleteRows', rowIds }),
     [recover],
   )
+  const stageInsert = useCallback(
+    (sourceRowId: TableRowId, sourceValues: Readonly<Record<string, unknown>>) => {
+      const snapshot = structuredClone(sourceValues)
+      recover({
+        type: 'insertRow',
+        draft: createInsertRowDraft(snapshot, context.schemaColumns),
+        sourceRowId,
+      })
+    },
+    [context.schemaColumns, recover],
+  )
   const undoReviewOperation = useCallback(
     (operationId: TableMutationReviewOperation['operationId']) =>
       recover({ type: 'undoReviewOperation', operationId }),
@@ -391,6 +408,7 @@ export function useTableMutationLedger() {
     revertRowUpdate,
     reviewOperations,
     stageDeletions,
+    stageInsert,
     stagedFieldsByRowId,
     stagedValuesByRowId: context.projection.stagedValuesByRowId,
     stagedCount,

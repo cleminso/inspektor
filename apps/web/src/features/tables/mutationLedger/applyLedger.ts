@@ -6,6 +6,7 @@ import type {
 
 export interface TableMutationExecutor {
   deleteRow: (rowId: string) => Promise<void>
+  insertRow: (fields: TableMutationFields) => Promise<string>
   updateRow: (rowId: string, fields: TableMutationFields) => Promise<void>
 }
 
@@ -27,6 +28,7 @@ export async function applyTableMutationLedger(
   // Keep persistence ordering explicit; this is a client sequence, not a database transaction.
   const entries = [
     ...ledger.entries.filter((entry) => entry.kind === 'update'),
+    ...ledger.entries.filter((entry) => entry.kind === 'insert'),
     ...ledger.entries.filter((entry) => entry.kind === 'delete'),
   ]
   const appliedEntryIds: TableMutationEntry['entryId'][] = []
@@ -35,6 +37,8 @@ export async function applyTableMutationLedger(
     try {
       if (entry.kind === 'update') {
         await executor.updateRow(entry.rowId, entry.fields)
+      } else if (entry.kind === 'insert') {
+        await executor.insertRow(entry.fields)
       } else {
         await executor.deleteRow(entry.rowId)
       }

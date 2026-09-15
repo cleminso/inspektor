@@ -12,6 +12,8 @@ import type { WhereOperator } from 'jazz-tools'
 /** Operators exposed by the generic filter UI and supported by query translation. */
 export type TableFilterOperator = WhereOperator
 
+export type TableFilterValueMatch = 'exclude' | 'include'
+
 /** Runtime operator list used to reject malformed URL-backed clauses. */
 export const tableFilterOperators = [
   'eq',

@@ -25,13 +25,20 @@ function ExportMenu({ data }: { data: DynamicTableRow[] }): React.ReactElement {
       { accessorKey: 'name' },
     ],
     data,
+    getRowId: (row) => String(row.id),
     state: {
       columnPinning: { start: ['name'], end: [] },
       columnVisibility: { hidden: false },
     },
   })
 
-  return <DataGridExport table={table} tableColumns={tableColumns} tableName="people" />
+  return (
+    <DataGridExport
+      table={table}
+      tableColumns={tableColumns}
+      tableName="people"
+    />
+  )
 }
 
 afterEach(() => {

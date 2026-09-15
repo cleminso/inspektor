@@ -93,7 +93,7 @@ function TestTable({
     data: data ?? [{ id: 'row-1', name: 'Ada' } as DynamicTableRow],
     meta: { stagedValuesByRowId },
     enableRowSelection: (row) => disabledRowIds?.has(row.id) !== true,
-    getRowId: (row) => String(row.id),
+    getRowId: (row) => row.id,
     initialState:
       initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
     state: { columnOrder, columnPinning, columnVisibility, sorting },

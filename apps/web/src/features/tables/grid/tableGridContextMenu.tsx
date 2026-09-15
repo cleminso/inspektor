@@ -13,7 +13,7 @@ import {
 } from '@inspektor/ds'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 
-import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
+import type { TableFilterValueMatch } from '@tables/filters/tableFilters'
 
 const binaryCopyFormatLabels = {
   base64: 'Base64',
@@ -39,10 +39,15 @@ interface TableGridContextMenuRenderProps {
 
 interface TableGridContextMenuProps {
   children: (props: TableGridContextMenuRenderProps) => ReactNode
+  canMutateRow: (rowId: string) => boolean
+  canSelectRow: (rowId: string) => boolean
   getCellActions: (target: DataGridCellTarget) => TableGridCellActions
   onCopyCell: (target: DataGridCellTarget, format?: BinaryCopyFormat) => void
   onEditCell: (target: DataGridCellTarget) => void
-  onFilterByCell: (target: DataGridCellTarget) => void
+  onFilterByCell: (target: DataGridCellTarget, match: TableFilterValueMatch) => void
+  onDeleteRow: (rowId: string) => void
+  onDuplicateRow: (rowId: string) => void
+  onSelectRow: (rowId: string) => void
   onTouchCellContextMenuOpen: (target: DataGridCellTarget) => void
   revertField: (rowId: string, fieldName: string) => void
   revertRowUpdate: (rowId: string) => void
@@ -53,16 +58,22 @@ interface TableGridContextMenuProps {
 interface TableGridCellActions {
   canCopy: boolean
   canEdit: boolean
+  canExclude: boolean
   canFilterBy: boolean
   copyAs: readonly BinaryCopyFormat[]
 }
 
 export function TableGridContextMenu({
   children,
+  canMutateRow,
+  canSelectRow,
   getCellActions,
   onCopyCell,
   onEditCell,
   onFilterByCell,
+  onDeleteRow,
+  onDuplicateRow,
+  onSelectRow,
   onTouchCellContextMenuOpen,
   revertField,
   revertRowUpdate,
@@ -98,13 +109,16 @@ export function TableGridContextMenu({
       return (
         stagedDeletionRowIds.has(rowId) === false &&
         stagedFields !== undefined &&
-        [...stagedFields].some((fieldName) => fieldName !== tableGridSelectionColumnId)
+        stagedFields.size > 0
       )
     },
     [stagedDeletionRowIds, stagedFieldsByRowId],
   )
   const hasContextActions = useCallback(
     ({ columnId, rowId }: { columnId?: string; rowId: string }) => {
+      if (canMutateRow(rowId) === true || canSelectRow(rowId) === true) {
+        return true
+      }
       if (columnId === undefined) {
         return rowHasUpdate(rowId)
       }
@@ -112,11 +126,12 @@ export function TableGridContextMenu({
       return (
         rowHasUpdate(rowId) === true ||
         actions.canEdit === true ||
+        actions.canExclude === true ||
         actions.canFilterBy === true ||
         actions.canCopy === true
       )
     },
-    [getCellActions, rowHasUpdate],
+    [canMutateRow, canSelectRow, getCellActions, rowHasUpdate],
   )
   const onCellContextMenu = useCallback<DataGridCellContextMenuHandler>(
     (cellTarget, event) => {
@@ -182,19 +197,25 @@ export function TableGridContextMenu({
     hasRowUpdate === true &&
     stagedFields !== undefined &&
     cellFieldName !== undefined &&
-    cellFieldName !== tableGridSelectionColumnId &&
     stagedFields.has(cellFieldName)
   const cellTarget =
     target === null || target.columnId === undefined
       ? null
       : { columnId: target.columnId, rowId: target.rowId }
   const cellActions = cellTarget === null ? null : getCellActions(cellTarget)
+  const targetCanSelectRow = target !== null && canSelectRow(target.rowId)
+  const targetCanMutateRow = target !== null && canMutateRow(target.rowId)
+  const hasEditOrCopyActions = cellActions?.canEdit === true || cellActions?.canCopy === true
+  const hasFilterActions = cellActions?.canFilterBy === true || cellActions?.canExclude === true
   const hasPrimaryCellActions =
     cellActions !== null &&
     cellActions !== undefined &&
     (cellActions.canEdit === true ||
+      cellActions.canExclude === true ||
       cellActions.canFilterBy === true ||
       cellActions.canCopy === true)
+  const hasRowActions = targetCanSelectRow === true || targetCanMutateRow === true
+  const hasRecoveryActions = hasCellUpdate === true || hasRowUpdate === true
 
   return (
     <ContextMenu.Root
@@ -237,15 +258,7 @@ export function TableGridContextMenu({
             }}
           >
             Edit
-          </ContextMenu.Item>
-        ) : null}
-        {cellActions?.canFilterBy === true && cellTarget !== null ? (
-          <ContextMenu.Item
-            onClick={() => {
-              onFilterByCell(cellTarget)
-            }}
-          >
-            Filter by this value
+            <ContextMenu.Shortcut hotkey={appHotkeys.editCell} />
           </ContextMenu.Item>
         ) : null}
         {cellActions?.canCopy === true && cellActions.copyAs.length === 0 && cellTarget !== null ? (
@@ -271,7 +284,50 @@ export function TableGridContextMenu({
               </ContextMenu.Item>
             ))
           : null}
-        {hasPrimaryCellActions === true && (hasCellUpdate === true || hasRowUpdate === true) ? (
+        {hasEditOrCopyActions === true && hasFilterActions === true ? (
+          <ContextMenu.Separator />
+        ) : null}
+        {cellActions?.canFilterBy === true && cellTarget !== null ? (
+          <ContextMenu.Item
+            onClick={() => {
+              onFilterByCell(cellTarget, 'include')
+            }}
+          >
+            Filter by this value
+          </ContextMenu.Item>
+        ) : null}
+        {cellActions?.canExclude === true && cellTarget !== null ? (
+          <ContextMenu.Item
+            onClick={() => {
+              onFilterByCell(cellTarget, 'exclude')
+            }}
+          >
+            Exclude this value
+          </ContextMenu.Item>
+        ) : null}
+        {hasPrimaryCellActions === true && hasRowActions === true ? (
+          <ContextMenu.Separator />
+        ) : null}
+        {targetCanSelectRow === true && target !== null ? (
+          <ContextMenu.Item
+            onClick={() => {
+              onSelectRow(target.rowId)
+            }}
+          >
+            Select row
+          </ContextMenu.Item>
+        ) : null}
+        {targetCanMutateRow === true && target !== null ? (
+          <ContextMenu.Item
+            onClick={() => {
+              onDuplicateRow(target.rowId)
+            }}
+          >
+            Duplicate row
+          </ContextMenu.Item>
+        ) : null}
+        {(hasPrimaryCellActions === true || hasRowActions === true) &&
+        hasRecoveryActions === true ? (
           <ContextMenu.Separator />
         ) : null}
         {hasCellUpdate === true && target !== null && cellFieldName !== undefined ? (
@@ -293,6 +349,22 @@ export function TableGridContextMenu({
             }}
           >
             Discard row changes
+          </ContextMenu.Item>
+        ) : null}
+        {(hasPrimaryCellActions === true ||
+          hasRowActions === true ||
+          hasRecoveryActions === true) &&
+        targetCanMutateRow === true ? (
+          <ContextMenu.Separator />
+        ) : null}
+        {targetCanMutateRow === true && target !== null ? (
+          <ContextMenu.Item
+            variant="danger"
+            onClick={() => {
+              onDeleteRow(target.rowId)
+            }}
+          >
+            Delete row
           </ContextMenu.Item>
         ) : null}
       </ContextMenu.Content>

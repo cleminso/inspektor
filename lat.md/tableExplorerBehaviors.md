@@ -107,6 +107,7 @@ Selecting one row checks it, focuses it, and opens its complete-row pane.
 - **And** the pane renders every schema field with its schema-derived field component
 
 Clicking row content does not check the row. The checkbox and its complete table cell are the row-selection hit area.
+An unchecked selectable row can also be checked from the context menu opened on any of its cells or on the row itself.
 
 ### Select rows individually
 
@@ -282,15 +283,20 @@ Pane and inline editors consume the same per-row mutation model:
 
 Insert fields distinguish `omitted`, `null`, `valid`, and `invalid`. Omitted fields are absent from the payload so stored defaults
 can apply. Explicit NULL remains a separate user choice. The insert pane persists a valid row directly through `Insert`; `Discard`
-closes without persistence, and `Insert more` resets and keeps the form open after each successful insert. Insert drafts do not
-enter the pending ledger.
+closes without persistence, and `Insert more` resets and keeps the form open after each successful insert.
+
+`Duplicate row` snapshots every schema field from the row's effective valid values, including staged values and hidden columns, but
+excludes automatic identity and provenance. The duplicate enters the pending ledger as an insertion and remains in mutation review
+until Apply or Undo. The grid continues to render only Jazz query results. After Apply, the live query introduces the persisted row once
+at its authoritative filtered and sorted position. A failed insertion remains available for retry or Undo, and a source staged for
+deletion cannot be duplicated. Staging keeps focus on the source cell without changing the viewport.
 
 Provider-owned edit drafts survive movement between fields and pane dismissal within one mounted table view. Several rows can retain
-isolated staged updates and deletions. Review remains available while the pane is open. The row pane shows `Delete row` for one
+isolated staged updates, insertions, and deletions. Review remains available while the pane is open. The row pane shows `Delete row` for one
 checked row and `Delete N checked rows` for multiple checked rows as a full-width footer action. Activating it replaces the action
 with a 75/25 `Confirm delete` and `Cancel` row. Confirmation snapshots that checked scope, stages the deletions, closes the pane,
 and unchecks the affected rows. The pane's `Close` action remains at the right side of its header. `Apply changes` is the persistence
-boundary for staged updates and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears row
+boundary for staged updates, duplicated-row insertions, and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears row
 selection and closes an open row pane. It does not close or reset an unrelated insert draft.
 While Apply owns the mutation state, the insert toolbar action, direct Insert action, and `Insert more` switch are disabled. An
 already-open insert draft remains mounted so Apply cannot erase its local values.
@@ -303,6 +309,10 @@ Valid staged-update fields receive a warm amber cell treatment without changing 
 selection checkbox. The staged marker survives selection and focus presentation. A staged cell context menu exposes `Revert this
 change`; the same grid context menu exposes row-scoped `Revert staged changes` whenever that row contains an update. Staged
 deletion takes precedence over staged-update presentation.
+
+The row context menu places `Delete row` last with danger presentation. It stages one deletion without confirmation and intentionally
+discards any staged update draft for that row. `Duplicate row` stages an insertion that can be reviewed, undone, applied, or retried
+after failure, but not edited in place.
 
 Review presents each mutation kind as an accordion trigger and renders plain-language operation summaries rather than an exhaustive
 affected-row inventory. Every expanded operation section contains a semantic list with its own scroll area, while the staged summary
@@ -407,7 +417,7 @@ The foundation establishes:
 - single-click cell focus without pane activation
 - double-click inline editing activation
 - pane and inline editing over one provider-owned update controller without simultaneous edit surfaces
-- table-scoped pending updates and deletions with one Apply action, plus direct complete-row insertion
+- table-scoped pending updates, duplicated-row insertions, and deletions with one Apply action, plus direct complete-row insertion
 - Command/Control additive multi-cell selection across rows and columns
 - Shift rectangular cell-range selection across visible rows and data columns
 - selection state independent from pane state

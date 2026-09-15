@@ -571,14 +571,44 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
   const pinnedX = (await labelHeader.boundingBox())?.x
   expect(pinnedX).toBeDefined()
 
-  await textCell.click()
+  const rowCheckboxes = page.locator(
+    '[data-slot="data-grid-body"] [role="checkbox"][aria-label^="Select row"]',
+  )
+  await rowCheckboxes.nth(0).click()
+  await rowCheckboxes.nth(1).click()
+  await expect(page.locator('[data-slot="data-grid-row"][data-selected]')).toHaveCount(2)
+
   const cellOverlapScrollLeft =
     (await textCell.evaluate((element) => (element as HTMLElement).offsetLeft)) -
     (await labelCell.evaluate((element) => (element as HTMLElement).offsetLeft))
+  const expectPinnedCellOnTop = async () => {
+    await expect.poll(() => locatorsOverlap(labelCell, textCell)).toBe(true)
+    await expect
+      .poll(() =>
+        labelCell.evaluate((element) => {
+          const bounds = element.getBoundingClientRect()
+          return document
+            .elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
+            ?.closest('[data-slot="data-grid-cell"]')
+            ?.getAttribute('data-column-id')
+        }),
+      )
+      .toBe('label')
+  }
   await viewport.evaluate((element, scrollLeft) => {
     element.scrollLeft = scrollLeft
   }, cellOverlapScrollLeft)
-  await expect.poll(() => locatorsOverlap(labelCell, textCell)).toBe(true)
+  await expectPinnedCellOnTop()
+
+  await viewport.evaluate((element) => {
+    element.scrollLeft = 0
+  })
+  await textCell.click()
+  await expect(textCell).toHaveAttribute('data-active', '')
+  await viewport.evaluate((element, scrollLeft) => {
+    element.scrollLeft = scrollLeft
+  }, cellOverlapScrollLeft)
+  await expectPinnedCellOnTop()
   await expect
     .poll(() =>
       labelCell.evaluate((element) => {
@@ -587,18 +617,6 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
       }),
     )
     .toBe(true)
-  await expect
-    .poll(() =>
-      labelCell.evaluate((element) => {
-        const bounds = element.getBoundingClientRect()
-        return document
-          .elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
-          ?.closest('[data-slot="data-grid-cell"]')
-          ?.getAttribute('data-column-id')
-      }),
-    )
-    .toBe('label')
-
   await viewport.evaluate((element) => {
     element.scrollLeft = 0
   })
@@ -875,6 +893,8 @@ test('persists an inserted project across reload', async ({ page }) => {
 test('highlights rows and cells changed through an external live client', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')
+  await page.getByRole('button', { name: 'Open label column menu' }).click()
+  await page.getByRole('menuitem', { name: 'Pin column' }).click()
   const session = await createJazzSession({
     app,
     permissions,
@@ -903,6 +923,41 @@ test('highlights rows and cells changed through an external live client', async 
     const row = page.getByRole('row', { name: new RegExp(`Select row ${insertedRowId}`) })
     await expect(row).toContainText('Externally inserted row')
     await expect(row).toHaveAttribute('data-status', 'recentlyInserted')
+
+    const insertedLabelCell = await getCellByColumn(page, row, 'label')
+    const insertionAnimations = await row.evaluate((element) => {
+      const pinnedCell = element.querySelector<HTMLElement>(
+        '[data-slot="data-grid-cell"][data-pinned="start"][data-column-id="label"]',
+      )
+      const pinnedCellAnimation = pinnedCell?.getAnimations()[0]
+      const rowEffect = element.getAnimations()[0]?.effect
+      const pinnedCellEffect = pinnedCellAnimation?.effect
+      const summarize = (effect: AnimationEffect | null | undefined) =>
+        effect instanceof KeyframeEffect
+          ? {
+              duration: effect.getComputedTiming().duration,
+              offsets: effect.getKeyframes().map((keyframe) => keyframe.offset),
+            }
+          : null
+      if (pinnedCellAnimation !== undefined && pinnedCellEffect instanceof KeyframeEffect) {
+        pinnedCellAnimation.pause()
+        const duration = pinnedCellEffect.getComputedTiming().duration
+        if (typeof duration === 'number') {
+          pinnedCellAnimation.currentTime = duration
+        }
+      }
+
+      return {
+        pinnedCell: summarize(pinnedCellEffect),
+        pinnedCellBackground:
+          pinnedCell === null ? null : getComputedStyle(pinnedCell).backgroundColor,
+        row: summarize(rowEffect),
+      }
+    })
+    await expect(insertedLabelCell).toHaveAttribute('data-pinned', 'start')
+    expect(insertionAnimations.row).toMatchObject({ duration: 1200 })
+    expect(insertionAnimations.pinnedCell).toEqual(insertionAnimations.row)
+    expect(insertionAnimations.pinnedCellBackground).not.toBe('rgba(0, 0, 0, 0)')
 
     await db
       .update(app.publicEditableRecords, insertedRowId, { label: 'Externally updated row' })

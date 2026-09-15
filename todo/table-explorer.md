@@ -19,6 +19,25 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[15/09/26]
+
+### Cell and row context actions
+
+- [x] Add schema-gated exclusion filters for cell values, mapping null exclusion to `is not null`.
+- [x] Group Edit and Copy actions before a separator that distinguishes them from value-filter actions.
+- [x] Select an unchecked row from any of its cell or row context menus.
+- [x] Show the existing Enter edit shortcut beside the cell Edit action.
+- [x] Stage a schema-projected duplicate of a row from its context menu.
+- [x] Stage one-row deletion from the final danger context-menu action.
+- [x] Review and apply duplicated-row insertions through the table mutation ledger.
+- [x] Keep duplicated-row insertions in mutation review without adding synthetic grid rows.
+- [x] Let the Jazz query place the persisted duplicate after Apply.
+- [x] Keep duplicate focus on the source without forcing viewport navigation.
+
+### Recently inserted feedback
+
+- [x] Synchronize the recently inserted fade across pinned and scrolling cells while preserving the pinned cells' opaque surface.
+
 [11/09/26]
 
 ### Complete-row provenance
@@ -1504,6 +1523,15 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[15/09/26]
+
+- [x] Cover include and exclude cell filters, row selection, action availability, and the Enter hint with focused tests.
+- [x] Cover context-menu duplication and deletion, staged insertion review, Undo, and Apply ordering with focused tests.
+- [x] Keep pending duplicated rows out of the grid and verify persisted inserts through the query lifecycle.
+- [x] Cover pinned-cell stacking above selected and active scrolling cells in a browser.
+- [x] Verify changed-file lint and affected package typechecks.
+- [ ] Verify the table context actions against the isolated browser fixture after Jazz accepts its native JSON fixture writes.
 
 [11/09/26]
 

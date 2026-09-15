@@ -172,10 +172,11 @@ export function DataGridExport({
   tableColumns,
   tableName,
 }: DataGridExportProps): React.ReactElement {
-  const hasRows = table.getRowModel().rows.length > 0
+  const exportRows = table.getRowModel().rows
+  const hasRows = exportRows.length > 0
 
   const handleExport = (format: DataExportFormat) => {
-    const exportRows = table.getRowModel().rows.map((row) => row.original)
+    const exportValues = exportRows.map((row) => row.original)
     const columnsById = new Map(tableColumns.map((column) => [column.id, column]))
     const visibleColumns = [
       ...table.getStartVisibleLeafColumns(),
@@ -189,7 +190,7 @@ export function DataGridExport({
         : [{ accessorKey: tableColumn.accessorKey, label: tableColumn.label }]
     })
     downloadExport(
-      createDataExport(format, exportColumns, exportRows),
+      createDataExport(format, exportColumns, exportValues),
       `${tableName}.${format}`,
       exportContentTypes[format],
     )

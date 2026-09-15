@@ -32,6 +32,7 @@ const tableViewState = vi.hoisted(() => ({
   isRefreshing: false,
   mutationExecutor: {
     deleteRow: vi.fn(),
+    insertRow: vi.fn(),
     updateRow: vi.fn(),
   },
   page: 1,
@@ -92,8 +93,10 @@ const tableViewState = vi.hoisted(() => ({
   }>,
 }))
 const stageDeletions = vi.hoisted(() => vi.fn())
+const stageInsert = vi.hoisted(() => vi.fn())
 const mutationLedgerRebaseRows = vi.hoisted(() => vi.fn())
 const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
+const mutationLedgerUndoReviewOperation = vi.hoisted(() => vi.fn())
 const revertField = vi.hoisted(() => vi.fn())
 const revertRowUpdate = vi.hoisted(() => vi.fn())
 const mutationEditorController = vi.hoisted(() => ({ actions: {}, state: { draft: {} } }))
@@ -180,12 +183,14 @@ vi.mock('@tables/mutationLedger/provider', () => ({
     execution: mutationExecution.current,
     rebaseRows: mutationLedgerRebaseRows,
     stageDeletions,
+    stageInsert,
     ledger: { entries: mutationLedgerEntries, hasInvalidDraft: false },
     undoDeletions: mutationLedgerUndoDeletions,
     revertField,
     revertRowUpdate,
     stagedFieldsByRowId: stagedFieldsByRowId.current,
     stagedValuesByRowId: stagedValuesByRowId.current,
+    undoReviewOperation: mutationLedgerUndoReviewOperation,
   }),
   useTableMutationEditorController: (options: Record<string, unknown>) => {
     mutationEditorOptions.current = options
@@ -582,6 +587,10 @@ afterEach(() => {
   tableViewState.handleMutationUpdatesApplied.mockReset()
   mutationLedgerRebaseRows.mockReset()
   mutationLedgerUndoDeletions.mockReset()
+  mutationLedgerUndoReviewOperation.mockReset()
+  stageDeletions.mockReset()
+  stageInsert.mockReset()
+  tableViewState.handleRowsStagedForDeletion.mockReset()
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
@@ -661,6 +670,7 @@ describe('TableView cell actions', () => {
 
   it('connects shared context actions to the table owner', async () => {
     configureNameCell('Grace')
+    schemaColumns.push({ name: 'status', column_type: { type: 'Text' }, nullable: false })
     mutationLedgerEntries.push({ entryId: 'delete:row-2', kind: 'delete', rowId: 'row-2' })
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Katherine' } }
@@ -671,10 +681,18 @@ describe('TableView cell actions', () => {
     })
     renderTableView()
     const menuProps = gridContextMenuProps.current as {
+      canMutateRow: (rowId: string) => boolean
+      canSelectRow: (rowId: string) => boolean
       getCellActions: (target: { columnId: string; rowId: string }) => unknown
       onCopyCell: (target: { columnId: string; rowId: string }) => void
       onEditCell: (target: { columnId: string; rowId: string }) => void
-      onFilterByCell: (target: { columnId: string; rowId: string }) => void
+      onFilterByCell: (
+        target: { columnId: string; rowId: string },
+        match: 'include' | 'exclude',
+      ) => void
+      onDeleteRow: (rowId: string) => void
+      onDuplicateRow: (rowId: string) => void
+      onSelectRow: (rowId: string) => void
       onTouchCellContextMenuOpen: (target: { columnId: string; rowId: string }) => void
       revertField: typeof revertField
       revertRowUpdate: typeof revertRowUpdate
@@ -683,13 +701,23 @@ describe('TableView cell actions', () => {
     }
     const target = { columnId: 'name', rowId: 'row-1' }
     const selectCellRange = vi.fn()
+    const toggleSelected = vi.fn()
+    let rowSelected = false
     tableViewState.table = {
       ...tableViewState.table,
       getRowModel: () => ({
         rows: [
           {
             id: 'row-1',
-            original: { id: 'row-1', name: 'Grace' },
+            original: {
+              id: 'row-1',
+              name: 'Grace',
+              status: 'active',
+              $createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            },
+            getCanSelect: () => true,
+            getIsSelected: () => rowSelected,
+            toggleSelected,
             getVisibleCells: () => [
               {
                 column: { id: 'name' },
@@ -705,21 +733,43 @@ describe('TableView cell actions', () => {
 
     menuProps.onCopyCell(target)
     menuProps.onEditCell(target)
-    menuProps.onFilterByCell(target)
+    menuProps.onFilterByCell(target, 'include')
+    menuProps.onFilterByCell(target, 'exclude')
+    menuProps.onDuplicateRow('row-1')
+    menuProps.onDeleteRow('row-1')
+    menuProps.onSelectRow('row-1')
     menuProps.onTouchCellContextMenuOpen(target)
 
     expect(menuProps.getCellActions(target)).toEqual({
       canCopy: true,
       canEdit: true,
+      canExclude: true,
       canFilterBy: true,
       copyAs: [],
     })
+    expect(menuProps.canSelectRow('row-1')).toBe(true)
+    rowSelected = true
+    expect(menuProps.canSelectRow('row-1')).toBe(false)
+    rowSelected = false
+    expect(menuProps.canMutateRow('row-1')).toBe(true)
+    expect(menuProps.canMutateRow('row-2')).toBe(false)
     await waitFor(() => expect(writeText).toHaveBeenCalledWith('Katherine'))
     expect(tableViewState.handleCellEditRequest).toHaveBeenCalledWith(target)
     expect(tableViewState.setFilters).toHaveBeenCalledWith([
       tableViewState.filters[0],
       expect.objectContaining({ column: 'name', operator: 'eq', value: 'Katherine' }),
     ])
+    expect(tableViewState.setFilters).toHaveBeenCalledWith([
+      tableViewState.filters[0],
+      expect.objectContaining({ column: 'name', operator: 'ne', value: 'Katherine' }),
+    ])
+    expect(toggleSelected).toHaveBeenCalledWith(true)
+    expect(stageInsert).toHaveBeenCalledWith('row-1', {
+      name: 'Katherine',
+      status: 'active',
+    })
+    expect(stageDeletions).toHaveBeenCalledWith(['row-1'])
+    expect(tableViewState.handleRowsStagedForDeletion).toHaveBeenCalledWith(['row-1'])
     expect(selectCellRange).toHaveBeenCalledWith({
       anchorColumnId: 'name',
       anchorRowId: 'row-1',

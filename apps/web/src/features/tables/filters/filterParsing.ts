@@ -7,7 +7,6 @@
  */
 import {
   getSupportedWhereOperatorsForColumn,
-  getSupportedWhereOperatorsForSchemaColumn,
   type ColumnDescriptor,
   type ColumnType,
   type WasmSchema,
@@ -17,6 +16,7 @@ import {
   tableFilterOperators,
   type TableFilterClause,
   type TableFilterOperator,
+  type TableFilterValueMatch,
 } from '@tables/filters/tableFilters'
 import { normalizeTimestampValue, parseBooleanValue } from '@tables/valueParsing'
 
@@ -234,6 +234,7 @@ export function getFilterOperatorsForColumn(column: ColumnDescriptor): TableFilt
 function getTableFilterPredicateFromValue(
   column: ColumnDescriptor,
   value: unknown,
+  match: TableFilterValueMatch,
 ): Pick<TableFilterClause, 'operator' | 'value'> | null {
   if (value === undefined) {
     return null
@@ -244,28 +245,27 @@ function getTableFilterPredicateFromValue(
     if (supportedOperators.includes('isNull') === false) {
       return null
     }
-    return { operator: 'isNull', value: true }
+    return { operator: 'isNull', value: match === 'include' }
   }
 
-  if (supportedOperators.includes('eq') === false) {
+  const operator = match === 'include' ? 'eq' : 'ne'
+  if (supportedOperators.includes(operator) === false) {
     return null
   }
 
   switch (column.column_type.type) {
     case 'Boolean':
-      return typeof value === 'boolean' ? { operator: 'eq', value } : null
+      return typeof value === 'boolean' ? { operator, value } : null
     case 'Integer':
-      return typeof value === 'number' && Number.isSafeInteger(value)
-        ? { operator: 'eq', value }
-        : null
+      return typeof value === 'number' && Number.isSafeInteger(value) ? { operator, value } : null
     case 'Double':
-      return typeof value === 'number' && Number.isFinite(value) ? { operator: 'eq', value } : null
+      return typeof value === 'number' && Number.isFinite(value) ? { operator, value } : null
     case 'Timestamp': {
       if (!(value instanceof Date) && typeof value !== 'number') {
         return null
       }
       const epochMilliseconds = normalizeTimestampValue(value)
-      return epochMilliseconds === null ? null : { operator: 'eq', value: epochMilliseconds }
+      return epochMilliseconds === null ? null : { operator, value: epochMilliseconds }
     }
     case 'BigInt':
       if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'bigint') {
@@ -275,17 +275,17 @@ function getTableFilterPredicateFromValue(
         return null
       }
       try {
-        return { operator: 'eq', value: String(BigInt(value)) }
+        return { operator, value: String(BigInt(value)) }
       } catch {
         return null
       }
     case 'Enum':
       return typeof value === 'string' && column.column_type.variants.includes(value)
-        ? { operator: 'eq', value }
+        ? { operator, value }
         : null
     case 'Text':
     case 'Uuid':
-      return typeof value === 'string' ? { operator: 'eq', value } : null
+      return typeof value === 'string' ? { operator, value } : null
     default:
       return null
   }
@@ -294,16 +294,18 @@ function getTableFilterPredicateFromValue(
 export function canCreateTableFilterClauseFromValue(
   column: ColumnDescriptor,
   value: unknown,
+  match: TableFilterValueMatch = 'include',
 ): boolean {
-  return getTableFilterPredicateFromValue(column, value) !== null
+  return getTableFilterPredicateFromValue(column, value, match) !== null
 }
 
 /** Builds the same normalized clause used by the Filter Builder from a runtime cell value. */
 export function createTableFilterClauseFromValue(
   column: ColumnDescriptor,
   value: unknown,
+  match: TableFilterValueMatch = 'include',
 ): TableFilterClause | null {
-  const predicate = getTableFilterPredicateFromValue(column, value)
+  const predicate = getTableFilterPredicateFromValue(column, value, match)
   if (predicate === null) {
     return null
   }
@@ -331,17 +333,15 @@ export function filterTableFilterClauses({
 
   return filters.flatMap((filter) => {
     const column = table.columns.find((candidate) => candidate.name === filter.column)
-    const supportedOperators = getSupportedWhereOperatorsForSchemaColumn(filter.column, column)
-    if (supportedOperators?.includes(filter.operator) !== true) return []
+    const parseColumn = column ?? (filter.column === 'id' ? tableIdFilterColumn : undefined)
+    if (parseColumn === undefined) return []
+    if (getFilterOperatorsForColumn(parseColumn).includes(filter.operator) === false) return []
     if (filter.operator === 'in' && Array.isArray(filter.value) === false) {
       return []
     }
     if (filter.operator === 'isNull' && typeof filter.value !== 'boolean') {
       return []
     }
-
-    const parseColumn = column ?? (filter.column === 'id' ? tableIdFilterColumn : undefined)
-    if (parseColumn === undefined) return []
     try {
       const value =
         filter.operator === 'in'

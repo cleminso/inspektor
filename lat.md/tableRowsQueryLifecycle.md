@@ -129,6 +129,10 @@ The grid distinguishes initial loading, compatible refresh, resolved rows, empty
 The loading body uses the design-system spinner and visible status text. It communicates pending work without implying a result count
 or record shape.
 
+Duplicated-row insertions remain in mutation review and do not enter the query-row projection. Applying an insertion lets the Jazz live
+query publish the persisted row at its authoritative filtered and sorted position; failed insertions remain retryable. Pagination,
+export, selection, navigation, and rendering therefore operate on one Jazz-owned row collection.
+
 ## Pagination and virtualization
 
 The table route stores a one-based page and a constrained page size. The default page size is 100 rows; supported alternatives are 500
@@ -161,6 +165,7 @@ These source modules implement route resolution, Jazz querying, state projection
 - `apps/web/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction.
 - `apps/web/src/features/tables/query/useJazzQueryState.ts`: React external-store adapter for Jazz cache entries.
 - `apps/web/src/features/tables/query/useTableRows.ts`: query derivation, row preservation, pagination, and status projection.
+- `apps/web/src/features/tables/workspace/useTableViewState.ts`: query-row ownership and table interaction state.
 - `apps/web/src/features/tables/grid/toolbar.tsx`: row status, page-size, page label, and previous/next controls.
 - `apps/web/src/features/tables/workspace/tableView.tsx`: product loading copy and virtual rendering selection.
 - `packages/design-system/src/components/dataGrid/dataGrid.tsx`: reusable loading and virtual table-body presentation.

@@ -49,7 +49,6 @@ interface UseTableGridOptions {
 }
 
 const selectNoInternalTableState = () => null
-
 export function useTableGrid({
   cellSelection,
   columnOrder,
@@ -111,7 +110,7 @@ export function useTableGrid({
       data: rows,
       columns: columnDefs,
       meta: { stagedValuesByRowId },
-      getRowId: (row) => String(row.id),
+      getRowId: (row) => row.id,
       autoResetCellSelection: false,
       columnResizeMode: 'onChange',
       enableRowSelection: (row) => disabledRowIds.has(row.id) === false,

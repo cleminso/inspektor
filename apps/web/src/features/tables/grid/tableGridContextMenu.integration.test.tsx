@@ -38,9 +38,14 @@ const columns = columnHelper.columns([
 function ContextMenuHarness({
   actions,
   binary = false,
+  canMutateRow,
+  canSelectRow,
   onCopyCell = vi.fn(),
   onEditCell = vi.fn(),
   onFilterByCell = vi.fn(),
+  onDeleteRow = vi.fn(),
+  onDuplicateRow = vi.fn(),
+  onSelectRow = vi.fn(),
   onTouchCellContextMenuOpen = vi.fn(),
   revertField = vi.fn(),
   revertRowUpdate = vi.fn(),
@@ -50,13 +55,19 @@ function ContextMenuHarness({
   actions?: {
     canCopy: boolean
     canEdit: boolean
+    canExclude: boolean
     canFilterBy: boolean
     copyAs: readonly ('hex' | 'base64')[]
   }
   binary?: boolean
+  canMutateRow?: boolean
+  canSelectRow?: boolean
   onCopyCell?: (target: DataGridCellTarget, format?: BinaryCopyFormat) => void
   onEditCell?: (target: DataGridCellTarget) => void
-  onFilterByCell?: (target: DataGridCellTarget) => void
+  onFilterByCell?: (target: DataGridCellTarget, match: 'include' | 'exclude') => void
+  onDeleteRow?: (rowId: string) => void
+  onDuplicateRow?: (rowId: string) => void
+  onSelectRow?: (rowId: string) => void
   onTouchCellContextMenuOpen?: (target: DataGridCellTarget) => void
   revertField?: (rowId: string, fieldName: string) => void
   revertRowUpdate?: (rowId: string) => void
@@ -84,9 +95,12 @@ function ContextMenuHarness({
   return (
     <>
       <TableGridContextMenu
+        canMutateRow={() => canMutateRow ?? stagedDeletionRowIds.has('row-1') === false}
+        canSelectRow={() => canSelectRow ?? stagedDeletionRowIds.has('row-1') === false}
         getCellActions={() => ({
           canCopy: actions?.canCopy ?? true,
           canEdit: actions?.canEdit ?? true,
+          canExclude: actions?.canExclude ?? true,
           canFilterBy: actions?.canFilterBy ?? true,
           copyAs: actions?.copyAs ?? (binary === true ? ['hex', 'base64'] : []),
         })}
@@ -100,6 +114,9 @@ function ContextMenuHarness({
           setEditing(true)
         }}
         onFilterByCell={onFilterByCell}
+        onDeleteRow={onDeleteRow}
+        onDuplicateRow={onDuplicateRow}
+        onSelectRow={onSelectRow}
         onTouchCellContextMenuOpen={onTouchCellContextMenuOpen}
       >
         {({
@@ -137,7 +154,7 @@ describe('TableGridContextMenu integration', () => {
     render(<ContextMenuHarness onEditCell={onEditCell} />)
 
     expect(fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))).toBe(false)
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: /^Edit/ }))
 
     expect(onEditCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
     await waitFor(() => {
@@ -154,10 +171,52 @@ describe('TableGridContextMenu integration', () => {
     fireEvent.contextMenu(cell)
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Filter by this value' }))
 
-    expect(onFilterByCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
+    expect(onFilterByCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' }, 'include')
     await waitFor(() => {
       expect(document.activeElement).toBe(cell)
     })
+  })
+
+  it('excludes a cell value and selects an unchecked row from cell and row menus', async () => {
+    const onFilterByCell = vi.fn()
+    const onSelectRow = vi.fn()
+    render(<ContextMenuHarness onFilterByCell={onFilterByCell} onSelectRow={onSelectRow} />)
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Exclude this value' }))
+    expect(onFilterByCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' }, 'exclude')
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Select' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Select row' }))
+    expect(onSelectRow).toHaveBeenCalledWith('row-1')
+
+    fireEvent.contextMenu(screen.getByRole('row', { name: /Select Ada/ }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Select row' }))
+    expect(onSelectRow).toHaveBeenCalledTimes(2)
+  })
+
+  it('duplicates and stages deletion for the targeted row', async () => {
+    const onDeleteRow = vi.fn()
+    const onDuplicateRow = vi.fn()
+    render(<ContextMenuHarness onDeleteRow={onDeleteRow} onDuplicateRow={onDuplicateRow} />)
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Duplicate row' }))
+    expect(onDuplicateRow).toHaveBeenCalledWith('row-1')
+
+    fireEvent.contextMenu(screen.getByRole('row', { name: /Select Ada/ }))
+    const deleteItem = await screen.findByRole('menuitem', { name: 'Delete row' })
+    expect(deleteItem.getAttribute('data-variant')).toBe('danger')
+    fireEvent.click(deleteItem)
+    expect(onDeleteRow).toHaveBeenCalledWith('row-1')
+  })
+
+  it('hides Select row when selection is unavailable', () => {
+    render(<ContextMenuHarness canSelectRow={false} />)
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
+
+    expect(screen.queryByRole('menuitem', { name: 'Select row' })).toBeNull()
   })
 
   it('restores the trigger focus when the root menu is dismissed with Escape', async () => {
@@ -211,17 +270,11 @@ describe('TableGridContextMenu integration', () => {
     const nameCell = screen.getByRole('cell', { name: 'Ada' })
 
     fireEvent.contextMenu(nameCell)
+    const fieldRecovery = await screen.findByRole('menuitem', { name: 'Discard field change' })
+    const rowRecovery = screen.getByRole('menuitem', { name: 'Discard row changes' })
     expect(
-      (await screen.findAllByRole('menuitem')).map((item) =>
-        item.textContent?.startsWith('Copy') === true ? 'Copy' : item.textContent,
-      ),
-    ).toEqual([
-      'Edit',
-      'Filter by this value',
-      'Copy',
-      'Discard field change',
-      'Discard row changes',
-    ])
+      fieldRecovery.compareDocumentPosition(rowRecovery) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0)
     fireEvent.click(screen.getByRole('menuitem', { name: /^Copy/ }))
     expect(onCopyCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
 
@@ -239,19 +292,15 @@ describe('TableGridContextMenu integration', () => {
     expect(revertRowUpdate).toHaveBeenNthCalledWith(2, 'row-1')
   })
 
-  it('suppresses recovery for selection cells and staged-deletion rows', () => {
-    const noActions = { canCopy: false, canEdit: false, canFilterBy: false, copyAs: [] } as const
-    const view = render(
-      <ContextMenuHarness
-        actions={noActions}
-        stagedFieldsByRowId={{ 'row-1': new Set([tableGridSelectionColumnId]) }}
-      />,
-    )
-
-    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Select' }))
-    expect(screen.queryByRole('menu')).toBeNull()
-
-    view.rerender(
+  it('suppresses recovery and mutation actions for staged-deletion rows', () => {
+    const noActions = {
+      canCopy: false,
+      canEdit: false,
+      canExclude: false,
+      canFilterBy: false,
+      copyAs: [],
+    } as const
+    render(
       <ContextMenuHarness
         actions={noActions}
         stagedDeletionRowIds={new Set(['row-1'])}
@@ -259,7 +308,8 @@ describe('TableGridContextMenu integration', () => {
       />,
     )
     fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
-    expect(screen.queryByRole('menu')).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Duplicate row' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Delete row' })).toBeNull()
   })
 
   it('does not open the cell menu from a non-row part of the viewport', () => {
@@ -297,7 +347,15 @@ describe('TableGridContextMenu integration', () => {
   it('does not open an empty menu for a cell without actions', () => {
     render(
       <ContextMenuHarness
-        actions={{ canCopy: false, canEdit: false, canFilterBy: false, copyAs: [] }}
+        actions={{
+          canCopy: false,
+          canEdit: false,
+          canExclude: false,
+          canFilterBy: false,
+          copyAs: [],
+        }}
+        canMutateRow={false}
+        canSelectRow={false}
       />,
     )
 

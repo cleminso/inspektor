@@ -7,6 +7,7 @@ import type { Hotkey } from '@tanstack/react-hotkeys'
 export const appHotkeys = {
   closeTableView: 'Alt+W',
   copyCell: 'Mod+C',
+  editCell: 'Enter',
   goBack: 'Alt+[',
   goForward: 'Alt+]',
   insertRow: 'Alt+I',

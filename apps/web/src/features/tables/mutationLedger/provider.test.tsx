@@ -83,6 +83,7 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
       </output>
       <output aria-label="Execution status">{mutations.execution.status}</output>
       <output aria-label="Review operations">{mutations.reviewOperations.length}</output>
+      <output aria-label="Staged count">{mutations.stagedCount}</output>
       <output aria-label="Workspace discarded">{String(workspaceDiscarded)}</output>
       <button
         type="button"
@@ -101,6 +102,12 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
       </button>
       <button type="button" onClick={mutations.discardAll}>
         Discard all
+      </button>
+      <button
+        type="button"
+        onClick={() => mutations.stageInsert('row-1', { name: 'Ada copy', age: 37 })}
+      >
+        Stage insert
       </button>
       <button
         type="button"
@@ -189,6 +196,21 @@ function RuntimeScopeStatus(): React.ReactElement {
 }
 
 describe('TableMutationLedgerProvider', () => {
+  it('retains a staged insert as pending workspace state', () => {
+    render(
+      <TestLedgerProvider>
+        <EditorHarness />
+        <RuntimeScopeStatus />
+      </TestLedgerProvider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stage insert' }))
+
+    expect(screen.getByLabelText('Staged count').textContent).toBe('1')
+    expect(screen.getByLabelText('Review operations').textContent).toBe('1')
+    expect(screen.getByLabelText('Runtime scope blocked').textContent).toBe('true')
+  })
+
   it('keeps one raw row draft across editor-surface remounts', () => {
     const { rerender } = render(
       <TestLedgerProvider>

@@ -273,13 +273,13 @@ surfaces. They project the same table mutation state rather than owning independ
 
 **Staged change**
 
-A valid local update or confirmed deletion that has not been persisted to Jazz. Row-pane edits update the staged draft directly;
-floating field edits become staged when the field is saved or completed. A staged change can be reviewed, removed, discarded, or
-persisted through Apply changes.
+A valid local update, duplicated-row insertion, or confirmed deletion that has not been persisted to Jazz. Row-pane edits update
+the staged draft directly; floating field edits become staged when the field is saved or completed. A staged change can be reviewed,
+removed, discarded, or persisted through Apply changes.
 
 **Mutation ledger**
 
-The in-memory, table-scoped collection of staged updates and deletions. Each table has an isolated ledger identified by its
+The in-memory, table-scoped collection of staged updates, duplicated-row insertions, and deletions. Each table has an isolated ledger identified by its
 connection, branch, schema hash, and table name. The Inspektor never combines changes from different tables into one Apply
 operation.
 
@@ -288,7 +288,7 @@ operation.
 This lifecycle defines when table-scoped staged changes persist, clear, or require confirmation.
 
 1. Switching rows, filters, pages, representations, tables, or workspace tabs preserves each table's staged changes.
-2. Returning to a table restores its staged updates, deletions, recoverable invalid drafts, and failed Apply state.
+2. Returning to a table restores its staged updates, duplicated-row insertions, deletions, recoverable invalid drafts, and failed Apply state.
 3. A successful `Apply changes` or explicit `Discard` clears that table's mutation ledger.
 4. Closing the final workspace tab representing a table with unresolved mutations opens an Alert Dialog. `Keep editing` cancels the
    close; `Discard and close` clears that table's ledger and closes the tab. Closing a tab never silently discards staged changes.
@@ -297,16 +297,20 @@ This lifecycle defines when table-scoped staged changes persist, clear, or requi
 6. Refreshing or closing the browser destroys the in-memory ledgers. The Inspektor requests the browser's unload warning when
    unresolved mutations or recoverable invalid drafts exist; the browser controls whether it appears and all displayed copy.
 
+Duplicated-row insertions remain in mutation review until Apply. The grid renders only Jazz query
+results, so successful persistence introduces one row at its authoritative filtered and sorted position.
+Staging keeps focus on the source cell without changing the viewport.
+
 **Floating widget**
 
 The table-owned projection of staged mutation state. It presents validation, review, Apply, Discard, and mutation failures. A
 centered application-dock trigger remains visible while the panel is expanded or collapsed, shows the staged count in leading
-position, and communicates whether the table has staged changes or input that needs attention. Contextual deletion initiation and
-confirmation remain in the complete-row pane.
+position, and communicates whether the table has staged changes or input that needs attention. Checked-row deletion confirmation
+remains in the complete-row pane; a row context menu can stage one deletion directly.
 
 **Apply presentation**
 
-The Floating widget's final review state. It lists staged changes grouped as updates and deletions, then offers one
+The Floating widget's final review state. It lists staged changes grouped as insertions, updates, and deletions, then offers one
 `Apply changes` action. Delete confirmation only adds selected rows to this staged collection; Apply changes remains the sole
 persistence step.
 
@@ -317,8 +321,8 @@ mutation ledger. Collapsing the Floating widget preserves the input and exposes 
 
 **Apply changes**
 
-The action that persists the current table's staged updates and deletions. A deletion-only operation uses the same Apply boundary
-as a mixed update-and-deletion operation. Complete-row insertion persists through its pane's `Insert` action.
+The action that persists the current table's staged updates, duplicated-row insertions, and deletions. Complete-row insertion from
+the Insert pane persists through its own `Insert` action.
 
 **Staged changes**
 
@@ -860,7 +864,7 @@ navigate only that stable checked set. `J` moves down, `K` moves up, and native 
 is held. The visible controls follow the keyboard's left-to-right `J`, `K` order: Down, then Up. Edit actions remain scoped to the
 focused row unless explicitly labelled as bulk actions.
 Insert remains a separate pane mode with direct `Insert`, `Discard`, and `Insert more` controls. Successful `Insert more` resets
-and retains the form; insert drafts never enter the pending ledger. Unless an open nested control consumes Escape first, Escape
+and retains the form; only insertions created by Duplicate row enter the pending ledger. Unless an open nested control consumes Escape first, Escape
 closes an open row pane and unchecks every checked row while preserving staged changes. Clearing the checked rows closes
 selection-only widget state. Pane dismissal restores focus to its persistent trigger. With no pane open, Escape clears semantic
 selection and focus state while retaining DOM focus on the current grid cell.
@@ -1200,6 +1204,9 @@ Applied clauses and in-progress input are separate states. Applied clauses are U
 value, completion stage, and validation issue are transient memory state. Cell context actions and Query Subscription links use
 the same schema-validation and filter actions as the builder.
 
+Cell context actions can include or exclude a supported runtime value. Inclusion maps scalar values to `eq` and null to
+`isNull: true`; exclusion maps scalar values to `ne` and null to `isNull: false`.
+
 Jazz does not expose generic count, distinct, group-by, aggregate min/max, or facet-count queries. Filter controls may use safe
 schema metadata such as enum variants, booleans, nullability, references, and stored types, but they do not present current-page
 counts as table-wide facets.
@@ -1269,14 +1276,14 @@ Update and deletion mutations share one persistence boundary:
 
 1. The developer edits a field or requests deletion of selected rows.
 2. The controller validates the input and adds each valid operation to the table's staged changes.
-3. The Floating widget presents `Review changes`, grouped as updates and deletions.
+3. The Floating widget presents `Review changes`, grouped as insertions, updates, and deletions.
 4. The developer chooses `Apply changes` to persist every staged operation in the current table ledger.
 5. If persistence fails, the widget preserves unresolved input and presents the rejection without silently discarding intent.
 
 There is no user-facing stage action and no mutation-specific persistence shortcut. `Apply changes` persists a deletion-only ledger and a
 mixed ledger through the same flow.
 
-Updates and deletions are accordion triggers in operation review. Each expanded section owns an independently scrollable list whose
+Insertions, updates, and deletions are accordion triggers in operation review. Each expanded section owns an independently scrollable list whose
 trigger remains fixed. Review uses plain-language operation summaries, distinguishes operation count from affected-row count, and
 does not enumerate every bulk target. Operation undo resets the corresponding form projection. Visible staged-update cells use a
 dedicated warm amber pending-change treatment and expose cell- and row-scoped revert commands through grid context menus.
@@ -1703,7 +1710,7 @@ These scenarios describe the main end-to-end product flows.
 2. Developer reopens a saved local connection and understands whether the server/runtime is reachable.
 3. Developer opens a table, filters rows, distinguishes empty from filtered-empty, and inspects one record.
 4. Developer double-clicks or presses Enter on a supported cell to edit it through the Floating widget without checking the row; relation and binary fields route to the complete-row pane.
-5. Developer accumulates pending updates and deletions for one table, reviews them together, and persists them through one Apply action.
+5. Developer accumulates pending updates, duplicated-row insertions, and deletions for one table, reviews them together, and persists them through one Apply action.
 6. Developer follows a relation cell to inspect linked data in another Data workspace item without losing the original table context.
 7. Developer sees live row changes while browsing and keeps selection context when possible.
 8. Developer opens Live queries after using the app and sees which server-visible query shapes are active.

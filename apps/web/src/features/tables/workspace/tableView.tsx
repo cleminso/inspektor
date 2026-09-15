@@ -43,6 +43,7 @@ import {
   createTableFilterClauseFromValue,
   tableIdFilterColumn,
 } from '@tables/filters/filterParsing'
+import type { TableFilterValueMatch } from '@tables/filters/tableFilters'
 import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
 import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
@@ -279,7 +280,13 @@ function TableViewContent({
     (target: DataGridCellTarget) => {
       const resolvedCell = resolveCellAction(target)
       if (resolvedCell === null) {
-        return { canCopy: false, canEdit: false, canFilterBy: false, copyAs: [] }
+        return {
+          canCopy: false,
+          canEdit: false,
+          canExclude: false,
+          canFilterBy: false,
+          copyAs: [],
+        }
       }
       const { columnMeta, value } = resolvedCell
       const filterColumn = columnMeta.column ?? tableIdFilterColumn
@@ -294,6 +301,7 @@ function TableViewContent({
       return {
         canCopy: value !== undefined,
         canEdit,
+        canExclude: canCreateTableFilterClauseFromValue(filterColumn, value, 'exclude'),
         canFilterBy: canCreateTableFilterClauseFromValue(filterColumn, value),
         copyAs: value instanceof Uint8Array ? (['hex', 'base64'] as const) : [],
       }
@@ -328,7 +336,7 @@ function TableViewContent({
     },
     [resolveCellAction, tableKey],
   )
-  const handleFilterByCell = (target: DataGridCellTarget) => {
+  const handleFilterByCell = (target: DataGridCellTarget, match: TableFilterValueMatch) => {
     const resolvedCell = resolveCellAction(target)
     if (resolvedCell === null) {
       return
@@ -336,11 +344,75 @@ function TableViewContent({
     const clause = createTableFilterClauseFromValue(
       resolvedCell.columnMeta.column ?? tableIdFilterColumn,
       resolvedCell.value,
+      match,
     )
     if (clause !== null) {
       void state.setFilters([...state.filters, clause])
     }
   }
+  const canSelectRow = useCallback(
+    (rowId: string) => {
+      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === rowId)
+      return row?.getCanSelect() === true && row.getIsSelected() === false
+    },
+    [state.table],
+  )
+  const canMutateRow = useCallback(
+    (rowId: string) => {
+      const rowExists = state.table.getRowModel().rows.some((candidate) => candidate.id === rowId)
+      return (
+        rowExists === true &&
+        state.canMutateRows === true &&
+        mutationApplying === false &&
+        stagedDeletionRowIds.has(rowId) === false
+      )
+    },
+    [mutationApplying, stagedDeletionRowIds, state.canMutateRows, state.table],
+  )
+  const stageInsert = mutations.stageInsert
+  const stagedValuesByRowId = mutations.stagedValuesByRowId
+  const handleDuplicateRow = useCallback(
+    (rowId: string) => {
+      if (canMutateRow(rowId) === false) {
+        return
+      }
+      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === rowId)
+      if (row === undefined) {
+        return
+      }
+      const stagedValues = stagedValuesByRowId[rowId]
+      const sourceValues = Object.fromEntries(
+        schemaColumns.flatMap((column) => {
+          const value = resolveStagedFieldValue(row.original, stagedValues, column.name)
+          return value === undefined ? [] : [[column.name, value]]
+        }),
+      )
+      stageInsert(rowId, sourceValues)
+    },
+    [canMutateRow, schemaColumns, stageInsert, stagedValuesByRowId, state.table],
+  )
+  const stageDeletions = mutations.stageDeletions
+  const handleRowsStagedForDeletion = state.handleRowsStagedForDeletion
+  const handleDeleteRow = useCallback(
+    (rowId: string) => {
+      if (canMutateRow(rowId) === false) {
+        return
+      }
+      stageDeletions([rowId])
+      handleRowsStagedForDeletion([rowId])
+    },
+    [canMutateRow, handleRowsStagedForDeletion, stageDeletions],
+  )
+  const handleSelectRow = useCallback(
+    (rowId: string) => {
+      if (canSelectRow(rowId) === false) {
+        return
+      }
+      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === rowId)
+      row?.toggleSelected(true)
+    },
+    [canSelectRow, state.table],
+  )
   const handleTouchCellContextMenuOpen = useCallback(
     (target: DataGridCellTarget) => {
       const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
@@ -448,8 +520,7 @@ function TableViewContent({
           : (Array.from(
               gridHotkeyTargetRef.current?.querySelectorAll<HTMLElement>('[aria-label]') ?? [],
             ).find(
-              (element) =>
-                element.getAttribute('aria-label') === `Select row ${focusReturn.rowId}`,
+              (element) => element.getAttribute('aria-label') === `Select row ${focusReturn.rowId}`,
             ) ?? null)
       if (target?.isConnected === true) {
         target.focus()
@@ -678,12 +749,17 @@ function TableViewContent({
               overflow="hidden"
             >
               <TableGridContextMenu
+                canMutateRow={canMutateRow}
+                canSelectRow={canSelectRow}
                 getCellActions={getCellActions}
                 onCopyCell={(target, format) => {
                   void handleCopyCell(target, format)
                 }}
                 onEditCell={handleCellEditRequest}
                 onFilterByCell={handleFilterByCell}
+                onDeleteRow={handleDeleteRow}
+                onDuplicateRow={handleDuplicateRow}
+                onSelectRow={handleSelectRow}
                 onTouchCellContextMenuOpen={handleTouchCellContextMenuOpen}
                 revertField={mutations.revertField}
                 revertRowUpdate={mutations.revertRowUpdate}
