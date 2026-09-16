@@ -29,7 +29,7 @@ import {
  *
  * UI components originate intent. This boundary decides whether a runtime-scope change is safe,
  * requests connection navigation, and persists a local branch label or schema selection. The
- * branch label does not configure alpha.54 queries or mutations. Connection-entry
+ * branch label does not configure Jazz queries or mutations. Connection-entry
  * discovery belongs to the route loader; active connectivity belongs to `InspectorProvider`.
  */
 export interface InspectorSessionContextValue {

@@ -95,7 +95,7 @@ Inspektor browser acceptance tests run with `pnpm test:browser`. Playwright owns
 | `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission contracts, repeatable seeding, and fixture disposal |
 | `pnpm test:browser` | Run Inspeltor browser acceptance tests against an isolated fixture |
 
-The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.54` rejects native writes to top-level `s.json()` columns, so the complete fixture suite remains the regression gate for a compatible Jazz upgrade. Do not skip or remove those fixture tests to make the package command pass.
+The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.55` still rejects native writes to top-level `s.json()` columns, so the complete fixture suite remains the regression gate for a compatible Jazz upgrade. Do not skip or remove those fixture tests to make the package command pass.
 
 ## Dependency security
 

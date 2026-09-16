@@ -40,8 +40,8 @@ Product structure and interaction decisions belong in [[lat.md/query-interface#L
 
 The investigation used:
 
-- Jazz source tag `v2.0.0-alpha.54`.
-- Jazz Tools package version `2.0.0-alpha.54`.
+- Jazz source tag `v2.0.0-alpha.55`.
+- Jazz Tools package version `2.0.0-alpha.55`.
 - The installed Inspektor `jazz-tools` declarations.
 - The official Jazz Inspektor live-query page.
 - A deployed Jazz Inspektor response containing populated server subscription groups.
@@ -92,15 +92,16 @@ Sources:
 
 ### Direct subscription
 
-`Db.subscribe(query, callback, options?)` is the public imperative live-query API.
+`Db.subscribe(query, callbacks, options?)` is the public imperative live-query API. `callbacks` may be
+the legacy update function or an object with `onUpdate` and `onError`.
 
 Its behavior:
 
 - The callback receives the complete materialized result whenever it changes.
 - Each callback receives a newly allocated result array and transformed row objects.
 - The returned function cancels pending setup, removes the local Inspektor trace, unsubscribes the native handle, and clears materialized state.
-- The public callback has no error channel.
-- Setup may fail synchronously; deferred readiness failures can surface asynchronously.
+- The callback-object form reports terminal subscription errors through `onError`.
+- The legacy function form reports unhandled terminal errors to `console.error`.
 
 Sources:
 
@@ -164,8 +165,9 @@ Application-facing `QueryOptions` includes:
 | `base`   | live branch or branch/snapshot pair                                             | Optional branch base |
 
 `localUpdates`, `propagation`, and `visibility` are internal controls rather than public query
-options. Inspektor table reads leave `tier` unset. Alpha.54 can return available local state first and
-keeps full propagation active so the live result receives server changes.
+options. Inspektor table reads use `ReadTier.Remote`, which withholds the initial result until the
+serving authority confirms populated or empty state. Local-first remains available to consumers that
+need immediate eligible local data and background propagation.
 There is no public option for hiding a standalone admin client's subscriptions from local
 development traces.
 

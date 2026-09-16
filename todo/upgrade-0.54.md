@@ -1,10 +1,10 @@
-# Jazz alpha.54 migration and alpha.55 adoption
+# Jazz alpha.54 migration
 
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
 - [Known alpha.54 table-loading issue](#known-alpha54-table-loading-issue)
-- [Alpha.55 adoption checklist](#alpha55-adoption-checklist)
+- [Alpha.55 follow-up](#alpha55-follow-up)
 - [Open product work](#open-product-work)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
 - [Settled interaction decisions](#settled-interaction-decisions)
@@ -59,30 +59,13 @@ Tests against the published alpha.54 packages established these facts:
 - The first subscription callback returns `[]` for `remote`, `remote-if-possible`, `local-first`, and the internal `global` tier.
 - The official standalone Inspector also uses a memory-backed admin client and local-first query options.
 - Jazz issue [#2755](https://github.com/garden-co/jazz/issues/2755) tracks initial WASM subscription-materialization cost, but it has no release milestone or confirmed fix.
-- Jazz issue [#2492](https://github.com/garden-co/jazz/issues/2492) assigns remote-read settlement semantics to the alpha.55 milestone.
 - Jazz issue [#1783](https://github.com/garden-co/jazz/issues/1783) tracks the broader subscription lifecycle and settlement contract.
 
 Do not race the subscription with `db.all()`. Jazz warns that the one-shot snapshot can be older than subscription deltas already delivered. Do not use a timeout or wait for a second callback because a genuinely empty table might never produce another callback.
 
-## Alpha.55 adoption checklist
+## Alpha.55 follow-up
 
-Use this checklist after Jazz publishes alpha.55 or another release that claims to fix authority-tier subscription openings.
-
-- [ ] Read the Jazz release notes and linked fixes for issues #2492, #2755, and #1783. Do not assume that a settlement fix also improves materialization performance.
-- [ ] Build an isolated contract test against the published packages with `createInspectorAdminClient` and `startLocalJazzServer`.
-- [ ] Seed a populated table, subscribe with `tier: 'remote'`, and verify that the first callback contains the complete requested page instead of `[]`.
-- [ ] Subscribe to a genuinely empty remote table and verify that the first callback eventually confirms `[]`.
-- [ ] Verify that local-first subscriptions retain their immediate local opening because attached and offline inspectors still need local behavior.
-- [ ] Update the Jazz package versions in `pnpm-workspace.yaml` and the matching `minimumReleaseAgeExclude` entries.
-- [ ] Regenerate `pnpm-lock.yaml` with PNPM.
-- [ ] Recheck `_dev/inspector-client`, the subscription-store API, read-tier names, query-option lowering, and client shutdown behavior.
-- [ ] Set `INSPEKTOR_QUERY_OPTIONS` to the supported remote tier only after the published-package contract tests pass.
-- [ ] Verify refresh, connection switching, schema switching, retry, reconnect, and client replacement with populated and empty tables.
-- [ ] Verify inserts, updates, deletion of the final row, filters, sorting, pagination, and the `pageSize + 1` probe while the remote subscription is active.
-- [ ] Compare 100, 500, and 1000-row pages before claiming a performance improvement.
-- [ ] Remove alpha.54-specific compatibility code only when the new release makes it unnecessary and its replacement tests pass.
-- [ ] Update [[tableRowsQueryLifecycle#Alpha.54 opening limitation]] and `lat.md/query-subscriptions.md` with the verified release behavior.
-- [ ] Run web lint, typecheck, unit tests, browser acceptance, build, and `lat check`.
+Alpha.55 adoption and remaining validation are tracked in [Jazz alpha.55 adoption](./upgrade-0.55.md).
 
 ## Open product work
 
@@ -103,7 +86,6 @@ Use this checklist after Jazz publishes alpha.55 or another release that claims 
   - [ ] Verify payload-enum read and write round trips in an isolated browser fixture.
   - [x] Keep payload enums non-sortable unless Jazz defines ordering semantics.
 - [ ] Restore a public Jazz database round-trip test for row mutation submissions.
-- [ ] Upgrade to a Jazz build that fixes alpha.54 native writes for top-level `s.json()` columns.
 - [ ] Surface or prevent sessionless admin writes to `managedByCreator` tables; alpha.54 can report
       durability while dropping those writes.
 
@@ -142,8 +124,6 @@ Use this checklist after Jazz publishes alpha.55 or another release that claims 
 - [x] Run focused provider, query, filter, and value-presentation tests.
 - [x] Run web and Inspektor Test lint and typechecks.
 - [x] Run the complete web suite.
-- [ ] Run the complete Inspektor Test suite after alpha.54 accepts the native JSON fixture writes.
 - [x] Build the web package.
-- [ ] Run browser acceptance against the isolated alpha.54 fixture.
 - [x] Verify shared-cloud row loading and insert persistence through a fresh browser context.
 - [x] Run `lat check`.

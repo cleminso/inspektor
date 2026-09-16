@@ -1,6 +1,6 @@
 # Jazz branch behavior
 
-Jazz alpha.54 defines branches through schema columns and selects branch views per query or mutation.
+Jazz alpha.55 defines branches through schema columns and selects branch views per query or mutation.
 
 ## Table of contents
 
@@ -40,5 +40,5 @@ Jazz receives branch coordinates with each database operation rather than when i
 `createInspectorAdminClient` has no branch option. Changing a branch view does not require a new
 Jazz client.
 
-Inspektor does not expose branch controls because it does not yet construct alpha.54 branch views
+Inspektor does not expose branch controls because it does not yet construct Jazz branch views
 for individual queries and mutations.

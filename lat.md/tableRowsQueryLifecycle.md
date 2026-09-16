@@ -12,7 +12,7 @@ This table of contents links to the document sections.
 - [Execution flow](#execution-flow)
 - [Query construction](#query-construction)
 - [Subscription lifecycle](#subscription-lifecycle)
-- [Alpha.54 opening limitation](#alpha54-opening-limitation)
+- [Authority-settled openings](#authority-settled-openings)
 - [Grid presentation states](#grid-presentation-states)
 - [Pagination and virtualization](#pagination-and-virtualization)
 - [Implementation map](#implementation-map)
@@ -88,9 +88,9 @@ The grid keeps author provenance hidden by default and exposes it through column
 The complete-row JSON and Provenance representations expose the selected row's provenance as read-only metadata.
 When the selected row leaves the visible page, its identity fallback query uses the same explicit provenance projection.
 
-Inspektor leaves `tier` unset. Alpha.54 starts a local-first subscription with full propagation, so
-available rows can render without waiting for a server round trip and the same subscription receives
-server changes.
+Inspektor uses the `remote` tier. A fresh memory-backed admin client keeps the query pending until the
+serving authority returns either the requested rows or a confirmed empty result. The same subscription
+then receives server changes.
 
 Change route defaults in `tableRowsSearch.ts`, query construction in `tableRowsQuery.ts`, and Jazz options in `queryOptions.ts`.
 
@@ -102,17 +102,18 @@ The rendered table owns its subscription through `useSyncExternalStore`. React c
 changes or the component unmounts. Page, page-size, filter, sort, schema, table, or client changes acquire the matching query entry.
 The Jazz subscription store decides how long an entry remains available after it is no longer active.
 
-## Alpha.54 opening limitation
+## Authority-settled openings
 
-Jazz alpha.54 can publish a provisional empty opening from a fresh memory-backed admin client before remotely stored rows reach the maintained subscription.
+Jazz alpha.55 remote subscriptions suppress the provisional empty local opening from a fresh
+memory-backed admin client. The first fulfilled result contains the authority's requested rows or its
+confirmed empty result.
 
-The alpha.54 subscription store marks the first delta as fulfilled, including an empty delta. Inspektor then leaves initial loading and renders its empty state. Later subscription deltas replace that transient empty result with the remote rows. The interface can therefore show an empty table between loading and populated rows.
+Contract tests use the published `jazz-tools` package with `createInspectorAdminClient` and an isolated
+Jazz server. They verify populated remote, empty remote, and local-first openings. Local-first retains
+its immediate empty opening for a fresh standalone memory client, so it is not the table-read policy.
 
-The alpha.54 public subscription result does not say whether an empty opening is local and provisional or confirmed by the remote authority. Inspektor cannot distinguish those states without inventing settlement semantics.
-
-An independent remote `db.all()` call is not a safe settlement signal. Jazz documents the maintained stream as the owner of the opening snapshot and later changes, and warns that a raced one-shot snapshot can be older than subscription deltas already delivered.
-
-Keep this behavior visible until a Jazz release makes remote subscription openings authority-settled. Do not replace it with a timeout, a second-callback assumption, or snapshot and subscription reconciliation.
+The maintained subscription remains the only row source. Do not add a timeout, callback-count
+heuristic, or raced `db.all()` snapshot.
 
 ## Grid presentation states
 

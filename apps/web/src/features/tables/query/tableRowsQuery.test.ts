@@ -51,7 +51,7 @@ describe('tableRowsQuery', () => {
       offset: 0,
       hops: [],
     })
-    expect(INSPEKTOR_QUERY_OPTIONS).toEqual({})
+    expect(INSPEKTOR_QUERY_OPTIONS).toEqual({ tier: 'remote' })
   })
 
   it('includes destination filters, sorting, page offset, and the sentinel row in query identity', () => {

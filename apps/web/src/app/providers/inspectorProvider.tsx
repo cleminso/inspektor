@@ -12,7 +12,7 @@ import { useStore } from '@nanostores/react'
 
 import type { StoredPermissionsResponse, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
-// Alpha.54 exposes browser admin client creation through this unstable development entry point.
+// Jazz exposes browser admin client creation through this unstable development entry point.
 import { createInspectorAdminClient } from 'jazz-tools/_dev/inspector-client'
 
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
