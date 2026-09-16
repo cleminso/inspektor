@@ -47,7 +47,7 @@ Consumer (`apps/web`) owns:
 - `active`: navigation state, applies `bg-secondary` and `text-default`
 - `checked`: bulk-selection state, applies `bg-selected` and `text-default`
 
-`active` takes precedence when both are true. The names are deliberately distinct: navigation and bulk selection can coexist and must not be conflated.
+`active` and `checked` compose when both are true. The names are deliberately distinct because navigation and bulk selection can coexist and must not be conflated.
 
 `ActionList.SelectionControl` is a sibling of `ActionList.Trigger`, not a child. This avoids invalid nested interactive elements and keeps the checkbox separate from the navigation link or button.
 
@@ -66,7 +66,7 @@ A checkbox is visible when:
 
 StyleX context variables on the root (`selectionControlsVisible`), item (`selectionHoverVisible`), and selection control (`selectionFocusVisible`, `selectionChecked`) compose into one opacity expression. The root state is explicit consumer input rather than selection state inferred by the design system.
 
-The item's `:hover` controls hover visibility. The selection control's `:focus-within` controls keyboard visibility. They are intentionally separated so focus on the trigger does not reveal the checkbox.
+The item's `:hover` controls hover visibility. The selection control's `:has([data-slot="checkbox"]:focus-visible)` condition controls keyboard visibility. They are intentionally separated so focus on the trigger does not reveal the checkbox.
 
 The table explorer enables list-wide visibility for both the Pinned and Tables lists while its checked set is non-empty. Clearing the final checked table restores the leading icons in both lists.
 
@@ -107,7 +107,9 @@ This removes the checkbox focus ring without suppressing accessible focus indica
 
 ## Focus and active states
 
-Item-level `:focus-within` is intentionally absent from the item's background and text color. Otherwise keyboard focus on the trigger looks like pointer hover.
+Item-level `:focus-within` does not introduce a distinct background or text color. The current marker remains independent from focus and pointer states.
+
+Item-level `:focus-within` is also absent from trailing-action visibility. A selection checkbox retains focus after it is unchecked, so using focus-within would leave the sibling trailing action visible. Trailing actions are visible while their item is hovered, while the action itself is focus-visible, or while its popup is open.
 
 Each interactive child owns its own `:focus-visible` treatment:
 
@@ -115,7 +117,7 @@ Each interactive child owns its own `:focus-visible` treatment:
 - Checkbox focus shows the checkbox and reveals it.
 - Trailing action focus shows the action outline.
 
-Active items keep `bg-secondary`. Checked items keep `bg-selected`. Both remain visible regardless of focus state.
+Active items keep a logical leading marker. Checked items keep `bg-selected`. When both states apply, the marker and background remain visible together regardless of focus state.
 
 ## Token usage
 
@@ -127,7 +129,7 @@ No new tokens were added. Existing semantic roles express the hierarchy:
 - Checked or active item: `text-default`
 - Disabled item: `text-disabled`
 
-Hover and checked backgrounds reuse `bg-hover` and `bg-selected` from the semantic token set.
+Hover and checked backgrounds reuse `bg-hover` and `bg-selected` from the semantic token set. The active marker reuses `selectionColors.border`, and its width reuses the focus-ring spatial token established for persistent state bars.
 
 ## Documentation metadata
 

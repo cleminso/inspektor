@@ -39,7 +39,9 @@ export default function TableNavigationDemo(): ReactElement {
               icon={<Table aria-hidden="true" />}
               onCheckedChange={(checked) => setChecked(table, checked === true)}
             />
-            <ActionList.Trigger>{table}</ActionList.Trigger>
+            <ActionList.Trigger aria-current={index === 0 ? 'page' : undefined}>
+              {table}
+            </ActionList.Trigger>
             {index === 0 ? (
               <Menu.Root>
                 <Menu.Trigger render={<ActionList.Action aria-label={`Open ${table} actions`} />}>

@@ -834,15 +834,6 @@ function TableViewContent({
                                     gap="xs"
                                   >
                                     <Text color="muted">This table is empty</Text>
-                                    <Button
-                                      type="button"
-                                      size="s"
-                                      variant="primary"
-                                      disabled={canOpenInsert === false}
-                                      onClick={openInsertPane}
-                                    >
-                                      Insert row
-                                    </Button>
                                   </Box>
                                 ) : null
                               ) : (

@@ -1,7 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  elementColors,
   focusColors,
   ghostElementColors,
   spatial,
@@ -37,7 +36,6 @@ export const actionListStyles = stylex.create({
   item: {
     [actionListVars.actionVisible]: {
       default: '0',
-      ':focus-within': '1',
       ':hover': '1',
     },
     [actionListVars.selectionHoverVisible]: {
@@ -68,14 +66,9 @@ export const actionListStyles = stylex.create({
     contentVisibility: 'auto',
   },
   itemActive: {
-    backgroundColor: {
-      default: elementColors.default,
-      ':focus-within': elementColors.default,
-      ':hover': elementColors.default,
-    },
+    // borderInlineStartColor: selectionColors.border,
     color: {
       default: textColors.default,
-      ':focus-within': textColors.default,
       ':hover': textColors.default,
     },
   },
@@ -193,6 +186,7 @@ export const actionListStyles = stylex.create({
     justifyContent: 'center',
     opacity: {
       default: actionListVars.actionVisible,
+      ':focus-visible': '1',
       ':is([data-popup-open])': '1',
     },
     outlineColor: focusColors.ring,

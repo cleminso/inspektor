@@ -54,21 +54,30 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
-test('reveals every table selection control after selection starts', async ({ page }) => {
+test('separates table selection controls from current-table treatment', async ({ page }) => {
   await connectToFixture(page)
 
   await page
     .getByRole('list', { name: 'Tables' })
     .locator('[data-table-name="publicReadOnlyRecords"]')
     .hover()
-  await page.getByRole('button', { name: 'Open publicReadOnlyRecords actions' }).click()
+  const publicReadOnlyRecordsAction = page.getByRole('button', {
+    name: 'Open publicReadOnlyRecords actions',
+  })
+  await publicReadOnlyRecordsAction.click()
+  await page.mouse.move(0, 0)
+  await expect(publicReadOnlyRecordsAction).toHaveCSS('opacity', '1')
   await page.getByRole('menuitem', { name: 'Pin 1 table' }).click()
 
   const tableList = page.getByRole('list', { name: 'Tables' })
   const pinnedList = page.getByRole('list', { name: 'Pinned tables' })
+  const currentTableItem = tableList.locator('[data-active]')
   const tableItem = tableList.locator('[data-table-name="columnTypeShowcase"]')
   const tableCheckbox = tableList.getByRole('checkbox', { name: 'Select columnTypeShowcase' })
   const additionalTableCheckbox = tableList.getByRole('checkbox', { name: 'Select projects' })
+  const additionalTableAction = tableList.getByRole('button', {
+    name: 'Open projects actions',
+  })
   const pinnedCheckbox = pinnedList.getByRole('checkbox', {
     name: 'Select publicReadOnlyRecords',
   })
@@ -105,6 +114,15 @@ test('reveals every table selection control after selection starts', async ({ pa
   await page.mouse.move(0, 0)
 
   await expect.poll(controlOpacities).toEqual(Array(selectionControlCount).fill('0'))
+  await expect(additionalTableAction).toHaveCSS('opacity', '0')
+  await expect(currentTableItem).not.toHaveAttribute('data-checked', '')
+  await expect(currentTableItem).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+  await expect(currentTableItem).toHaveCSS('border-inline-start-width', '2px')
+
+  await additionalTableCheckbox.press('Tab')
+  await page.keyboard.press('Tab')
+  await expect(additionalTableAction).toBeFocused()
+  await expect(additionalTableAction).toHaveCSS('opacity', '1')
 })
 
 test('wraps header context only after its controls stop fitting', async ({ page }) => {
