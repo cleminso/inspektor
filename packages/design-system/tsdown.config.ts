@@ -3,6 +3,7 @@ import { defineConfig } from 'tsdown'
 export default defineConfig({
   entry: {
     index: './src/index.ts',
+    'brand/index': './src/brand/index.ts',
     'tokens/tokens.stylex': './src/tokens/tokens.stylex.ts',
     'components/tooltip/tooltip': './src/components/tooltip/tooltip.tsx',
   },

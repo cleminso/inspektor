@@ -1,30 +1,36 @@
 {
   "name": "@inspektor/ds",
   "version": "0.0.1",
+  "private": true,
   "description": "Inspektor design system",
   "author": "Regarde",
-  "type": "module",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/cleminso/inspektor.git",
     "directory": "packages/design-system"
   },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
   "sideEffects": [
     "./src/styles/baseline.css",
     "./dist/baseline.css"
   ],
-  "files": [
-    "dist"
-  ],
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "inspektor-source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./brand": {
+      "inspektor-source": "./src/brand/index.ts",
+      "types": "./dist/brand/index.d.ts",
+      "import": "./dist/brand/index.js",
+      "default": "./dist/brand/index.js"
     },
     "./theme": {
       "inspektor-source": "./src/tokens/tokens.stylex.ts",

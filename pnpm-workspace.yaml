@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 allowBuilds:
-  "@swc/core": true
+  '@swc/core': true
   better-sqlite3: true
   esbuild: true
   msw: true
@@ -11,28 +11,29 @@ allowBuilds:
   workerd: true
 
 overrides:
-  "@opentelemetry/core": 2.8.0
-  "esbuild@>=0.27.3 <0.28.1": 0.28.2
-  "protobufjs@>=8.0.0 <8.6.6": 8.7.2
+  '@opentelemetry/core': 2.8.0
+  'esbuild@>=0.27.3 <0.28.1': 0.28.2
+  'protobufjs@>=8.0.0 <8.6.6': 8.7.2
 
 catalog:
-  "@base-ui/react": ^1.8.0
-  "@fontsource-variable/geist": ^5.3.0
-  "@fontsource-variable/geist-mono": ^5.3.0
-  "@stylexjs/stylex": ^0.19.0
-  "@stylexjs/unplugin": ^0.19.0
-  "@tanstack/react-hotkeys": ^0.10.0
-  "@tanstack/react-router": ^1.170.32
-  "@tanstack/react-router-devtools": ^1.167.1
-  "@tanstack/react-table": ^9.2.4
-  "@tanstack/react-virtual": ^3.14.10
-  "@tanstack/router-plugin": ^1.168.35
-  "@testing-library/react": ^16.3.3
-  "@types/node": ^26.4.1
-  "@types/react": ~19.2.18
-  "@types/react-dom": ^19.2.7
-  "@vitejs/plugin-react": ^6.1.1
-  "jazz-tools": 2.0.0-alpha.54
+  '@base-ui/react': ^1.8.0
+  '@fontsource-variable/geist': ^5.3.0
+  '@fontsource-variable/geist-mono': ^5.3.0
+  '@fontsource-variable/instrument-sans': ^5.2.8
+  '@stylexjs/stylex': ^0.19.0
+  '@stylexjs/unplugin': ^0.19.0
+  '@tanstack/react-hotkeys': ^0.10.0
+  '@tanstack/react-router': ^1.170.32
+  '@tanstack/react-router-devtools': ^1.167.1
+  '@tanstack/react-table': ^9.2.4
+  '@tanstack/react-virtual': ^3.14.10
+  '@tanstack/router-plugin': ^1.168.35
+  '@testing-library/react': ^16.3.3
+  '@types/node': ^26.4.1
+  '@types/react': ~19.2.18
+  '@types/react-dom': ^19.2.7
+  '@vitejs/plugin-react': ^6.1.1
+  'jazz-tools': 2.0.0-alpha.54
   jsdom: ^30.0.1
   lucide-react: ^1.40.0
   next-themes: 0.4.6
@@ -41,16 +42,16 @@ catalog:
   react-resizable-panels: ^4.12.3
   tsdown: ^0.23.0
   typescript: ^7.0.2
-  "vite": ^8.2.2
+  'vite': ^8.2.2
   vitest: ^5.0.0
 
 minimumReleaseAgeExclude:
   - '@base-ui/react@1.5.0 || 1.8.0'
   - '@base-ui/utils@0.2.9 || 0.4.0'
-  - "@tanstack/react-table@9.0.0"
-  - "@tanstack/table-core@9.0.0"
-  - "@vitest/mocker@5.0.0"
-  - "@vitest/spy@5.0.0"
+  - '@tanstack/react-table@9.0.0'
+  - '@tanstack/table-core@9.0.0'
+  - '@vitest/mocker@5.0.0'
+  - '@vitest/spy@5.0.0'
   - vitest@5.0.0
   - '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.54'
   - '@garden-co/jazz-napi-darwin-x64@2.0.0-alpha.54'
@@ -63,6 +64,6 @@ minimumReleaseAgeExclude:
 patchedDependencies:
   # Prevent Vitest from hanging on file handles and a referenced polling timer.
   # Remove after @stylexjs/unplugin includes https://github.com/facebook/stylex/pull/1534.
-  "@stylexjs/unplugin@0.19.0": patches/@stylexjs__unplugin@0.19.0.patch
+  '@stylexjs/unplugin@0.19.0': patches/@stylexjs__unplugin@0.19.0.patch
 
 # onlyBuiltDependencies:
