@@ -1,5 +1,4 @@
-import '@fontsource-variable/instrument-sans/wght.css'
-
+import './fonts.css'
 import './index.css'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'

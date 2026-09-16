@@ -1,3 +1,4 @@
+/* Establish the shared browser baseline once before application-specific globals. */
 @import "@inspektor/ds/baseline.css";
 
 :root {
@@ -6,12 +7,14 @@
   color-scheme: light dark;
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
+html.light {
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  color-scheme: light;
 }
 
-body {
-  margin: 0;
+html.dark {
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+  color-scheme: dark;
 }

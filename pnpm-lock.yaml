@@ -15,9 +15,6 @@ catalogs:
     '@fontsource-variable/geist-mono':
       specifier: ^5.3.0
       version: 5.3.0
-    '@fontsource-variable/instrument-sans':
-      specifier: ^5.2.8
-      version: 5.3.0
     '@stylexjs/stylex':
       specifier: ^0.19.0
       version: 0.19.0
@@ -319,9 +316,6 @@ importers:
 
   apps/website:
     dependencies:
-      '@fontsource-variable/instrument-sans':
-        specifier: 'catalog:'
-        version: 5.3.0
       '@inspektor/ds':
         specifier: workspace:*
         version: link:../../packages/design-system
@@ -1091,9 +1085,6 @@ packages:
 
   '@fontsource-variable/geist@5.3.0':
     resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==}
-
-  '@fontsource-variable/instrument-sans@5.3.0':
-    resolution: {integrity: sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw==}
 
   '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.54':
     resolution: {integrity: sha512-U2SGn+Chqs/UiZ8tza9fgMXpm3zNFCBA22MJyvQ7G6+Z6O5XdoopUZR6IhJCAhWagerV1pkCMTG1n/XBf0xZVA==}
@@ -4734,8 +4725,6 @@ snapshots:
   '@fontsource-variable/geist-mono@5.3.0': {}
 
   '@fontsource-variable/geist@5.3.0': {}
-
-  '@fontsource-variable/instrument-sans@5.3.0': {}
 
   '@garden-co/jazz-napi-darwin-arm64@2.0.0-alpha.54':
     optional: true
