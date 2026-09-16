@@ -1,0 +1,23 @@
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import { HomePage } from './homePage'
+
+describe('HomePage', () => {
+  it('renders the accepted content and landmarks', () => {
+    render(<HomePage />)
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'inspektor studio explore your Jazz application data',
+      }),
+    ).not.toBeNull()
+    expect(screen.queryByRole('heading', { level: 2 })).toBeNull()
+    expect(screen.getByRole('img', { name: 'Inspektor' })).not.toBeNull()
+    expect(screen.getByRole('main')).not.toBeNull()
+    expect(screen.getByText(/Inspektor connects to your sync server/)).not.toBeNull()
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(screen.queryByRole('link')).toBeNull()
+  })
+})

@@ -6,7 +6,7 @@ export const Route = createRootRoute({
       { title: 'Inspektor Studio' },
       {
         name: 'description',
-        content: 'Inspect your Jazz application data locally in your browser.',
+        content: 'Explore your Jazz application data locally in your browser.',
       },
     ],
   }),
