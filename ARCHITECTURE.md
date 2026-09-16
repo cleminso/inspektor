@@ -61,7 +61,7 @@ The design system owns reusable presentation and interaction behavior:
 - Accessible keyboard, focus, selection, popup, and form behavior provided by component primitives.
 - Public component props and consumer-facing types.
 - Reusable optional behavior, including carefully scoped deferred loading boundaries.
-- Reusable brand page structure and typography published through a focused brand entry.
+- Reusable brand site framing, semantic sections, and hero typography published through a focused brand entry.
 
 ### `apps/website`
 
@@ -128,7 +128,7 @@ Workspace mutation state publishes an exit blocker upward. Session enforces that
 | Import path                  | Intended surface                                            |
 | ---------------------------- | ----------------------------------------------------------- |
 | `@inspektor/ds`              | Main public component, token, primitive, and hook barrel    |
-| `@inspektor/ds/brand`        | Focused brand page structure and typography                 |
+| `@inspektor/ds/brand`        | Focused brand site framing, sections, and typography        |
 | `@inspektor/ds/theme`        | Theme token entry                                           |
 | `@inspektor/ds/baseline.css` | Opt-in browser normalization used by workspace applications |
 | `@inspektor/ds/tooltip`      | Focused Tooltip entry used at an application-wide boundary  |
@@ -200,7 +200,7 @@ This means the design-system TSDown build verifies artifact generation, while `a
 - a dynamic development-only StyleX runtime import.
 - `defaultPreload: "intent"`, which lets the router preload route work after a user shows intent to navigate. Preloading is not the same as making the route part of the HTML entry closure.
 
-`apps/website` uses the same source-resolution and StyleX extraction path without product runtime providers or data dependencies. It loads Instrument Sans as an application asset and uses system light and dark color schemes.
+`apps/website` uses the same source-resolution and StyleX extraction path without product runtime providers or data dependencies. It loads Instrument Sans as an application asset, publishes the font license under `/licenses`, and uses system light and dark color schemes. [Instrument Sans website delivery](research/instrumentSans/instrumentSans.md) records the font's provenance and maintenance contract.
 
 ## Static and deferred dependency graphs
 

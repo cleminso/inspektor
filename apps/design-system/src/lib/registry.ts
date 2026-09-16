@@ -431,8 +431,8 @@ export const brandWordmarkItem = {
   href: '/components/brand-wordmark',
   description: 'Renders the canonical Inspektor wordmark for brand surfaces.',
   source: {
-    label: 'brandWordmark.tsx',
-    path: 'packages/design-system/src/brand/brandWordmark.tsx',
+    label: 'wordmark.tsx',
+    path: 'packages/design-system/src/brand/wordmark/wordmark.tsx',
   },
 } satisfies DocsItem
 

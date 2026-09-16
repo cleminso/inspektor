@@ -1,4 +1,4 @@
-# Brand text
+# Brand typography
 
 ## Table of contents
 
@@ -10,6 +10,14 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+### [16/09/26]
+
+- [x] Move page-title and description typography into the semantic hero that owns their DOM.
+- [x] Use one `h1` with primary and muted spans instead of separate heading roles.
+- [x] Apply the selected responsive type scale and 710px description measure.
+- [x] Preload the initial Latin variable WOFF2 to prevent fallback-font layout movement.
+- The following blocks record the removed `BrandText` API and are not current.
 
 ### [16/09/26]
 
@@ -38,6 +46,10 @@
 
 ### [16/09/26]
 
+- Visual hierarchy does not create an additional document heading level.
+
+### [16/09/26]
+
 - The page heading and muted continuation stay in one zero-gap heading group.
 
 ### [15/09/26]
@@ -51,6 +63,10 @@
 - Decide whether a future brand revision enables `ss02` for headings.
 
 ## Validation checklist
+
+### [16/09/26]
+
+- [x] Verify one heading, responsive typography, description measure, and WOFF2 loading.
 
 ### [15/09/26]
 

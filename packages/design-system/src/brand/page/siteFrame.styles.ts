@@ -20,6 +20,10 @@ export const brandSiteFrameStyles = stylex.create({
     minHeight: '100dvh',
     minWidth: 0,
     width: '100%',
+    '::selection': {
+      backgroundColor: brandColors.selectionBackground,
+      color: brandColors.selectionText,
+    },
   },
   rail: {
     borderRadius: borderRadii.xs,

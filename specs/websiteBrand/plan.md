@@ -46,8 +46,8 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Add reusable branded presentation under `packages/design-system/src/brand`.
 - Publish branded components through `@inspektor/ds/brand` rather than the root barrel.
 - Keep brand and studio presentation in separate module contexts.
-- Add a brand page frame for the responsive centered website layout.
-- Add closed brand typography roles backed by Instrument Sans.
+- Add a closed brand site frame for the responsive centered website layout.
+- Add a semantic hero backed by Instrument Sans.
 - Support light and dark color schemes.
 - Update current-state architecture and Lat documentation to match the implemented package and application surfaces.
 
@@ -60,7 +60,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Keep the page heading, muted continuation, and description together in one top-aligned hero message.
 - Render this initial content:
   - Page heading: `inspektor studio`
-  - Section heading: `inspect your Jazz application data`
+  - Muted heading continuation: `explore your Jazz application data`
   - Description: `Inspektor connects to your sync server. It loads the schema, creates an admin client locally in your browser, and renders an interface for you to inspect your application data.`
 - Support the accepted heading sizes and both color schemes.
 - Keep the existing product deployment and `/` redirect unchanged in this iteration.
@@ -88,41 +88,41 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - `packages/design-system` remains the package owner for generic and branded presentation.
 - `@inspektor/ds/brand` is a focused public entry. Brand exports do not enter the generic root barrel.
 - Brand components may consume public generic design-system APIs. Generic modules do not consume brand modules.
-- The first brand entry exports `BrandPageFrame`, its `Header`, `Main`, and `Footer` parts, `BrandHero`, `BrandWordmark`, `BrandSection`, and `BrandText` with their public prop types. `BrandHero.Content` and `BrandHero.Frame` expose the same nested layout boundaries as the reference structure.
-- `BrandPageFrame` renders the passive side columns internally. Its public parts express semantic page regions rather than expose the empty columns to consumers.
-- Public brand component props omit `className`, `style`, and arbitrary typography overrides.
-- Instrument Sans is the brand sans-serif. The website application loads the font assets; brand typography owns their semantic presentation.
+- The brand entry exports `BrandSiteFrame`, `BrandHero`, and `BrandWordmark` with their public prop types. A specialized section enters the API only when accepted content establishes its semantics and layout.
+- Public components represent reusable visual or semantic units rather than internal DOM wrappers.
+- `BrandSiteFrame` accepts header content and ordered main children. It renders the header, main surface, passive side columns, and decorative bottom strip internally.
+- `BrandHero` accepts title, continuation, and description strings. It renders the title and visual continuation inside one `h1` and keeps layout wrappers private.
+- Public brand component props omit `className`, `style`, unsafe content replacement, and arbitrary typography overrides.
+- Instrument Sans is the brand sans-serif. The website application loads the font assets and preloads the Latin variable WOFF2 used above the fold; brand typography owns their semantic presentation.
 - Brand text uses weight `450` through the standard `font-weight` property.
-- The description uses a 600px maximum. Headings use the available hero width.
+- The description uses a 710px maximum. The primary title uses the available hero width; the muted continuation has a 500px maximum below 900px to preserve the selected tablet line break.
 - Headings use Instrument Sans default glyphs.
 - Brand text has these responsive roles:
 
-  | Role             | Default element | Below 900px | From 900px | From 1471px | Line height     | Tracking  | Wrapping |
-  | ---------------- | --------------- | ----------: | ---------: | ----------: | --------------- | --------- | -------- |
-  | `pageHeading`    | `h1`            |        40px |       48px |        56px | `48px` / `56px` | `-0.02em` | `pretty` |
-  | `sectionHeading` | `h2`            |        36px |       36px |        56px | `48px` / `56px` | `-0.02em` | `pretty` |
-  | `description`    | `p`             |        18px |       18px |        18px | `28px`          | `0`       | `pretty` |
+| Role                   | Element          | Below 900px | From 900px | From 1471px | Line height       | Tracking  | Wrapping |
+| ---------------------- | ---------------- | ----------: | ---------: | ----------: | ----------------- | --------- | -------- |
+| Primary title          | `span` in `h1`   |        40px |       48px |        56px | `48px` / `56px`   | `-0.02em` | `pretty` |
+| Muted continuation     | `span` in `h1`   |        36px |       48px |        56px | `40px` / `48px` / `56px` | `-0.02em` | `pretty` |
+| Description            | `p`              |        18px |       18px |        18px | `28px`            | `0`       | `pretty` |
 
 - The section heading and description use an opaque muted text treatment that preserves normal-text contrast.
-- `BrandText.Line` preserves intentional display-heading line breaks.
-- The header and footer surfaces are 46px tall. The header positions a 140×20 wordmark with 12px inline padding.
-- The hero section itself is unpadded. Its content container owns width, its inner frame owns 42px block padding and 84px from the 1471px desktop breakpoint, and its message frame owns 12px inline padding.
+- The header is 52px tall. Its private content frame positions a 140×20 wordmark with 16px inline padding, leaving the header surface unpadded. The decorative bottom strip is 46px tall and remains wrapperless while empty.
+- The hero's private content frame owns 42px block padding and 16px inline padding at every supported width. The semantic section remains unpadded.
 - The hero message uses an 18px gap between its zero-gap heading group and description.
 
 - The page frame has 4px outer padding and 4px gaps between visible columns.
 - Below 1280px, the central column fills the available inline space and the passive side columns are absent.
 - From 1280px, the central column has a 1216px maximum width. At 1280px, each passive side column is 24px wide.
 - Above 1280px, both passive side columns grow equally while the central column remains 1216px wide. At 2048px, each side column is 408px wide.
-- Content sections inside the central column use 12px inline padding.
+- Content sections do not recreate the main surface. Each specialized section owns a private content frame for its spacing.
 - Private brand semantic colors map the existing palette to layout responsibilities. Brand component styles consume these roles rather than palette values directly:
 
   | Role                          | Light             | Dark                 |
   | ----------------------------- | ----------------- | -------------------- |
-  | Central section surface       | `palette.gray50`  | `palette.neutral950` |
+  | Continuous main surface       | `palette.gray50`  | `palette.neutral950` |
   | Outer canvas and side columns | `palette.gray200` | `palette.neutral800` |
-  | Section boundaries            | `palette.gray300` | `palette.neutral700` |
 
-- The section-boundary role links to the existing `borderColors.default` semantic token. Private brand variables own the central-surface and outer-canvas mappings.
+- Canvas gaps define surface boundaries. Private brand variables own the continuous-surface and outer-canvas mappings.
 - The brand color model supports both light and dark schemes.
 
 ## Open decisions
@@ -144,7 +144,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - [x] Define the public brand contracts and contract tests.
 - [x] Add the `@inspektor/ds/brand` source and distribution entry.
 - [x] Add Instrument Sans as an application-loaded variable WOFF2 dependency.
-- [x] Implement the brand page frame, section spacing, and typography roles with StyleX.
+- [x] Implement the brand page frame, hero content spacing, and typography roles with StyleX.
 - [x] Document the reusable wordmark in the design-system application.
 - [x] Create the `inspektor.website` SPA and configure TanStack Router, StyleX source consumption, light and dark schemes, and route metadata.
 - [x] Compose the website route from public `@inspektor/ds` and `@inspektor/ds/brand` imports with the accepted heading and description content.
