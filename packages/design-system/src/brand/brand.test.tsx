@@ -1,148 +1,121 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, expectTypeOf, it, vi } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { BrandHero, BrandPageFrame, BrandSection, BrandText, BrandWordmark } from './index'
+import {
+  BrandHero,
+  BrandSiteFrame,
+  BrandWordmark,
+  type BrandHeroProps,
+  type BrandSiteFrameProps,
+  type BrandWordmarkProps,
+} from './index'
 
 describe('brand components', () => {
-  it('provides the accepted semantic page structure', () => {
+  it('renders the site frame and hero with one page heading', () => {
     render(
-      <BrandPageFrame data-testid="frame">
-        <BrandPageFrame.Header>
-          <BrandWordmark />
-        </BrandPageFrame.Header>
-        <BrandPageFrame.Main>
-          <BrandHero>
-            <BrandHero.Content>
-              <BrandHero.Frame>
-                <BrandHero.Message>
-                  <BrandHero.Headings>
-                    <BrandText variant="pageHeading">Page</BrandText>
-                    <BrandText variant="sectionHeading">Section</BrandText>
-                  </BrandHero.Headings>
-                  <BrandText variant="description">Description</BrandText>
-                </BrandHero.Message>
-              </BrandHero.Frame>
-            </BrandHero.Content>
-          </BrandHero>
-        </BrandPageFrame.Main>
-        <BrandPageFrame.Footer aria-hidden="true" />
-      </BrandPageFrame>,
+      <BrandSiteFrame header={<BrandWordmark />}>
+        <BrandHero
+          title="inspektor studio"
+          continuation="explore your Jazz application data"
+          description="Description"
+        />
+      </BrandSiteFrame>,
     )
 
-    expect(screen.getByTestId('frame').tagName).toBe('DIV')
     expect(screen.getByRole('banner')).not.toBeNull()
     expect(screen.getByRole('main')).not.toBeNull()
     expect(screen.getByRole('img', { name: 'Inspektor' })).not.toBeNull()
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Page')
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('Section')
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'inspektor studio explore your Jazz application data',
+      }),
+    ).not.toBeNull()
+    expect(screen.queryByRole('heading', { level: 2 })).toBeNull()
     expect(screen.queryByRole('contentinfo')).toBeNull()
-  })
-
-  it('selects native elements from closed text roles', () => {
-    const { container } = render(
-      <BrandSection>
-        <BrandText variant="pageHeading">Page</BrandText>
-        <BrandText variant="sectionHeading">Section</BrandText>
-        <BrandText variant="description">Description</BrandText>
-      </BrandSection>,
-    )
-
-    const rendered = within(container)
-    expect(rendered.getByRole('heading', { level: 1 }).textContent).toBe('Page')
-    expect(rendered.getByRole('heading', { level: 2 }).textContent).toBe('Section')
-    expect(rendered.getByText('Description').tagName).toBe('P')
   })
 
   it('strips styling escape hatches passed by untyped consumers', () => {
     const { container } = render(
-      <BrandPageFrame {...({ 'data-testid': 'frame', className: 'consumer-style' } as object)}>
-        <BrandSection {...({ 'data-testid': 'section', style: { color: 'red' } } as object)}>
-          <BrandText
-            {...({
-              'data-testid': 'text',
-              className: 'consumer-style',
-              style: { color: 'red' },
-            } as object)}
-            variant="description"
-          >
-            Description
-          </BrandText>
-        </BrandSection>
-      </BrandPageFrame>,
+      <BrandSiteFrame
+        {...({
+          'data-testid': 'frame',
+          className: 'consumer-style',
+          dangerouslySetInnerHTML: { __html: 'Consumer frame markup' },
+          style: { color: 'red' },
+        } as object)}
+        header={<BrandWordmark />}
+      >
+        <BrandHero
+          {...({
+            'data-testid': 'hero',
+            className: 'consumer-style',
+            children: 'Consumer content',
+            dangerouslySetInnerHTML: { __html: 'Consumer markup' },
+            style: { color: 'red' },
+          } as object)}
+          title="Page"
+          continuation="Continuation"
+          description="Description"
+        />
+      </BrandSiteFrame>,
     )
 
-    const { getByTestId } = within(container)
-    const text = getByTestId('text')
-    expect(getByTestId('frame').className).not.toContain('consumer-style')
-    expect(getByTestId('section').style.color).not.toBe('red')
-    expect(text.className).not.toContain('consumer-style')
-    expect(text.style.color).not.toBe('red')
+    const rendered = within(container)
+    expect(rendered.getByTestId('frame').className).not.toContain('consumer-style')
+    expect(rendered.getByTestId('frame').style.color).not.toBe('red')
+    expect(rendered.getByTestId('hero').className).not.toContain('consumer-style')
+    expect(rendered.getByTestId('hero').style.color).not.toBe('red')
+    expect(rendered.queryByText('Consumer frame markup')).toBeNull()
+    expect(rendered.queryByText('Consumer content')).toBeNull()
+    expect(rendered.queryByText('Consumer markup')).toBeNull()
   })
 
-  it('preserves the canonical wordmark name for untyped consumers', () => {
+  it('preserves the canonical wordmark for untyped consumers', () => {
     const { container } = render(
-      <BrandWordmark {...({ 'aria-labelledby': 'consumer-label' } as object)} />,
+      <BrandWordmark
+        {...({
+          'aria-labelledby': 'consumer-label',
+          children: 'Consumer content',
+          className: 'consumer-style',
+          dangerouslySetInnerHTML: { __html: 'Consumer markup' },
+          style: { color: 'red' },
+        } as object)}
+      />,
     )
 
     const wordmark = within(container).getByRole('img', { name: 'Inspektor' })
     expect(wordmark.hasAttribute('aria-labelledby')).toBe(false)
+    expect(wordmark.getAttribute('class')).not.toContain('consumer-style')
+    expect(wordmark.style.color).not.toBe('red')
+    expect(wordmark.querySelectorAll('use')).toHaveLength(65)
   })
 
-  it('keeps callback refs attached across ordinary renders', () => {
-    const ref = vi.fn()
-    const { rerender } = render(
-      <BrandText ref={ref} variant="description">
-        Description
-      </BrandText>,
-    )
-
-    rerender(
-      <BrandText ref={ref} variant="description">
-        Updated description
-      </BrandText>,
-    )
-
-    expect(ref).toHaveBeenCalledTimes(1)
-    expect(ref).toHaveBeenLastCalledWith(screen.getByText('Updated description'))
-  })
-
-  it('preserves React callback-ref cleanup', () => {
-    const cleanup = vi.fn()
-    const ref = vi.fn(() => cleanup)
-    const { unmount } = render(
-      <BrandText ref={ref} variant="description">
-        Description
-      </BrandText>,
-    )
-
-    unmount()
-
-    expect(cleanup).toHaveBeenCalledOnce()
-  })
-
-  it('rejects consumer-owned presentation props', () => {
+  it('rejects consumer-owned presentation and hero structure', () => {
     type RootExports = typeof import('../index')
-    type BrandLeakedIntoRoot = 'BrandText' extends keyof RootExports ? true : false
+    type BrandLeakedIntoRoot = 'BrandSiteFrame' extends keyof RootExports ? true : false
+    type HeroAcceptsClassName = 'className' extends keyof BrandHeroProps ? true : false
+    type HeroAcceptsChildren = 'children' extends keyof BrandHeroProps ? true : false
+    type HeroAcceptsStyle = 'style' extends keyof BrandHeroProps ? true : false
+    type FrameAcceptsUnsafeHtml = 'dangerouslySetInnerHTML' extends keyof BrandSiteFrameProps
+      ? true
+      : false
+    type WordmarkAcceptsUnsafeHtml = 'dangerouslySetInnerHTML' extends keyof BrandWordmarkProps
+      ? true
+      : false
 
-    // @ts-expect-error BrandText owns its presentation.
-    const className = <BrandText className="consumer-style" variant="description" />
-    // @ts-expect-error BrandPageFrame owns its presentation.
-    const frameClassName = <BrandPageFrame className="consumer-style" />
-    // @ts-expect-error BrandSection owns its presentation.
-    const style = <BrandSection style={{ color: 'red' }} />
-    // @ts-expect-error BrandHero owns its presentation.
-    const heroStyle = <BrandHero style={{ color: 'red' }} />
+    // @ts-expect-error BrandSiteFrame owns its presentation.
+    const frameClassName = <BrandSiteFrame className="consumer-style" header={null} />
     // @ts-expect-error BrandWordmark owns its presentation.
     const wordmarkClassName = <BrandWordmark className="consumer-style" />
-    // @ts-expect-error BrandText exposes only accepted roles.
-    const variant = <BrandText variant="heading" />
 
-    expect(className).toBeDefined()
     expect(frameClassName).toBeDefined()
-    expect(style).toBeDefined()
-    expect(heroStyle).toBeDefined()
     expect(wordmarkClassName).toBeDefined()
-    expect(variant).toBeDefined()
     expectTypeOf<BrandLeakedIntoRoot>().toEqualTypeOf<false>()
+    expectTypeOf<HeroAcceptsClassName>().toEqualTypeOf<false>()
+    expectTypeOf<HeroAcceptsChildren>().toEqualTypeOf<false>()
+    expectTypeOf<HeroAcceptsStyle>().toEqualTypeOf<false>()
+    expectTypeOf<FrameAcceptsUnsafeHtml>().toEqualTypeOf<false>()
+    expectTypeOf<WordmarkAcceptsUnsafeHtml>().toEqualTypeOf<false>()
   })
 })

@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 import { forwardRef, useId, type ComponentPropsWithRef } from 'react'
 
-import { brandWordmarkStyles } from './brandWordmark.styles'
+import { brandWordmarkStyles } from './wordmark.styles'
 
 export type BrandWordmarkProps = Omit<
   ComponentPropsWithRef<'svg'>,
@@ -9,6 +9,7 @@ export type BrandWordmarkProps = Omit<
   | 'aria-labelledby'
   | 'children'
   | 'className'
+  | 'dangerouslySetInnerHTML'
   | 'height'
   | 'role'
   | 'style'
@@ -21,7 +22,9 @@ export const BrandWordmark = forwardRef<SVGSVGElement, BrandWordmarkProps>(
   function BrandWordmark(props, forwardedRef) {
     const {
       'aria-labelledby': _ariaLabelledby,
+      children: _children,
       className: _className,
+      dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
       style: _style,
       ...wordmarkProps
     } = props as ComponentPropsWithRef<'svg'>

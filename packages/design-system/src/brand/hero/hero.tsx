@@ -3,113 +3,63 @@ import { forwardRef, type ComponentPropsWithRef } from 'react'
 
 import { brandHeroStyles } from './hero.styles'
 
-type WithoutStyles<Props> = Omit<Props, 'className' | 'style'>
+export interface BrandHeroProps extends Omit<
+  ComponentPropsWithRef<'section'>,
+  'children' | 'className' | 'dangerouslySetInnerHTML' | 'style' | 'title'
+> {
+  /** Primary page title text. */
+  title: string
+  /** Muted continuation of the page title. */
+  continuation: string
+  /** Supporting copy displayed below the page title. */
+  description: string
+}
 
-export type BrandHeroProps = WithoutStyles<ComponentPropsWithRef<'section'>>
-export type BrandHeroContentProps = WithoutStyles<ComponentPropsWithRef<'div'>>
-export type BrandHeroFrameProps = WithoutStyles<ComponentPropsWithRef<'div'>>
-export type BrandHeroMessageProps = WithoutStyles<ComponentPropsWithRef<'div'>>
-export type BrandHeroHeadingsProps = WithoutStyles<ComponentPropsWithRef<'div'>>
+/** Presents the primary message for an Inspektor brand page. */
+export const BrandHero = forwardRef<HTMLElement, BrandHeroProps>(function BrandHero(
+  { continuation, description, title, ...props },
+  forwardedRef,
+) {
+  const {
+    children: _children,
+    className: _className,
+    dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
+    style: _style,
+    ...sectionProps
+  } = props as ComponentPropsWithRef<'section'>
 
-const BrandHeroRoot = forwardRef<HTMLElement, BrandHeroProps>(
-  function BrandHeroRoot(props, forwardedRef) {
-    const {
-      className: _className,
-      style: _style,
-      ...heroProps
-    } = props as ComponentPropsWithRef<'section'>
-
-    return (
-      <section
-        {...heroProps}
-        ref={forwardedRef}
-        data-slot="brand-hero"
-        {...stylex.props(brandHeroStyles.root)}
-      />
-    )
-  },
-)
-
-const BrandHeroContent = forwardRef<HTMLDivElement, BrandHeroContentProps>(
-  function BrandHeroContent(props, forwardedRef) {
-    const {
-      className: _className,
-      style: _style,
-      ...contentProps
-    } = props as ComponentPropsWithRef<'div'>
-
-    return (
+  return (
+    <section
+      {...sectionProps}
+      ref={forwardedRef}
+      data-slot="brand-hero"
+      {...stylex.props(brandHeroStyles.root)}
+    >
       <div
-        {...contentProps}
-        ref={forwardedRef}
         data-slot="brand-hero-content"
         {...stylex.props(brandHeroStyles.content)}
-      />
-    )
-  },
-)
-
-const BrandHeroFrame = forwardRef<HTMLDivElement, BrandHeroFrameProps>(
-  function BrandHeroFrame(props, forwardedRef) {
-    const {
-      className: _className,
-      style: _style,
-      ...frameProps
-    } = props as ComponentPropsWithRef<'div'>
-
-    return (
-      <div
-        {...frameProps}
-        ref={forwardedRef}
-        data-slot="brand-hero-frame"
-        {...stylex.props(brandHeroStyles.frame)}
-      />
-    )
-  },
-)
-
-const BrandHeroMessage = forwardRef<HTMLDivElement, BrandHeroMessageProps>(
-  function BrandHeroMessage(props, forwardedRef) {
-    const {
-      className: _className,
-      style: _style,
-      ...messageProps
-    } = props as ComponentPropsWithRef<'div'>
-
-    return (
-      <div
-        {...messageProps}
-        ref={forwardedRef}
-        data-slot="brand-hero-message"
-        {...stylex.props(brandHeroStyles.message)}
-      />
-    )
-  },
-)
-
-const BrandHeroHeadings = forwardRef<HTMLDivElement, BrandHeroHeadingsProps>(
-  function BrandHeroHeadings(props, forwardedRef) {
-    const {
-      className: _className,
-      style: _style,
-      ...headingsProps
-    } = props as ComponentPropsWithRef<'div'>
-
-    return (
-      <div
-        {...headingsProps}
-        ref={forwardedRef}
-        data-slot="brand-hero-headings"
-        {...stylex.props(brandHeroStyles.headings)}
-      />
-    )
-  },
-)
-
-/** Arranges the primary message at the top of a brand page. */
-export const BrandHero = Object.assign(BrandHeroRoot, {
-  Content: BrandHeroContent,
-  Frame: BrandHeroFrame,
-  Message: BrandHeroMessage,
-  Headings: BrandHeroHeadings,
+      >
+        <h1 {...stylex.props(brandHeroStyles.heading)}>
+          <span
+            data-slot="brand-hero-title"
+            {...stylex.props(brandHeroStyles.title)}
+          >
+            {title}
+          </span>{' '}
+          <span
+            data-slot="brand-hero-continuation"
+            {...stylex.props(brandHeroStyles.continuation)}
+          >
+            {continuation}
+          </span>
+        </h1>
+        <p
+          data-slot="brand-hero-description"
+          {...stylex.props(brandHeroStyles.description)}
+        >
+          {description}
+        </p>
+      </div>
+    </section>
+  )
 })

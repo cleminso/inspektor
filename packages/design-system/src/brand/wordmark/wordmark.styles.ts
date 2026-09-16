@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { textColors } from '../tokens/semantics.stylex'
-import { brandLayout } from './brandLayout.stylex'
+import { textColors } from '../../tokens/semantics.stylex'
+import { brandLayout } from '../page/layout.stylex'
 
 export const brandWordmarkStyles = stylex.create({
   root: {
