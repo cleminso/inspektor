@@ -425,6 +425,17 @@ export const boxItem = {
   },
 } satisfies DocsItem
 
+export const brandWordmarkItem = {
+  title: 'Brand Wordmark',
+  slug: 'brand-wordmark',
+  href: '/components/brand-wordmark',
+  description: 'Renders the canonical Inspektor wordmark for brand surfaces.',
+  source: {
+    label: 'brandWordmark.tsx',
+    path: 'packages/design-system/src/brand/brandWordmark.tsx',
+  },
+} satisfies DocsItem
+
 export const sidePanelItem = {
   title: 'Side Panel',
   slug: 'side-panel',
@@ -608,6 +619,7 @@ const componentItems: readonly DocsItem[] = [
   badgeItem,
   binaryValueItem,
   boxItem,
+  brandWordmarkItem,
   buttonItem,
   buttonLinkItem,
   checkboxItem,

@@ -27,3 +27,4 @@ This index links the maintained product, architecture, design-system, Jazz, and 
 - [[tableExplorerBehaviors]] - Maintained Table Explorer interaction rules.
 - [[tableRowsQueryLifecycle]] - Table query execution and subscription lifecycle.
 - [[workspace-dom-structure]] - Connected workspace DOM and layout structure.
+- [[websiteBrand]] - Public website and reusable brand-surface ownership.

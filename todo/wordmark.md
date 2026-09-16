@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+### [16/09/26]
+
+- [x] Add a reusable, accessible `BrandWordmark` component.
+- [x] Render the wordmark at 140×20 in the public website header.
+
 ### [13/09/26]
 
 - [x] Draw the Inspektor wordmark as an original modular SVG.
@@ -21,14 +26,15 @@
 
 ### [13/09/26]
 
-- [ ] Decide where the wordmark should appear in the product.
+- [x] Decide where the wordmark should appear in the public website.
 
 ## Work outside the foundation scope
 
 ### [13/09/26]
 
-- [ ] A reusable design-system brand component.
-- [ ] Application header or onboarding integration.
+- [x] A reusable design-system brand component.
+- [x] Public website header integration.
+- [ ] Product application header or onboarding integration.
 - [ ] Favicons and application icons.
 
 ## Settled interaction decisions

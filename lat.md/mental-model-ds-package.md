@@ -54,7 +54,7 @@ tsup could also be configured around an unbundled JavaScript build and a separat
 
 The package build emits runtime modules first, then checks the source and emits declarations.
 
-1. TSDown starts from the three public entries.
+1. TSDown starts from the four public entries, including the focused brand entry.
 2. Rolldown and Oxc remove TypeScript types and convert the reachable TSX and TypeScript files to unbundled ESM modules.
 3. Dynamic imports remain separate modules for consumer bundlers.
 4. TypeScript performs the semantic check and emits matching declarations.
