@@ -43,9 +43,22 @@ test.afterEach(() => {
 })
 
 test('connects through the form and restores the connection after reload', async ({ page }) => {
+  const runtimeMetadataRequests: string[] = []
+  page.on('request', (request) => {
+    if (request.method() !== 'GET') return
+    const pathname = new URL(request.url()).pathname
+    if (
+      /\/apps\/[^/]+\/schema\/[^/]+$/u.test(pathname) ||
+      /\/apps\/[^/]+\/admin\/permissions$/u.test(pathname)
+    ) {
+      runtimeMetadataRequests.push(pathname)
+    }
+  })
+
   await connectToFixture(page)
 
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
+  expect(runtimeMetadataRequests).toHaveLength(2)
   await page.reload()
 
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()

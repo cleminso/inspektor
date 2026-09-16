@@ -110,6 +110,7 @@ const mutationExecution = vi.hoisted(() => ({
   current: { error: null as string | null, status: 'idle' as 'applying' | 'failed' | 'idle' },
 }))
 const gridContextMenuProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
+const dataGridRootProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
@@ -401,22 +402,40 @@ vi.mock('@inspektor/ds', () => {
   const DataGridContent = ({ emptyContent }: { emptyContent: ReactNode }) => (
     <div>{tableViewState.rows.length === 0 ? emptyContent : null}</div>
   )
+  const DataGridRootPropsCapture = ({
+    columnDragPreview,
+    reorderableColumnIds,
+  }: {
+    columnDragPreview?: (columnId: string) => ReactNode
+    reorderableColumnIds?: readonly string[]
+  }) => {
+    dataGridRootProps.current = { columnDragPreview, reorderableColumnIds }
+    return null
+  }
   const DataGridRoot = ({
     children,
+    columnDragPreview,
     getCellStatus,
     getRowStatus,
     onCellContextMenu,
     onCellEditRequest,
     onRowContextMenu,
+    reorderableColumnIds,
   }: {
     children: ReactNode
+    columnDragPreview?: (columnId: string) => ReactNode
     getCellStatus?: (cell: { column: { id: string }; row: { id: string } }) => string
     getRowStatus?: (row: { id: string }) => string
     onCellContextMenu?: (target: { columnId: string; rowId: string }, event: unknown) => void
     onCellEditRequest?: (target: { columnId: string; rowId: string }) => void
     onRowContextMenu?: (rowId: string, event: unknown) => void
+    reorderableColumnIds?: readonly string[]
   }) => (
     <div>
+      <DataGridRootPropsCapture
+        columnDragPreview={columnDragPreview}
+        reorderableColumnIds={reorderableColumnIds}
+      />
       {tableViewState.renderRowCheckbox === true ? (
         <input type="checkbox" aria-label="Select row row-1" />
       ) : null}
@@ -428,7 +447,10 @@ vi.mock('@inspektor/ds', () => {
         {getCellStatus?.({ column: { id: 'email' }, row: { id: 'row-1' } })}
       </div>
       <div data-testid="row-1-selection-status">
-        {getCellStatus?.({ column: { id: '\uE000inspector-row-selection' }, row: { id: 'row-1' } })}
+        {getCellStatus?.({
+          column: { id: '\uE000inspector-row-selection' },
+          row: { id: 'row-1' },
+        })}
       </div>
       <button
         type="button"
@@ -569,10 +591,12 @@ afterEach(() => {
   tableViewState.recentlyAppliedCells = {}
   tableViewState.recentlyInsertedRowIds = new Set()
   tableViewState.renderRowCheckbox = true
+  tableViewState.reorderableColumnIds = []
   stagedFieldsByRowId.current = {}
   stagedValuesByRowId.current = {}
   mutationExecution.current = { error: null, status: 'idle' }
   gridContextMenuProps.current = null
+  dataGridRootProps.current = null
   useTableViewStateOptions.current = null
   mutationLedgerProviderProps.current = null
   mutationEditorOptions.current = null
@@ -874,6 +898,23 @@ describe('TableView cell actions', () => {
 })
 
 describe('TableView composition boundary', () => {
+  it('configures column reordering only after the first rows query settles', () => {
+    tableViewState.isInitialLoading = true
+    tableViewState.reorderableColumnIds = ['id', 'name']
+    const { rerenderTableView } = renderTableView()
+
+    expect(dataGridRootProps.current).toEqual({
+      columnDragPreview: undefined,
+      reorderableColumnIds: undefined,
+    })
+
+    tableViewState.isInitialLoading = false
+    rerenderTableView()
+
+    expect(dataGridRootProps.current?.reorderableColumnIds).toEqual(['id', 'name'])
+    expect(dataGridRootProps.current?.columnDragPreview).toBeTypeOf('function')
+  })
+
   it('reports when the first rows query settles', () => {
     tableViewState.isInitialLoading = true
     const { rerenderTableView } = renderTableView()

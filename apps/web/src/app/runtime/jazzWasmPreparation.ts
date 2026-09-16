@@ -10,9 +10,9 @@ export function getJazzWasmRuntimeSources(isProduction: boolean): RuntimeSources
 }
 
 /**
- * Starts one shared WASM load after connection navigation has been accepted.
+ * Starts one shared WASM load for a locally valid or accepted connection entry.
  *
- * Accepted-intent callers start this without awaiting it. `RuntimeAdminClient` joins the same
+ * Entry-point callers start this without awaiting it. `RuntimeAdminClient` joins the same
  * attempt before creating the Jazz client and owns visible failure handling. Failed attempts are
  * cleared so the runtime retry action can load the configured artifact again.
  */

@@ -21,6 +21,7 @@ This index links the maintained product, architecture, design-system, Jazz, and 
 - [[query-interface]] - Live-query product behavior and presentation.
 - [[query-subscriptions]] - Live-query telemetry technical contract.
 - [[routing]] - Route state and workspace navigation model.
+- [[runtimeConnectionStartup]] - Jazz runtime connection phases, ownership, measurement, and optimization order.
 - [[shellLayout]] - Application shell ownership and persistence.
 - [[stylexBestPractices]] - StyleX integration and repository practices.
 - [[table-explorer]] - Historical Table Explorer research and proposals.

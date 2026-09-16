@@ -25,6 +25,7 @@ Before editing files for a substantial task that changes TanStack behavior or di
 - [Active workspace](#active-workspace)
 - [Git index ownership](#git-index-ownership)
 - [Architecture](#architecture)
+- [Route lifecycle](#route-lifecycle)
 - [Design-system boundaries](#design-system-boundaries)
 - [Repository invariants](#repository-invariants)
 - [TypeScript conventions](#typescript-conventions)
@@ -70,6 +71,13 @@ Other workspace packages require an explicit user request.
 - `apps/web` owns routes, application state, Jazz data access, and feature composition. Move reusable presentation and interaction behavior into `packages/design-system`.
 - Do not recreate Base UI behavior in `apps/web`.
 - The Inspektor is schema-driven and generic. Do not add table-specific UI or generated query builders for inspected applications.
+
+## Route lifecycle
+
+- Keep provider and outlet ancestry unconditional on routes that own shared lifecycle state.
+- Put route-specific layouts on child routes instead of conditionally wrapping a parent outlet from current or pending location state.
+- Treat an outlet wrapper change as a lifecycle change: React remounts the descendant tree, which restarts providers, requests, clients, subscriptions, and local state.
+- Use a React `key` to reset a routed subtree only when that reset is intentional and covered by a lifecycle test.
 
 ## Design-system boundaries
 

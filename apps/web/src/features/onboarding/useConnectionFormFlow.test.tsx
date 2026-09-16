@@ -140,6 +140,22 @@ describe('useConnectionFormFlow', () => {
     })
 
     expect(fetchSchemaCatalogue).toHaveBeenCalledTimes(1)
+    expect(prepareJazzWasm).toHaveBeenCalledTimes(1)
+  })
+
+  it('starts WASM preparation alongside catalogue discovery after local validation', () => {
+    fetchSchemaCatalogue.mockReturnValue(new Promise(() => undefined))
+    const { result } = renderValidConnectionFormFlow()
+
+    act(() => {
+      void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+    expect(fetchSchemaCatalogue).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm.mock.invocationCallOrder[0]).toBeLessThan(
+      fetchSchemaCatalogue.mock.invocationCallOrder[0]!,
+    )
   })
 
   it('keeps submission pending until connection navigation settles', async () => {
@@ -182,6 +198,7 @@ describe('useConnectionFormFlow', () => {
       field: 'serverUrl',
     })
     expect(fetchSchemaCatalogue).not.toHaveBeenCalled()
+    expect(prepareJazzWasm).not.toHaveBeenCalled()
   })
 
   it('keeps normalized fetch failures after a field is edited', async () => {

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConnRouteImport } from './routes/conn'
+import { Route as ConnIndexRouteImport } from './routes/conn/index'
 import { Route as ConnConnectionIdRouteImport } from './routes/conn/$connectionId'
 import { Route as ConnNewRouteImport } from './routes/conn/new'
 import { Route as ConnConnectionIdIndexRouteImport } from './routes/conn/$connectionId/index'
@@ -30,6 +31,11 @@ const ConnRoute = ConnRouteImport.update({
   id: '/conn',
   path: '/conn',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConnIndexRoute = ConnIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConnRoute,
 } as any)
 const ConnConnectionIdRoute = ConnConnectionIdRouteImport.update({
   id: '/$connectionId',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/conn': typeof ConnRouteWithChildren
   '/conn/$connectionId': typeof ConnConnectionIdRouteWithChildren
   '/conn/new': typeof ConnNewRoute
+  '/conn/': typeof ConnIndexRoute
   '/conn/$connectionId/live-queries': typeof ConnConnectionIdLiveQueriesRouteWithChildren
   '/conn/$connectionId/tables': typeof ConnConnectionIdTablesRouteWithChildren
   '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
@@ -96,8 +103,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/conn': typeof ConnRouteWithChildren
   '/conn/new': typeof ConnNewRoute
+  '/conn': typeof ConnIndexRoute
   '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
   '/conn/$connectionId': typeof ConnConnectionIdIndexRoute
   '/conn/$connectionId/live-queries': typeof ConnConnectionIdLiveQueriesIndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesById {
   '/conn': typeof ConnRouteWithChildren
   '/conn/$connectionId': typeof ConnConnectionIdRouteWithChildren
   '/conn/new': typeof ConnNewRoute
+  '/conn/': typeof ConnIndexRoute
   '/conn/$connectionId/live-queries': typeof ConnConnectionIdLiveQueriesRouteWithChildren
   '/conn/$connectionId/tables': typeof ConnConnectionIdTablesRouteWithChildren
   '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
@@ -125,6 +133,7 @@ export interface FileRouteTypes {
     | '/conn'
     | '/conn/$connectionId'
     | '/conn/new'
+    | '/conn/'
     | '/conn/$connectionId/live-queries'
     | '/conn/$connectionId/tables'
     | '/conn/edit/$connectionId'
@@ -135,8 +144,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/conn'
     | '/conn/new'
+    | '/conn'
     | '/conn/edit/$connectionId'
     | '/conn/$connectionId'
     | '/conn/$connectionId/live-queries'
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/conn'
     | '/conn/$connectionId'
     | '/conn/new'
+    | '/conn/'
     | '/conn/$connectionId/live-queries'
     | '/conn/$connectionId/tables'
     | '/conn/edit/$connectionId'
@@ -177,6 +187,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/conn'
       preLoaderRoute: typeof ConnRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/conn/': {
+      id: '/conn/'
+      path: '/'
+      fullPath: '/conn/'
+      preLoaderRoute: typeof ConnIndexRouteImport
+      parentRoute: typeof ConnRoute
     }
     '/conn/$connectionId': {
       id: '/conn/$connectionId'
@@ -295,12 +312,14 @@ const ConnConnectionIdRouteWithChildren =
 interface ConnRouteChildren {
   ConnConnectionIdRoute: typeof ConnConnectionIdRouteWithChildren
   ConnNewRoute: typeof ConnNewRoute
+  ConnIndexRoute: typeof ConnIndexRoute
   ConnEditConnectionIdRoute: typeof ConnEditConnectionIdRoute
 }
 
 const ConnRouteChildren: ConnRouteChildren = {
   ConnConnectionIdRoute: ConnConnectionIdRouteWithChildren,
   ConnNewRoute: ConnNewRoute,
+  ConnIndexRoute: ConnIndexRoute,
   ConnEditConnectionIdRoute: ConnEditConnectionIdRoute,
 }
 

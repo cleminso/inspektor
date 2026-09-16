@@ -204,7 +204,7 @@ export const dataGridStyles = stylex.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     height: '100%',
-    paddingLeft: spacing.m,
+    paddingLeft: spacing.xs,
     paddingRight: spacing.xs,
     width: '100%',
   },

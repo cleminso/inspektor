@@ -1,36 +1,15 @@
 // The `-` prefix keeps this support module out of TanStack Router's generated route tree.
-import { Outlet, useRouterState } from '@tanstack/react-router'
+import { Outlet } from '@tanstack/react-router'
 
-import { appRoutes } from '@app/routing/appRoutes'
-import { ConnectionsLayout } from '@onboarding/connectionsLayout'
-import { ConnectionsView } from '@onboarding/view'
-
+/**
+ * Keeps `/conn` as a transparent route boundary with stable outlet ancestry.
+ *
+ * Do not wrap this outlet based on the current or pending location. Onboarding leaves own their
+ * layouts, while `/conn/$connectionId` owns the runtime providers. Changing the wrapper here moves
+ * the matched subtree to a new React position, which remounts the runtime and restarts its metadata
+ * requests, Jazz client, WebSocket, subscriptions, and local component state.
+ */
+// @lat: [[routing#Stable route ancestry]]
 export function ConnRoute(): React.ReactElement {
-  const pathname = useRouterState({
-    select: (state) => (state.resolvedLocation ?? state.location).pathname,
-  })
-  const isConnectionsRoute = pathname === appRoutes.connections
-  const isNewConnectionRoute = pathname === appRoutes.newConnection
-  const isEditConnectionRoute = pathname.startsWith('/conn/edit/')
-  const isOnboardingRoute =
-    isConnectionsRoute === true || isNewConnectionRoute === true || isEditConnectionRoute === true
-
-  if (isOnboardingRoute === false) {
-    return <Outlet />
-  }
-
-  return (
-    <ConnectionsLayout
-      connectionTriggerLabel={isEditConnectionRoute === true ? undefined : 'Open connection'}
-      pageTitle={
-        isNewConnectionRoute === true
-          ? 'Add connection'
-          : isEditConnectionRoute === true
-            ? 'Edit connection'
-            : 'Connections'
-      }
-    >
-      {isConnectionsRoute === true ? <ConnectionsView /> : <Outlet />}
-    </ConnectionsLayout>
-  )
+  return <Outlet />
 }

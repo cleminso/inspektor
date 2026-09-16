@@ -109,9 +109,6 @@ export function useConnectionFormFlow(
     if (result === 'blocked') {
       return
     }
-    if (opensExistingConnection === true) {
-      void prepareJazzWasm()
-    }
     handoffStoredRuntimeTarget(draft, { branch, connectionId, schemaCatalogue, schemaHash })
 
     await navigate({
@@ -140,6 +137,7 @@ export function useConnectionFormFlow(
       }
 
       setError(null)
+      void prepareJazzWasm()
       let schemaCatalogue: Awaited<ReturnType<typeof fetchConnectionSchemaCatalogue>>
       try {
         schemaCatalogue = await fetchConnectionSchemaCatalogue({

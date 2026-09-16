@@ -8,6 +8,7 @@ This table of contents links to the document sections.
 
 - [Mental model](#mental-model)
 - [Route structure](#route-structure)
+- [Stable route ancestry](#stable-route-ancestry)
 - [Context ownership](#context-ownership)
 - [Workspace-item routing](#workspace-item-routing)
 - [State ownership](#state-ownership)
@@ -31,17 +32,46 @@ The route does not represent the visual tab strip, open item order, pane arrange
 The route tree places table and live-query resources under one saved connection.
 
 ```text
-/conn/:connectionId/
-├── tables/
-│   └── :tableName/
-│       └── index          → Data or Schema representation
-└── live-queries           → Live queries navigator entry
+/conn                         → transparent outlet boundary
+├── /                         → connections layout and saved connections
+├── new                       → connections layout and add form
+├── edit/:connectionId        → connections layout and edit form
+└── :connectionId             → runtime provider and workbench
+    ├── tables/
+    │   └── :tableName/
+    │       └── index         → Data or Schema representation
+    └── live-queries          → Live queries navigator entry
 ```
 
 Data is the primary table surface and does not add a `/data` segment.
 
 Filters, sorting, and other shareable Data state use search parameters. Schema is a distinct representation selected with
 `view=schema` on the table route.
+
+## Stable route ancestry
+
+The `/conn` route is a transparent boundary that always renders one unwrapped outlet.
+
+Onboarding leaves own `ConnectionsLayout`. The `:connectionId` child owns `InspectorRuntimeBoundary`
+and the workbench. This placement keeps the matched subtree at one React position while navigation
+moves from onboarding into a connection.
+
+Do not choose an outlet wrapper from the current location, the resolved location, or pending router
+state. A conditional parent creates this unhappy path:
+
+1. The router begins navigation while the onboarding layout remains committed.
+2. The matched workspace subtree appears below the old wrapper.
+3. The route resolves and removes that wrapper.
+4. React discards the descendant tree because its parent type and position changed.
+5. The runtime provider mounts again and restarts metadata requests, the Jazz client, the WebSocket,
+   subscriptions, and local component state.
+
+The remount can duplicate privileged requests and preflights. It can also close a client that is still
+starting, discard in-flight results, reconnect subscriptions, and reset workspace state. These failures
+look like network or Strict Mode duplication even though route ancestry caused them.
+
+Conditional siblings do not have this problem when the provider and outlet remain in the same
+position. Use a `key` only when a route identity change must reset the subtree.
 
 ## Context ownership
 
@@ -133,13 +163,14 @@ These decisions keep route identity independent from workspace tabs and local la
 | Decision                                      | Rationale                                                                                |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Keep connection id in the path                | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
-| Keep branch out of content routes             | It is visible header context and a saved preference of the selected connection.           |
-| Allow schema in parent route search           | It selects a schema explicitly and remains available across connection child navigation.  |
+| Keep branch out of content routes             | It is visible header context and a saved preference of the selected connection.          |
+| Allow schema in parent route search           | It selects a schema explicitly and remains available across connection child navigation. |
 | Omit `/data`                                  | Data is the default table representation.                                                |
 | Select Schema with `view=schema`              | Schema is a distinct workspace-item representation on the table route.                   |
 | Keep tabs out of routes                       | Tabs are one presentation of workspace items and may later exist in several panes.       |
 | Keep filters in search parameters             | Filters are shareable state of a Data item.                                              |
 | Keep Tables and Live queries in the left dock | They are different resource navigators and switching them must not replace main content. |
+| Keep `/conn` as a transparent outlet          | Onboarding layout changes cannot remount the connection runtime and restart its work.    |
 
 ## Browser-tab behavior
 

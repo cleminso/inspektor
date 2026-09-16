@@ -201,7 +201,11 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
  * client lifecycle, runtime errors, and retry. It does not resolve connection-entry intent or own
  * workspace selection. Workspace children mount independently of client readiness and consume
  * nullable projections for their loading and error states.
+ *
+ * The admin-client factory is lazy. Jazz creates the native runtime and opens its WebSocket when the
+ * first schema-bound subscription materializes, not when `createInspectorAdminClient()` resolves.
  */
+// @lat: [[runtimeConnectionStartup#Connection startup phases]]
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext()
   const [retryGeneration, retryRuntime] = useReducer((generation: number) => generation + 1, 0)

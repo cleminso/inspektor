@@ -38,6 +38,13 @@ interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
   $schemaCatalogue: WritableAtom<readonly SchemaCatalogueRecord[]>
   $storedPermissions: WritableAtom<StoredPermissionsResponse | null>
   $wasmSchema: WritableAtom<WasmSchema | null>
+  getMetadataRequests: () => RuntimeMetadataRequests | null
+  publishSchemaError: (error: unknown) => void
+}
+
+interface RuntimeMetadataRequests {
+  permissions: ReturnType<typeof fetchStoredPermissions>
+  schema: ReturnType<typeof fetchStoredWasmSchema>
 }
 
 interface UseInspectorRuntimeOptions {
@@ -51,6 +58,7 @@ interface UseInspectorRuntimeOptions {
 function createInspectorRuntimeStore(
   isWasmSchemaLoading: boolean,
   sensitiveValues: readonly string[],
+  startMetadataRequests?: () => RuntimeMetadataRequests,
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null)
   const $wasmSchema = atom<WasmSchema | null>(null)
@@ -59,6 +67,15 @@ function createInspectorRuntimeStore(
   const $error = atom<InspectorRuntimeError | null>(null)
   const $isPermissionsLoading = atom(isWasmSchemaLoading)
   const $isWasmSchemaLoading = atom(isWasmSchemaLoading)
+  let metadataRequests: RuntimeMetadataRequests | null = null
+
+  const getMetadataRequests = () => {
+    if (startMetadataRequests === undefined) {
+      return null
+    }
+    metadataRequests ??= startMetadataRequests()
+    return metadataRequests
+  }
 
   const publishClient = (client: JazzClient) => {
     $client.set(client)
@@ -81,6 +98,15 @@ function createInspectorRuntimeStore(
     reportRuntimeError(runtimeError, sensitiveValues)
   }
 
+  const publishSchemaError = (error: unknown) => {
+    if ($error.get() === null) {
+      const runtimeError = { source: 'schema', error: normalizeRuntimeError(error) } as const
+      $error.set(runtimeError)
+      reportRuntimeError(runtimeError, sensitiveValues)
+    }
+    $isWasmSchemaLoading.set(false)
+  }
+
   return {
     $client,
     $error,
@@ -90,8 +116,10 @@ function createInspectorRuntimeStore(
     $schemaCatalogue,
     $wasmSchema,
     clearClient,
+    getMetadataRequests,
     publishClient,
     publishClientError,
+    publishSchemaError,
   }
 }
 
@@ -115,49 +143,45 @@ export function useInspectorRuntime({
       createInspectorRuntimeStore(
         connection !== null && branch !== null && schemaHash !== null,
         connection === null ? [] : [connection.adminSecret],
+        connection === null || branch === null || schemaHash === null
+          ? undefined
+          : () => ({
+              permissions: fetchStoredPermissions(connection.serverUrl, {
+                appId: connection.appId,
+                adminSecret: connection.adminSecret,
+              }),
+              schema: fetchStoredWasmSchema(connection.serverUrl, {
+                appId: connection.appId,
+                adminSecret: connection.adminSecret,
+                schemaHash,
+              }),
+            }),
       ),
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Retry intentionally replaces the runtime store.
     [branch, connection, retryGeneration, schemaHash],
   )
 
   useEffect(() => {
-    if (connection === null || branch === null || schemaHash === null) {
-      return
-    }
+    runtime.$schemaCatalogue.set(initialSchemaCatalogue ?? [])
+  }, [initialSchemaCatalogue, runtime])
+
+  useEffect(() => {
+    const requests = runtime.getMetadataRequests()
+    if (requests === null) return
 
     let active = true
-    const failRuntime = (error: unknown) => {
-      if (active === false) {
-        return
-      }
-      if (runtime.$error.get() === null) {
-        const runtimeError = { source: 'schema', error: normalizeRuntimeError(error) } as const
-        runtime.$error.set(runtimeError)
-        reportRuntimeError(runtimeError, [connection.adminSecret])
-      }
-      runtime.$isWasmSchemaLoading.set(false)
-    }
-
-    runtime.$isWasmSchemaLoading.set(true)
-    runtime.$isPermissionsLoading.set(true)
-    runtime.$schemaCatalogue.set(initialSchemaCatalogue ?? [])
-
-    const schemaRequest = fetchStoredWasmSchema(connection.serverUrl, {
-      appId: connection.appId,
-      adminSecret: connection.adminSecret,
-      schemaHash,
-    }).then(({ schema }) => {
-      if (active === false) {
-        return
-      }
-      runtime.$wasmSchema.set(schema)
-      runtime.$isWasmSchemaLoading.set(false)
-    })
-
-    void fetchStoredPermissions(connection.serverUrl, {
-      appId: connection.appId,
-      adminSecret: connection.adminSecret,
-    }).then(
+    void requests.schema.then(
+      ({ schema }) => {
+        if (active === true) {
+          runtime.$wasmSchema.set(schema)
+          runtime.$isWasmSchemaLoading.set(false)
+        }
+      },
+      (error: unknown) => {
+        if (active === true) runtime.publishSchemaError(error)
+      },
+    )
+    void requests.permissions.then(
       (permissions) => {
         if (active === true) {
           runtime.$storedPermissions.set(permissions)
@@ -171,12 +195,10 @@ export function useInspectorRuntime({
       },
     )
 
-    void schemaRequest.catch(failRuntime)
-
     return () => {
       active = false
     }
-  }, [branch, connection, initialSchemaCatalogue, runtime, schemaHash])
+  }, [runtime])
 
   return runtime
 }

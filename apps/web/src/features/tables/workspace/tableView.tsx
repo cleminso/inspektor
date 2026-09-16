@@ -775,7 +775,6 @@ function TableViewContent({
                 }) => (
                   <DataGrid.Root
                     table={state.table}
-                    reorderableColumnIds={state.reorderableColumnIds}
                     density="compact"
                     activeColumnId={state.activeColumnId}
                     activeRowId={state.rowEditor.activeRowId}
@@ -786,12 +785,24 @@ function TableViewContent({
                     onCellContextMenu={onCellContextMenu}
                     onCellContextMenuTouchStart={onCellContextMenuTouchStart}
                     onCellEditRequest={handleCellEditRequest}
-                    columnDragPreview={(columnId) => {
-                      const column = state.tableColumns.find(
-                        (candidate) => candidate.id === columnId,
-                      )
-                      return column === undefined ? columnId : <ColumnDragPreview column={column} />
-                    }}
+                    {...(state.isInitialLoading === true
+                      ? {
+                          reorderableColumnIds: undefined,
+                          columnDragPreview: undefined,
+                        }
+                      : {
+                          reorderableColumnIds: state.reorderableColumnIds,
+                          columnDragPreview: (columnId: string) => {
+                            const column = state.tableColumns.find(
+                              (candidate) => candidate.id === columnId,
+                            )
+                            return column === undefined ? (
+                              columnId
+                            ) : (
+                              <ColumnDragPreview column={column} />
+                            )
+                          },
+                        })}
                     onColumnActivate={state.handleColumnActivate}
                     onRowContextMenu={onRowContextMenu}
                     onRowContextMenuTouchStart={onRowContextMenuTouchStart}

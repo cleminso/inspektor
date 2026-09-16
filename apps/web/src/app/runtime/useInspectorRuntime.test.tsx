@@ -1,4 +1,5 @@
 import { cleanup, renderHook, waitFor } from '@testing-library/react'
+import { StrictMode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { JazzClient } from 'jazz-tools/client'
 
@@ -34,6 +35,69 @@ afterEach(() => {
 })
 
 describe('useInspectorRuntime', () => {
+  it('shares runtime metadata work across Strict Mode effect reconnections', async () => {
+    jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { accounts: { columns: [] } } })
+    jazzMocks.fetchStoredPermissions.mockResolvedValue({ accounts: { read: true } })
+    const connection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    } as const
+
+    const { result } = renderHook(
+      () => useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
+      { wrapper: StrictMode },
+    )
+
+    await waitFor(() =>
+      expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } }),
+    )
+    expect(result.current.$storedPermissions.get()).toEqual({ accounts: { read: true } })
+    expect(jazzMocks.fetchStoredWasmSchema).toHaveBeenCalledTimes(1)
+    expect(jazzMocks.fetchStoredPermissions).toHaveBeenCalledTimes(1)
+  })
+
+  it('updates the route catalogue without restarting runtime metadata work', async () => {
+    jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { accounts: { columns: [] } } })
+    jazzMocks.fetchStoredPermissions.mockResolvedValue(null)
+    const connection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    } as const
+    const { result, rerender } = renderHook(
+      ({ catalogue }: { catalogue: readonly { hash: string; publishedAt: number | null }[] }) =>
+        useInspectorRuntime({
+          connection,
+          branch: 'main',
+          schemaHash: 'schema-1',
+          initialSchemaCatalogue: catalogue,
+        }),
+      { initialProps: { catalogue: [{ hash: 'schema-1', publishedAt: 1 }] } },
+    )
+    await waitFor(() => expect(result.current.$isWasmSchemaLoading.get()).toBe(false))
+
+    rerender({
+      catalogue: [
+        { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
+      ],
+    })
+
+    expect(result.current.$schemaCatalogue.get()).toEqual([
+      { hash: 'schema-1', publishedAt: 1 },
+      { hash: 'schema-2', publishedAt: 2 },
+    ])
+    expect(jazzMocks.fetchStoredWasmSchema).toHaveBeenCalledTimes(1)
+    expect(jazzMocks.fetchStoredPermissions).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps the first fatal startup error when concurrent work also fails', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const schemaFailure = deferred<never>()

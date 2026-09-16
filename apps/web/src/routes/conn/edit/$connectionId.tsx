@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ConnectionsLayout } from '@onboarding/connectionsLayout'
 import { EditConnectionView } from '@onboarding/editConnectionView'
 
 export const Route = createFileRoute('/conn/edit/$connectionId')({
@@ -9,7 +10,11 @@ export const Route = createFileRoute('/conn/edit/$connectionId')({
   component: EditConnectionRoute,
 })
 
-function EditConnectionRoute(): React.ReactElement {
+export function EditConnectionRoute(): React.ReactElement {
   const { connectionId } = Route.useParams()
-  return <EditConnectionView connectionId={connectionId} />
+  return (
+    <ConnectionsLayout pageTitle="Edit connection">
+      <EditConnectionView connectionId={connectionId} />
+    </ConnectionsLayout>
+  )
 }

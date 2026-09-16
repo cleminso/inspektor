@@ -411,6 +411,10 @@ The connection id resolves one profile from `inspektor-connections`. Branch come
 resolution uses an explicit `?schema=` value when valid and otherwise selects the first advertised schema. Copied content URLs
 remain dependent on the locally saved connection and never carry the admin secret.
 
+The shared `/conn` route owns the [[routing#Stable route ancestry|stable route boundary]]. The
+connections index, add, and edit leaves own their onboarding layout, so entering a workspace does not
+move the connection runtime across layout ancestry or remount its provider.
+
 Open table items, item order, recent views, and navigator state are local workspace state. The active route describes table
 content and can recreate or focus its canonical item, but it does not make the visual tab part of the route model.
 
@@ -565,11 +569,22 @@ Runtime bootstrap turns a selected connection and schema hash into the active In
 The stored branch label partitions local state but does not configure Jazz operations. All data
 surfaces depend on this runtime.
 
+[[runtimeConnectionStartup#Connection startup phases|Connection startup phases]] separates app,
+browser, network, and Jazz ownership before optimization work begins.
+
 #### Connection-entry loading and WASM preparation
 
-Accepted connection entry starts one shared Jazz WASM preparation attempt.
+Locally valid connection form submissions start one shared Jazz WASM preparation attempt alongside
+schema-catalogue discovery.
 
-Accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved connection exists and before schema-catalogue discovery. This covers saved actions, accepted add or edit flows, direct URLs, refreshes, and history navigation while avoiding work for unknown connection IDs.
+This speculative preparation overlaps the credential-independent runtime download with remote
+credential validation. Catalogue discovery remains the authority for form errors, persistence, and
+navigation. Invalid local input does not start preparation.
+
+Other accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection
+route also starts preparation after confirming that its saved connection exists and before
+schema-catalogue discovery. This covers saved actions, direct URLs, refreshes, and history navigation
+while avoiding work for unknown connection IDs.
 
 `jazzWasmPreparation.ts` owns one application-wide promise. Development uses Jazz's bundled WASM resolution. Production calls Jazz's public `loadWasmModule()` API with the exact alpha.55 artifact stored under a content-addressed `assets.inspektor.dev` URL. Repeated accepted actions and React remounts share the same attempt. A failed attempt is cleared so retry can fetch it again. `RuntimeAdminClient` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version and publishing remote asset failures through the existing runtime error boundary.
 
@@ -581,7 +596,8 @@ Add and edit validation hand their resolved target to the matching route loader.
 
 Startup proceeds from connection intent through schema verification to the first table query.
 
-1. An accepted connection action may start shared WASM preparation without awaiting it.
+1. A locally valid connection form or another accepted connection action may start shared WASM
+   preparation without awaiting it.
 2. The parent connection route confirms the saved connection, starts the same preparation, and resolves the local branch label and schema catalogue. It consumes a matching validated target handoff or performs discovery. Discovery must succeed before the route commits the runtime target.
 3. `InspectorRuntimeBoundary` synchronizes the route-resolved connection, branch label, and schema hash with session state before mounting `InspectorProvider`.
 4. `useInspectorRuntime(...)` starts stored-schema verification and optional permissions loading as sibling work.

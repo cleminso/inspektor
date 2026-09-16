@@ -173,7 +173,7 @@ export function ConnectionSwitcher({
                       }
                     }}
                   >
-                    Remove saved connection
+                    Delete connection
                   </Button>
                 </Box>
               </ContextSwitcher.Footer>
@@ -209,14 +209,14 @@ export function ConnectionSwitcher({
         }}
       >
         <AlertDialog.Content>
-          <AlertDialog.Title>Remove saved connection?</AlertDialog.Title>
+          <AlertDialog.Title>Delete connection?</AlertDialog.Title>
           <AlertDialog.Description>
             {connectionToRemove === null
               ? null
-              : `This removes ${getConnectionDisplayName(connectionToRemove)} and its saved preferences from this browser. It does not affect the Jazz app.`}
+              : `This removes ${getConnectionDisplayName(connectionToRemove)} and its saved preferences from this browser. It does not affect your Jazz app.`}
           </AlertDialog.Description>
           <AlertDialog.Actions>
-            <AlertDialog.Close>Keep saved connection</AlertDialog.Close>
+            <AlertDialog.Close>Keep connection</AlertDialog.Close>
             <Button
               variant="danger"
               onClick={() => {
@@ -230,7 +230,7 @@ export function ConnectionSwitcher({
                 void navigate({ to: appRoutes.connections })
               }}
             >
-              Remove saved connection
+              Confirm delete
             </Button>
           </AlertDialog.Actions>
         </AlertDialog.Content>
