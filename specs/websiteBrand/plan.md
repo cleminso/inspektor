@@ -31,10 +31,9 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 
 ## Current behavior
 
-- The workspace has no public website application.
-- `apps/web` is the inspector product application.
-- The deployed product currently owns `inspektor.dev` as one static-assets SPA and redirects `/` to `/conn` in the client router.
-- The product build emits root-relative assets and root-owned public files, so it cannot yet share path ownership with a separately built root website.
+- The workspace contains `apps/website` as the public website application and `apps/web` as the inspector product application.
+- The `inspektor` gateway owns `inspektor.dev`, serves website assets at the root, and dispatches `/conn` to the Product Worker.
+- Product assets use the `/conn` namespace while website assets remain root-relative, so the two SPAs retain separate path ownership on one origin.
 - `packages/design-system` publishes generic components and tokens through `@inspektor/ds`.
 - The package has no public brand entry.
 - The applications load Geist Sans and Geist Mono. The design system owns their semantic use but does not load font assets.
@@ -63,9 +62,9 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
   - Muted heading continuation: `explore your Jazz application data`
   - Description: `Connect to your Jazz sync server from your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries.`
 - Support the accepted heading sizes and both color schemes.
-- Keep the existing product deployment and `/` redirect unchanged in this iteration.
+- Keep the production Worker integration in the separate same-origin deployment scope.
 
-## Work outside the scope
+## Work outside the first iteration
 
 - Rename `apps/web` to `apps/studio`.
 - Classify or move existing design-system components into a studio surface.
@@ -73,8 +72,8 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Add route-aware behavior to brand components.
 - Add website copy, metadata, or content models to the design-system package.
 - Add marketing sections beyond the accepted hero content.
-- Configure a Worker, domain, or deployment pipeline for the website.
-- Change the existing product's route ownership, asset paths, root redirect, or browser storage.
+- The separate production integration configures the hostname gateway, Product service binding, Custom Domain, and deployment command.
+- The separate production integration changes product route ownership and asset paths. Browser storage remains unchanged.
 - Add third-party analytics before the shared-origin dependency and content-security-policy review.
 - Enable Instrument Sans stylistic set `ss02`. Keep it as open brand work pending a rendered comparison.
 
@@ -85,6 +84,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - The website uses TanStack Router as a client-rendered SPA.
 - The intended production ownership is `apps/website` at `inspektor.dev/` and non-product paths, with `apps/web` retaining `/conn` and its descendants on the same origin.
 - Same-origin ownership preserves the product's existing origin-scoped connection profiles. Website code and dependencies must therefore be treated as product-trusted code.
+- `pnpm deploy:production` publishes the Product Worker and then the website gateway.
 - `packages/design-system` remains the package owner for generic and branded presentation.
 - `@inspektor/ds/brand` is a focused public entry. Brand exports do not enter the generic root barrel.
 - Brand components may consume public generic design-system APIs. Generic modules do not consume brand modules.
@@ -130,7 +130,6 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 ## Open decisions
 
 - None for the accepted implementation scope.
-- Production publication requires a separate integration decision for Cloudflare request routing, product asset namespacing, shared-origin headers and content security policy, validation, and rollback.
 
 ## Dependencies
 
@@ -138,7 +137,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Owner: none
 - Evidence: none
 - Unblock condition: none
-- Production publication: blocked on an accepted same-origin integration plan; this does not block the website UI implementation.
+- Production publication is owned by the separate same-origin Worker integration documented in `ARCHITECTURE.md` and `lat.md/websiteBrand.md`.
 
 ## Implementation tasks
 
@@ -178,6 +177,8 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 ## Outcome
 
 Implemented and independently reviewed. The design-system package, website package, browser suite, and affected builds pass. The design-system documentation lint baseline still has three invalid `autoComplete` values in existing input demos. Its full test baseline still has four unrelated page-test failures in the accordion, copy-button, date-picker, and input documentation.
+
+The separate production integration assigns the hostname to a gateway that serves website assets directly and dispatches `/conn` descendants to the Product Worker. Product assets remain inside the `/conn` namespace.
 
 ## Retro
 

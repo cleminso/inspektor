@@ -5,6 +5,7 @@
 - [Purpose](#purpose)
 - [Workspace map](#workspace-map)
 - [Ownership boundaries](#ownership-boundaries)
+- [Production request routing](#production-request-routing)
 - [Browser-to-feature execution flow](#browser-to-feature-execution-flow)
 - [Connection lifecycle](#connection-lifecycle)
 - [Design-system package contract](#design-system-package-contract)
@@ -67,7 +68,7 @@ The design system owns reusable presentation and interaction behavior:
 
 The public website owns its routes, copy, metadata, SEO, analytics, and assembly. It composes `@inspektor/ds/brand` without moving content or route behavior into the package.
 
-The website is a client-rendered TanStack Router SPA. Its intended production ownership is the root and non-product paths on `inspektor.dev`, while `apps/web` retains `/conn` and descendants. The deployment integration needed to split those paths is not implemented.
+The website is a client-rendered TanStack Router SPA. It owns the root and non-product paths on `inspektor.dev`, while `apps/web` owns `/conn` and descendants.
 
 ### `apps/design-system`
 
@@ -81,6 +82,20 @@ The documentation application is a real consumer of the design system. It owns:
 - Documentation-only tooling such as MDX compilation and Shiki.
 
 It must not import package-private implementation files at runtime. If documentation cannot express or demonstrate a needed public behavior, the public component API or documentation design needs reconsideration.
+
+## Production request routing
+
+The `inspektor` gateway Worker owns the `inspektor.dev` Custom Domain, the website static assets, and the public request boundary. It dispatches `/conn` plus descendants to the independent `inspektor-product` Worker through a service binding.
+
+Production deployment runs `pnpm deploy:production`. It publishes the Product Worker and then the website gateway so the product service binding targets a deployed service.
+
+The gateway checks the path-segment boundary exactly, so paths such as `/connection` and `/conn-other` stay on the website. Product requests keep their browser-visible `/conn` prefix while the Product Worker strips that prefix for its private static-assets lookup. Vite emits product resource URLs under `/conn/assets`, and missing subresources remain errors rather than receiving the product SPA shell.
+
+The gateway and Product Worker own explicit document fallback. Their asset services disable automatic HTML path rewrites, return exact files or errors, and fall back to an SPA shell only for document requests. This keeps deep links in the correct SPA and leaves missing subresources as errors.
+
+The product route files already include `/conn`, so TanStack Router has no additional base path. Cross-application links use document navigation rather than asking either client router to own the other application.
+
+Both applications execute on the same browser origin. This preserves origin-scoped connection profiles, but it also means website JavaScript can read product storage, including persisted connection credentials. Website code and dependencies are therefore part of the product trust boundary. Both applications enforce content security and browser security headers. HTML responses use `no-transform` to prevent automatic analytics injection, and third-party website scripts require an explicit security decision.
 
 ## Browser-to-feature execution flow
 

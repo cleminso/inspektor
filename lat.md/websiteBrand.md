@@ -41,13 +41,15 @@ The hero's private content frame owns 42px block padding and 16px inline padding
 
 ## Typography
 
-The hero heading uses Instrument Sans at weight 450 with 900px and 1471px display breakpoints. The primary title and muted continuation are spans within one `h1`; visual hierarchy does not create a second heading level.
+The hero heading, description, and primary action use Instrument Sans. The heading uses weight 450 with 900px and 1471px display breakpoints.
+
+The primary title and muted continuation are spans within one `h1`; visual hierarchy does not create a second heading level.
 
 The website preloads the Latin variable WOFF2 used by its initial heading to prevent fallback-font layout movement.
 
 The website vendors the font files, processes their CSS references through Vite, and publishes the OFL text at `/licenses/instrumentSans.txt`. [Instrument Sans website delivery](../research/instrumentSans/instrumentSans.md) records provenance, loading rationale, license obligations, and the maintenance checklist.
 
-Below 900px, the primary title uses 40px text with a 48px line height and the continuation uses 36px text with a 40px line height. The continuation has a 500px maximum below 900px to preserve the selected tablet line break, and the website keeps `application data` together. Both use 48px text and line height from 900px, then 56px text and line height from 1471px. Headings use `-0.96px` tracking through 48px and `-1.1px` tracking at 56px, with pretty wrapping. Descriptions use muted system text at 18px with a 28px line height, zero tracking, and pretty wrapping.
+Below 900px, the primary title uses 40px text with a 48px line height and the continuation uses 36px text with a 40px line height. The continuation has a 500px maximum below 900px to preserve the selected tablet line break, and the website keeps `application data` together. Both use 48px text and line height from 900px, then 56px text and line height from 1471px. Headings use `-0.96px` tracking through 48px and `-1.1px` tracking at 56px, with pretty wrapping. Descriptions use Instrument Sans at 18px with a 28px line height, zero tracking, and pretty wrapping. The primary action uses the same family at 18px and weight 500.
 
 ## Color schemes
 
@@ -59,6 +61,12 @@ The continuous surface uses gray50 in light mode and neutral950 in dark mode. Th
 
 ## Production paths
 
-The intended production origin keeps the website at the root and the product under `/conn` so existing origin-scoped connection profiles remain available.
+The production origin keeps the website at the root and the product under `/conn` so existing origin-scoped connection profiles remain available.
 
-The current product deployment still owns the hostname and redirects `/` to `/conn`. Request routing, product asset namespacing, shared-origin security policy, and deployment transition remain a separate integration decision.
+The `inspektor` gateway Worker owns the hostname, website static assets, and request boundary. It dispatches `/conn` plus descendants to `inspektor-product` through a service binding.
+
+`pnpm deploy:production` publishes the Product Worker and then the website gateway.
+
+The gateway validates the `/conn` path-segment boundary, keeping paths such as `/connection` on the website. Product HTML, chunks, fonts, icons, and brand images use the `/conn` namespace; the Product Worker strips that prefix only for its internal static-assets lookup. TanStack Router keeps its authored `/conn` routes without a separate base path.
+
+The shared origin makes website JavaScript part of the product credential trust boundary. Both applications enforce content security and browser security headers. Website HTML uses `no-transform` to prevent automatic analytics injection, and the website does not load third-party scripts without a separate security decision.
