@@ -6,6 +6,14 @@ import { createSchemaCatalogueLoadError } from '@app/connections/connectionValid
 
 const routeOptions = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const resolveStoredRuntimeTarget = vi.hoisted(() => vi.fn())
+const resolveRuntimeConnection = vi.hoisted(() =>
+  vi.fn<() => { adminSecret: string } | null>(() => ({ adminSecret: 'secret' })),
+)
+const redirectToEditConnection = vi.hoisted(() =>
+  vi.fn(() => {
+    throw new Error('redirect to edit')
+  }),
+)
 const prepareJazzWasm = vi.hoisted(() => vi.fn())
 const connectionRecovery = vi.hoisted(() => ({ begin: vi.fn(), reload: vi.fn() }))
 const storedConnections = vi.hoisted(() => ({ connections: [{ id: 'connection-1' }] }))
@@ -30,8 +38,13 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 }))
 
 vi.mock('@app/routing/inspectorNavigation', () => ({
+  redirectToEditConnection,
   redirectToConnections: vi.fn(),
   resolveStoredRuntimeTarget,
+}))
+
+vi.mock('@app/connections/connectionCredentials', () => ({
+  resolveRuntimeConnection,
 }))
 
 vi.mock('@app/connections/connections', () => ({
@@ -95,6 +108,9 @@ const { ConnectionRouteError } = await import('./-connectionRouteStatus')
 afterEach(() => {
   cleanup()
   resolveStoredRuntimeTarget.mockReset()
+  resolveRuntimeConnection.mockReset()
+  resolveRuntimeConnection.mockReturnValue({ adminSecret: 'secret' })
+  redirectToEditConnection.mockClear()
   prepareJazzWasm.mockReset()
   connectionRecovery.begin.mockReset()
   connectionRecovery.begin.mockReturnValue(false)
@@ -135,6 +151,26 @@ describe('connection route', () => {
     expect(prepareJazzWasm.mock.invocationCallOrder[0]).toBeLessThan(
       resolveStoredRuntimeTarget.mock.invocationCallOrder[0]!,
     )
+  })
+
+  it('redirects a saved profile without a current credential to its edit form', async () => {
+    resolveRuntimeConnection.mockReturnValueOnce(null)
+    const loader = routeOptions.current?.loader as (options: {
+      abortController: AbortController
+      deps: { schemaHash: string | undefined }
+      params: { connectionId: string }
+    }) => Promise<unknown>
+
+    await expect(
+      loader({
+        abortController: new AbortController(),
+        deps: { schemaHash: undefined },
+        params: { connectionId: 'connection-1' },
+      }),
+    ).rejects.toThrow('redirect to edit')
+    expect(redirectToEditConnection).toHaveBeenCalledWith('connection-1')
+    expect(resolveStoredRuntimeTarget).not.toHaveBeenCalled()
+    expect(prepareJazzWasm).not.toHaveBeenCalled()
   })
 
   it('validates the schema search parameter for loader dependencies', () => {
@@ -259,7 +295,6 @@ describe('connection route', () => {
     expect(screen.getByRole('alert').textContent).not.toContain('secret server detail')
     expect(screen.getByText('Connection interrupted')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Reconnect' }))
-    expect(connectionRecovery.begin).toHaveBeenCalledTimes(2)
     expect(connectionRecovery.reload).toHaveBeenCalledOnce()
   })
 

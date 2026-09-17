@@ -7,7 +7,11 @@
  */
 import { redirect } from '@tanstack/react-router'
 
-import { matchesConnectionCredentials } from '@app/connections/connectionIdentity'
+import {
+  matchesConnectionCredentials,
+  normalizeServerUrl,
+} from '@app/connections/connectionIdentity'
+import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
 import {
   createSchemaCatalogueLoadError,
   isTransientSchemaFetchError,
@@ -19,7 +23,7 @@ import {
   resolveDefaultBranch,
   resolveDefaultSchemaHash,
   type ConnectionCredentials,
-  type StoredConnection,
+  type RuntimeConnection,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
 
@@ -47,7 +51,7 @@ interface ResolveRuntimeTargetOptions {
   connectionId: string
   branchOverride?: string | null
   schemaHashOverride?: string | null
-  getConnection: (connectionId: string) => StoredConnection | null
+  getConnection: (connectionId: string) => RuntimeConnection | null
   resolveBranch: (connectionId: string, branchOverride?: string | null) => string
   resolveSchemaHash: (
     schemaCatalogue: readonly SchemaCatalogueRecord[],
@@ -88,7 +92,7 @@ export function buildSchemaCatalogue(
 async function fetchConnectionLatestSchemaHash(
   connection: ConnectionCredentials,
 ): Promise<string | null> {
-  const serverUrl = connection.serverUrl.trim().replace(/\/+$/, '')
+  const serverUrl = normalizeServerUrl(connection.serverUrl)
   const response = await fetch(
     `${serverUrl}/apps/${encodeURIComponent(connection.appId)}/admin/permissions/head`,
     {
@@ -266,7 +270,7 @@ export async function resolveStoredRuntimeTarget({
   signal,
 }: ResolveStoredRuntimeTargetOptions): Promise<ResolvedRuntimeTarget | null> {
   const resolvedStore = store ?? readStoredConnections()
-  const connection = getConnectionById(resolvedStore, connectionId)
+  const connection = resolveRuntimeConnection(getConnectionById(resolvedStore, connectionId))
   if (connection === null) {
     return null
   }
@@ -293,4 +297,9 @@ export async function resolveStoredRuntimeTarget({
 /** Sends users back to connection setup when a Jazz runtime target is unavailable. */
 export function redirectToConnections(): never {
   throw redirect({ to: appRoutes.connections })
+}
+
+/** Sends a saved profile without a current credential to its unlock/edit form. */
+export function redirectToEditConnection(connectionId: string): never {
+  throw redirect({ to: appRoutes.editConnection, params: { connectionId } })
 }

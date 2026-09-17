@@ -6,7 +6,13 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 
-import { redirectToConnections, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
+import {
+  redirectToConnections,
+  redirectToEditConnection,
+  resolveStoredRuntimeTarget,
+} from '@app/routing/inspectorNavigation'
+import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
+import { getCredentialSafeRelativeUrl } from '@app/routing/credentialSafeUrl'
 import { getConnectionById, readStoredConnections } from '@app/connections/connections'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
@@ -44,21 +50,26 @@ export const Route = createFileRoute('/conn/$connectionId')({
   loaderDeps: ({ search }) => ({ schemaHash: search.schema }),
   loader: async ({ abortController, deps, location, params }) => {
     const store = readStoredConnections()
-    if (getConnectionById(store, params.connectionId) !== null) void prepareJazzWasm()
+    const profile = getConnectionById(store, params.connectionId)
+    if (profile === null) redirectToConnections()
+    if (resolveRuntimeConnection(profile) === null) redirectToEditConnection(params.connectionId)
+    void prepareJazzWasm()
     const target = await resolveStoredRuntimeTarget({
       connectionId: params.connectionId,
       schemaHashOverride: deps.schemaHash,
       signal: abortController.signal,
       store,
     })
-    if (target === null) {
-      redirectToConnections()
-    }
+    if (target === null) redirectToConnections()
     if (deps.schemaHash !== undefined && deps.schemaHash !== target.schemaHash) {
       const search = new URLSearchParams(location.searchStr)
       search.set('schema', target.schemaHash)
       throw redirect({
-        href: `${location.pathname}?${search.toString()}${location.hash.length > 0 ? `#${location.hash}` : ''}`,
+        href: getCredentialSafeRelativeUrl({
+          pathname: location.pathname,
+          search: `?${search.toString()}`,
+          hash: location.hash,
+        }),
         replace: true,
       })
     }

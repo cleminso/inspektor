@@ -5,6 +5,7 @@ import './index.css'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
 import { ThemeProvider } from 'next-themes'
 // The app shell only needs Tooltip. Its focused public export avoids importing through the broad
 // design-system barrel at this application-wide boundary.
@@ -13,12 +14,14 @@ import { Tooltip } from '@inspektor/ds/tooltip'
 import { routeTree } from './routeTree.gen'
 import { ThemeMetadata } from './app/themeMetadata'
 import { reportCaughtReactError } from './app/runtime/runtimeError'
-import ReactDOM from 'react-dom/client'
+import { sanitizeCurrentCredentialUrl } from './app/routing/credentialSafeUrl'
 
 if (import.meta.env.DEV === true) {
   // StyleX source is compiled by Vite; its development runtime is only needed while developing.
   void import('virtual:stylex:runtime')
 }
+
+sanitizeCurrentCredentialUrl()
 
 const router = createRouter({
   routeTree,

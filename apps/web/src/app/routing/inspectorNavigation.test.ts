@@ -6,6 +6,11 @@ import {
 } from '@app/connections/connections'
 import { SchemaCatalogueLoadError } from '@app/connections/connectionValidation'
 import {
+  clearConnectionCredential,
+  resolveRuntimeConnection,
+  saveConnectionCredential,
+} from '@app/connections/connectionCredentials'
+import {
   buildSchemaCatalogue,
   handoffStoredRuntimeTarget,
   resolveStoredRuntimeTarget,
@@ -31,24 +36,27 @@ afterEach(() => {
   fetchSchemaHashes.mockReset()
   fetchPermissionsHead.mockReset()
   vi.unstubAllGlobals()
+  clearConnectionCredential('connection-1')
+  clearConnectionCredential('connection-2')
 })
 
 function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnectionsStore {
   const store = createEmptyConnectionStore()
 
+  const connection = {
+    id: 'connection-1',
+    name: 'Local app',
+    serverUrl: 'https://example.com',
+    appId: 'app-1',
+    env: 'dev',
+    credentialRetention: 'memory' as const,
+  }
+  saveConnectionCredential(connection, 'secret')
+
   return {
     ...store,
     activeConnectionId: 'connection-1',
-    connections: [
-      {
-        id: 'connection-1',
-        name: 'Local app',
-        serverUrl: 'https://example.com',
-        appId: 'app-1',
-        adminSecret: 'secret',
-        env: 'dev',
-      },
-    ],
+    connections: [connection],
     preferencesByConnectionId: {
       'connection-1': {
         lastBranch: 'main',
@@ -67,7 +75,7 @@ describe('resolveStoredRuntimeTarget', () => {
       schemaHash: 'schema-1',
       schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
     }
-    handoffStoredRuntimeTarget(createStore().connections[0]!, target)
+    handoffStoredRuntimeTarget(resolveRuntimeConnection(createStore().connections[0])!, target)
 
     await expect(
       resolveStoredRuntimeTarget({
@@ -81,7 +89,7 @@ describe('resolveStoredRuntimeTarget', () => {
 
   it('rejects a handed-off target after the saved credentials change', async () => {
     const originalStore = createStore()
-    handoffStoredRuntimeTarget(originalStore.connections[0]!, {
+    handoffStoredRuntimeTarget(resolveRuntimeConnection(originalStore.connections[0])!, {
       connectionId: 'connection-1',
       branch: 'main',
       schemaHash: 'schema-1',
@@ -91,6 +99,7 @@ describe('resolveStoredRuntimeTarget', () => {
       ...originalStore,
       connections: [{ ...originalStore.connections[0]!, serverUrl: 'https://changed.example.com' }],
     }
+    saveConnectionCredential(changedStore.connections[0]!, 'secret')
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1'],
       schemas: [{ hash: 'schema-1', publishedAt: 1 }],
@@ -106,7 +115,7 @@ describe('resolveStoredRuntimeTarget', () => {
 
   it('rejects a handed-off target for another connection profile', async () => {
     const originalStore = createStore()
-    handoffStoredRuntimeTarget(originalStore.connections[0]!, {
+    handoffStoredRuntimeTarget(resolveRuntimeConnection(originalStore.connections[0])!, {
       connectionId: 'connection-1',
       branch: 'main',
       schemaHash: 'schema-1',
@@ -119,6 +128,7 @@ describe('resolveStoredRuntimeTarget', () => {
         'connection-2': originalStore.preferencesByConnectionId['connection-1']!,
       },
     }
+    saveConnectionCredential(store.connections[0]!, 'secret')
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1'],
       schemas: [{ hash: 'schema-1', publishedAt: 1 }],
