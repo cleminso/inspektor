@@ -27,7 +27,10 @@ export const brandHeroStyles = stylex.create({
     margin: 0,
     fontFamily: "'Instrument Sans Variable', sans-serif",
     fontWeight: 450,
-    letterSpacing: '-0.02em',
+    letterSpacing: {
+      default: '-0.06rem', // 0.96px
+      [largeDisplay]: '-0.06875rem', // 1.1px
+    },
     overflowWrap: 'break-word',
     textWrap: 'pretty',
   },
@@ -73,5 +76,11 @@ export const brandHeroStyles = stylex.create({
     lineHeight: '28px',
     textWrap: 'pretty',
     maxWidth: brandLayout.descriptionMeasure,
+  },
+  action: {
+    gap: '28px',
+    alignItems: 'flex-start',
+    display: 'flex',
+    marginBlockStart: '12px',
   },
 })

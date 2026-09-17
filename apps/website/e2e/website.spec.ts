@@ -66,8 +66,15 @@ test('renders the website without viewport overflow', async ({ page }) => {
       }),
     ).toBeVisible()
     await expect(page.getByRole('heading', { level: 2 })).toHaveCount(0)
-    await expect(page.getByText(/Inspektor connects to your sync server/)).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Open Inspektor' })).toHaveCount(0)
+    await expect(
+      page.getByText(
+        /Connect to your Jazz sync server from your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries\./,
+      ),
+    ).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Open Inspektor' })).toHaveAttribute(
+      'href',
+      '/conn',
+    )
 
     const geometry = await page.evaluate(() => {
       const getElement = (slot: string): HTMLElement => {

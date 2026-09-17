@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+### [17/09/26]
+
+- [x] Keep the website's `application data` phrase together below the 900px continuation breakpoint.
+- [x] Add the optional action region and primary `BrandButtonLink` for the website CTA.
+
 ### [16/09/26]
 
 - [x] Replace public layout parts and generic text roles with semantic string inputs.
@@ -33,7 +38,7 @@
 
 ### [16/09/26]
 
-- [ ] Add an action input and internal action region only when the website call to action is accepted.
+- [x] Add an action input and internal action region for the accepted website call to action.
 
 ## Work outside the foundation scope
 
@@ -48,6 +53,7 @@
 - The route owns hero copy; the component owns heading semantics, typography, and internal wrappers.
 - The semantic section remains unpadded; its private content frame owns the responsive gutters.
 - The hero does not render an empty action region.
+- The action region accepts composed brand action content and remains absent when no action is provided.
 
 ### [16/09/26]
 
@@ -65,6 +71,7 @@
 
 - [x] Verify the hero exposes one `h1`, no `h2`, and no consumer-owned children or styling props.
 - [x] Verify responsive typography and spacing in a production browser build.
+- [x] Verify the action link destination, semantics, and responsive placement in a production browser build.
 
 ### [16/09/26]
 

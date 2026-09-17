@@ -27,7 +27,7 @@ The entry exports `BrandSiteFrame`, `BrandHero`, and `BrandWordmark`. Public pro
 
 Public components represent reusable visual or semantic units rather than each internal DOM wrapper. Components keep layout-only wrappers private until consumers need to compose or address them independently.
 
-`BrandSiteFrame` accepts header content and ordered main content. It owns the header, continuous main surface, decorative bottom strip, and passive side columns. `BrandHero` accepts route-owned strings and owns one `h1`, its visual continuation, and the supporting paragraph. Future content regions establish specialized section components when their semantics and layout are known rather than sharing a speculative section wrapper.
+`BrandSiteFrame` accepts header content and ordered main content. It owns the header, continuous main surface, decorative bottom strip, and passive side columns. `BrandHero` accepts route-owned strings and an optional action region. It owns one `h1`, its visual continuation, the supporting paragraph, and the private action layout. Future content regions establish specialized section components when their semantics and layout are known rather than sharing a speculative section wrapper.
 
 ## Responsive frame
 
@@ -37,7 +37,7 @@ The frame uses 4px outer padding and gaps. Below 1280px the center fills the ava
 
 The header is 52px tall. Its private content frame positions a 140×20 wordmark with 16px inline padding, leaving the header surface unpadded. The decorative bottom strip is 46px tall and remains wrapperless while it has no content. The continuous main surface fills the remaining viewport, while hero content stays aligned to its top edge.
 
-The hero's private content frame owns 42px block padding and 16px inline padding at every supported width, leaving the semantic section available for full-width presentation. The content stack keeps 18px between the heading and description. The description has a 710px maximum measure. An action region is not rendered until the website has an accepted call to action.
+The hero's private content frame owns 42px block padding and 16px inline padding at every supported width, leaving the semantic section available for full-width presentation. The content stack keeps 18px between the heading and description. The description has a 710px maximum measure. The optional action region adds 12px to that stack before its 40px primary brand link.
 
 ## Typography
 
@@ -47,7 +47,7 @@ The website preloads the Latin variable WOFF2 used by its initial heading to pre
 
 The website vendors the font files, processes their CSS references through Vite, and publishes the OFL text at `/licenses/instrumentSans.txt`. [Instrument Sans website delivery](../research/instrumentSans/instrumentSans.md) records provenance, loading rationale, license obligations, and the maintenance checklist.
 
-Below 900px, the primary title uses 40px text with a 48px line height and the continuation uses 36px text with a 40px line height. The continuation has a 500px maximum below 900px to preserve the selected tablet line break. Both use 48px text and line height from 900px, then 56px text and line height from 1471px. Headings use `-0.02em` tracking and pretty wrapping. Descriptions use muted system text at 18px with a 28px line height, zero tracking, and pretty wrapping.
+Below 900px, the primary title uses 40px text with a 48px line height and the continuation uses 36px text with a 40px line height. The continuation has a 500px maximum below 900px to preserve the selected tablet line break, and the website keeps `application data` together. Both use 48px text and line height from 900px, then 56px text and line height from 1471px. Headings use `-0.96px` tracking through 48px and `-1.1px` tracking at 56px, with pretty wrapping. Descriptions use muted system text at 18px with a 28px line height, zero tracking, and pretty wrapping.
 
 ## Color schemes
 

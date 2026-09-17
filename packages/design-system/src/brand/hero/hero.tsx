@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex'
-import { forwardRef, type ComponentPropsWithRef } from 'react'
+import { forwardRef, type ComponentPropsWithRef, type ReactNode } from 'react'
 
 import { brandHeroStyles } from './hero.styles'
 
@@ -13,11 +13,13 @@ export interface BrandHeroProps extends Omit<
   continuation: string
   /** Supporting copy displayed below the page title. */
   description: string
+  /** Optional action content displayed below the description. */
+  action?: ReactNode
 }
 
 /** Presents the primary message for an Inspektor brand page. */
 export const BrandHero = forwardRef<HTMLElement, BrandHeroProps>(function BrandHero(
-  { continuation, description, title, ...props },
+  { action, continuation, description, title, ...props },
   forwardedRef,
 ) {
   const {
@@ -59,6 +61,14 @@ export const BrandHero = forwardRef<HTMLElement, BrandHeroProps>(function BrandH
         >
           {description}
         </p>
+        {action !== undefined && action !== null ? (
+          <div
+            data-slot="brand-hero-action"
+            {...stylex.props(brandHeroStyles.action)}
+          >
+            {action}
+          </div>
+        ) : null}
       </div>
     </section>
   )

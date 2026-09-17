@@ -1,11 +1,12 @@
-import { BrandHero } from '@inspektor/ds/brand'
+import { BrandButtonLink, BrandHero } from '@inspektor/ds/brand'
 
 export function HomeHero(): React.ReactElement {
   return (
     <BrandHero
       title="inspektor studio"
-      continuation="explore your Jazz application data"
-      description="Inspektor connects to your sync server. It loads the schema, creates an admin client locally in your browser, and renders an interface for you to inspect your application data."
+      continuation={'explore your Jazz application\u00a0data'}
+      description="Connect to your Jazz sync server from your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries."
+      action={<BrandButtonLink href="/conn">Open Inspektor</BrandButtonLink>}
     />
   )
 }

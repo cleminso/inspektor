@@ -61,7 +61,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Render this initial content:
   - Page heading: `inspektor studio`
   - Muted heading continuation: `explore your Jazz application data`
-  - Description: `Inspektor connects to your sync server. It loads the schema, creates an admin client locally in your browser, and renders an interface for you to inspect your application data.`
+  - Description: `Connect to your Jazz sync server from your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries.`
 - Support the accepted heading sizes and both color schemes.
 - Keep the existing product deployment and `/` redirect unchanged in this iteration.
 
@@ -72,7 +72,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Build server rendering or static generation.
 - Add route-aware behavior to brand components.
 - Add website copy, metadata, or content models to the design-system package.
-- Add a call to action or marketing sections beyond the accepted heading and description content.
+- Add marketing sections beyond the accepted hero content.
 - Configure a Worker, domain, or deployment pipeline for the website.
 - Change the existing product's route ownership, asset paths, root redirect, or browser storage.
 - Add third-party analytics before the shared-origin dependency and content-security-policy review.
@@ -92,18 +92,20 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Public components represent reusable visual or semantic units rather than internal DOM wrappers.
 - `BrandSiteFrame` accepts header content and ordered main children. It renders the header, main surface, passive side columns, and decorative bottom strip internally.
 - `BrandHero` accepts title, continuation, and description strings. It renders the title and visual continuation inside one `h1` and keeps layout wrappers private.
+- `BrandHero` accepts an optional action region. The website passes a `BrandButtonLink` to `/conn`; the brand package owns its presentation and private placement.
 - Public brand component props omit `className`, `style`, unsafe content replacement, and arbitrary typography overrides.
 - Instrument Sans is the brand sans-serif. The website application loads the font assets and preloads the Latin variable WOFF2 used above the fold; brand typography owns their semantic presentation.
 - Brand text uses weight `450` through the standard `font-weight` property.
-- The description uses a 710px maximum. The primary title uses the available hero width; the muted continuation has a 500px maximum below 900px to preserve the selected tablet line break.
+- The description uses a 710px maximum. The primary title uses the available hero width; the muted continuation has a 500px maximum below 900px to preserve the selected tablet line break, while `application data` remains unbroken.
+- The action region uses a 40px primary brand link with 14px inline padding, 6px block padding, and a 28px internal gap for future accepted actions.
 - Headings use Instrument Sans default glyphs.
 - Brand text has these responsive roles:
 
-| Role                   | Element          | Below 900px | From 900px | From 1471px | Line height       | Tracking  | Wrapping |
-| ---------------------- | ---------------- | ----------: | ---------: | ----------: | ----------------- | --------- | -------- |
-| Primary title          | `span` in `h1`   |        40px |       48px |        56px | `48px` / `56px`   | `-0.02em` | `pretty` |
-| Muted continuation     | `span` in `h1`   |        36px |       48px |        56px | `40px` / `48px` / `56px` | `-0.02em` | `pretty` |
-| Description            | `p`              |        18px |       18px |        18px | `28px`            | `0`       | `pretty` |
+| Role               | Element        | Below 900px | From 900px | From 1471px | Line height              | Tracking  | Wrapping |
+| ------------------ | -------------- | ----------: | ---------: | ----------: | ------------------------ | --------- | -------- |
+| Primary title      | `span` in `h1` |        40px |       48px |        56px | `48px` / `56px`          | `-0.96px` / `-1.1px` | `pretty` |
+| Muted continuation | `span` in `h1` |        36px |       48px |        56px | `40px` / `48px` / `56px` | `-0.96px` / `-1.1px` | `pretty` |
+| Description        | `p`            |        18px |       18px |        18px | `28px`                   | `0`       | `pretty` |
 
 - The section heading and description use an opaque muted text treatment that preserves normal-text contrast.
 - The header is 52px tall. Its private content frame positions a 140×20 wordmark with 16px inline padding, leaving the header surface unpadded. The decorative bottom strip is 46px tall and remains wrapperless while empty.

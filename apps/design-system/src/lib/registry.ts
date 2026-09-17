@@ -436,6 +436,17 @@ export const brandWordmarkItem = {
   },
 } satisfies DocsItem
 
+export const brandButtonLinkItem = {
+  title: 'Brand Button Link',
+  slug: 'brand-button-link',
+  href: '/components/brand-button-link',
+  description: 'Renders the primary navigation link for brand surfaces.',
+  source: {
+    label: 'buttonLink.tsx',
+    path: 'packages/design-system/src/brand/button/buttonLink.tsx',
+  },
+} satisfies DocsItem
+
 export const sidePanelItem = {
   title: 'Side Panel',
   slug: 'side-panel',
@@ -619,6 +630,7 @@ const componentItems: readonly DocsItem[] = [
   badgeItem,
   binaryValueItem,
   boxItem,
+  brandButtonLinkItem,
   brandWordmarkItem,
   buttonItem,
   buttonLinkItem,

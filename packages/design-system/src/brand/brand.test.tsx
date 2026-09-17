@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
+  BrandButtonLink,
   BrandHero,
   BrandSiteFrame,
   BrandWordmark,
@@ -18,6 +19,7 @@ describe('brand components', () => {
           title="inspektor studio"
           continuation="explore your Jazz application data"
           description="Description"
+          action={<BrandButtonLink href="/conn">Open Inspektor</BrandButtonLink>}
         />
       </BrandSiteFrame>,
     )
@@ -32,6 +34,7 @@ describe('brand components', () => {
       }),
     ).not.toBeNull()
     expect(screen.queryByRole('heading', { level: 2 })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Open Inspektor' }).getAttribute('href')).toBe('/conn')
     expect(screen.queryByRole('contentinfo')).toBeNull()
   })
 
@@ -69,6 +72,39 @@ describe('brand components', () => {
     expect(rendered.queryByText('Consumer frame markup')).toBeNull()
     expect(rendered.queryByText('Consumer content')).toBeNull()
     expect(rendered.queryByText('Consumer markup')).toBeNull()
+  })
+
+  it('keeps the action region absent when no action is provided', () => {
+    const { container } = render(
+      <BrandHero
+        title="Page"
+        continuation="Continuation"
+        description="Description"
+        action={null}
+      />,
+    )
+
+    expect(container.querySelector('[data-slot="brand-hero-action"]')).toBeNull()
+  })
+
+  it('strips styling escape hatches from the brand action link', () => {
+    const { container } = render(
+      <BrandButtonLink
+        {...({
+          className: 'consumer-style',
+          dangerouslySetInnerHTML: { __html: 'Consumer markup' },
+          style: { color: 'red' },
+        } as object)}
+        href="/conn"
+      >
+        Open Inspektor
+      </BrandButtonLink>,
+    )
+
+    const link = within(container).getByRole('link', { name: 'Open Inspektor' })
+    expect(link.className).not.toContain('consumer-style')
+    expect(link.getAttribute('style')).toBeNull()
+    expect(within(container).queryByText('Consumer markup')).toBeNull()
   })
 
   it('preserves the canonical wordmark for untyped consumers', () => {
