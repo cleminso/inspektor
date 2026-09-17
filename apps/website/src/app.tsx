@@ -3,8 +3,10 @@ import './index.css'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
+import { ThemeProvider } from 'next-themes'
 import ReactDOM from 'react-dom/client'
 
+import { ThemeMetadata } from './app/themeMetadata'
 import { routeTree } from './routeTree.gen'
 
 if (import.meta.env.DEV === true) {
@@ -29,7 +31,16 @@ const rootElement = document.getElementById('root')
 if (rootElement !== null) {
   ReactDOM.createRoot(rootElement).render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+        storageKey="theme"
+      >
+        <ThemeMetadata />
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </StrictMode>,
   )
 }
