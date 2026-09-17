@@ -6,19 +6,25 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && pnpm typecheck",
+    "preview": "pnpm build && wrangler dev",
+    "deploy": "pnpm build && wrangler deploy",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
     "test:browser": "playwright test",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.e2e.json --noEmit"
+    "types:worker": "wrangler types --include-runtime false",
+    "types:worker:check": "wrangler types --include-runtime false --check",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.worker.json --noEmit && pnpm types:worker:check"
   },
   "dependencies": {
     "@inspektor/ds": "workspace:*",
     "@tanstack/react-router": "catalog:",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260917.1",
     "@playwright/test": "^1.62.1",
     "@stylexjs/unplugin": "catalog:",
     "@tanstack/router-plugin": "catalog:",
@@ -30,6 +36,7 @@
     "jsdom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "wrangler": "^4.129.0"
   }
 }

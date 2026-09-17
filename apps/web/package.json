@@ -17,7 +17,9 @@
     "test:node": "vitest run --project node",
     "test:browser": "playwright test",
     "test:browser:install": "playwright install chromium",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.node.json --noEmit"
+    "types:worker": "wrangler types --include-runtime false",
+    "types:worker:check": "wrangler types --include-runtime false --check",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.worker.json --noEmit && pnpm types:worker:check"
   },
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
@@ -39,6 +41,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260917.1",
     "@playwright/test": "^1.62.1",
     "@stylexjs/unplugin": "catalog:",
     "@tanstack/devtools-vite": "^0.8.5",

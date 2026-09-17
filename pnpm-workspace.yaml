@@ -59,6 +59,7 @@ minimumReleaseAgeExclude:
   - jazz-napi@2.0.0-alpha.54 || 2.0.0-alpha.55
   - jazz-tools@2.0.0-alpha.54 || 2.0.0-alpha.55
   - jazz-wasm@2.0.0-alpha.54 || 2.0.0-alpha.55
+  - '@cloudflare/workers-types@5.20260917.1'
 
 patchedDependencies:
   # Prevent Vitest from hanging on file handles and a referenced polling timer.
