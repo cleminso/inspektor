@@ -70,7 +70,7 @@ export const brandHeroStyles = stylex.create({
   description: {
     margin: 0,
     color: brandColors.description,
-    fontFamily: 'system-ui, sans-serif',
+    fontFamily: "'Instrument Sans Variable', sans-serif",
     fontSize: '18px',
     letterSpacing: 0,
     lineHeight: '28px',

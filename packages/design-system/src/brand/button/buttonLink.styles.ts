@@ -1,7 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { focusColors, textColors, accentElementColors } from '../../tokens/semantics.stylex'
-import { borderRadii, fontFamilies, fontWeights, spacing } from '../../tokens/value.stylex'
+import { focusColors, textColors, surfaceColors } from '../../tokens/semantics.stylex'
+import { borderRadii, fontWeights, spacing } from '../../tokens/value.stylex'
+import { brandColors } from '../brandColors.stylex'
 
 export const brandButtonLinkStyles = stylex.create({
   root: {
@@ -11,18 +12,18 @@ export const brandButtonLinkStyles = stylex.create({
     textDecoration: 'none',
     alignItems: 'center',
     backgroundColor: {
-      default: accentElementColors.default,
-      ':hover': accentElementColors.hover,
-      ':active': accentElementColors.pressed,
+      default: surfaceColors.inverse,
+      ':hover': brandColors.actionHover,
+      ':active': brandColors.actionPressed,
     },
     boxSizing: 'border-box',
     color: textColors.onInverse,
     cursor: 'pointer',
     display: 'inline-flex',
     flexShrink: 0,
-    fontFamily: fontFamilies.sans,
+    fontFamily: "'Instrument Sans Variable', sans-serif",
     fontSize: '18px',
-    fontWeight: fontWeights.medium,
+    fontWeight: fontWeights.regular,
     justifyContent: 'center',
     lineHeight: '28px',
     outlineColor: focusColors.ring,
