@@ -1,14 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "jsx-a11y",
-    "oxc",
-    "react",
-    "react-perf",
-    "typescript",
-    "unicorn"
-  ],
+  "plugins": ["import", "jsx-a11y", "oxc", "react", "react-perf", "typescript", "unicorn"],
   "jsPlugins": [
     {
       "name": "@stylexjs",
@@ -49,10 +41,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "packages/design-system/**/*.ts",
-        "packages/design-system/**/*.tsx"
-      ],
+      "files": ["packages/design-system/**/*.ts", "packages/design-system/**/*.tsx"],
       "rules": {
         "@stylexjs/valid-styles": [
           "error",
@@ -97,7 +86,7 @@
       }
     },
     {
-      "files": ["apps/web/src/**/*.tsx"],
+      "files": ["apps/web/src/**/*.tsx", "apps/website/src/**/*.tsx"],
       "rules": {
         "anti-slop/no-direct-lucide-jsx": "error",
         "react/forbid-elements": [
@@ -124,10 +113,7 @@
       }
     },
     {
-      "files": [
-        "**/components/checkbox/checkbox.tsx",
-        "**/components/inputGroup/inputGroup.tsx"
-      ],
+      "files": ["**/components/checkbox/checkbox.tsx", "**/components/inputGroup/inputGroup.tsx"],
       "rules": {
         "jsx-a11y/label-has-associated-control": "off"
       }
@@ -161,9 +147,5 @@
       }
     }
   ],
-  "ignorePatterns": [
-    "**/dist/**",
-    "**/node_modules/**",
-    "tools/oxlint/antiSlop/**"
-  ]
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "tools/oxlint/antiSlop/**"]
 }

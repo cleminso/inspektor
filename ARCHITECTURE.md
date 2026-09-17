@@ -23,7 +23,7 @@ This document explains how the Inspektor frontend is assembled and why its bound
 
 The key model is:
 
-> `apps/web` owns Inspektor product behavior and data. `@inspektor/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
+> `apps/web` owns Inspektor product behavior and data. `apps/website` owns the public website. `@inspektor/ds` owns reusable generic and brand UI. `apps/design-system` documents and validates the public design-system contract.
 
 The import-boundary rules for optional heavy behavior are specified in [the import-boundary playbook](lat.md/importBoundaryPlaybook.md). Component-level implementation work belongs in the corresponding `todo/*.md` checklist.
 
@@ -34,10 +34,11 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 | Location                 | Role                                            | May depend on                                                 |
 | ------------------------ | ----------------------------------------------- | ------------------------------------------------------------- |
 | `apps/web`               | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                |
+| `apps/website`           | Public Inspektor website                        | public `@inspektor/ds` exports and website dependencies       |
 | `apps/design-system`     | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies |
 | `packages/design-system` | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies           |
 
-`apps/web` and `apps/design-system` are consumers of `@inspektor/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
+Workspace applications are consumers of `@inspektor/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
 
 ## Ownership boundaries
 
@@ -60,6 +61,13 @@ The design system owns reusable presentation and interaction behavior:
 - Accessible keyboard, focus, selection, popup, and form behavior provided by component primitives.
 - Public component props and consumer-facing types.
 - Reusable optional behavior, including carefully scoped deferred loading boundaries.
+- Reusable brand site framing, semantic sections, and hero typography published through a focused brand entry.
+
+### `apps/website`
+
+The public website owns its routes, copy, metadata, SEO, analytics, and assembly. It composes `@inspektor/ds/brand` without moving content or route behavior into the package.
+
+The website is a client-rendered TanStack Router SPA. Its intended production ownership is the root and non-product paths on `inspektor.dev`, while `apps/web` retains `/conn` and descendants. The deployment integration needed to split those paths is not implemented.
 
 ### `apps/design-system`
 
@@ -117,12 +125,13 @@ Workspace mutation state publishes an exit blocker upward. Session enforces that
 
 `packages/design-system/package.json` defines the package contract. Consumers should only import paths listed in its `exports` map:
 
-| Import path             | Intended surface                                           |
-| ----------------------- | ---------------------------------------------------------- |
-| `@inspektor/ds`         | Main public component, token, primitive, and hook barrel   |
-| `@inspektor/ds/theme`   | Theme token entry                                          |
+| Import path                  | Intended surface                                            |
+| ---------------------------- | ----------------------------------------------------------- |
+| `@inspektor/ds`              | Main public component, token, primitive, and hook barrel    |
+| `@inspektor/ds/brand`        | Focused brand site framing, sections, and typography        |
+| `@inspektor/ds/theme`        | Theme token entry                                           |
 | `@inspektor/ds/baseline.css` | Opt-in browser normalization used by workspace applications |
-| `@inspektor/ds/tooltip` | Focused Tooltip entry used at an application-wide boundary |
+| `@inspektor/ds/tooltip`      | Focused Tooltip entry used at an application-wide boundary  |
 
 ### Public barrels
 
@@ -156,7 +165,7 @@ The `sideEffects` array marks only the source and built baseline CSS files as ef
 
 ## How workspace applications resolve the design system
 
-Both Vite applications declare these resolution conditions:
+All Vite applications declare these resolution conditions:
 
 `inspektor-source`, `module`, `browser`, `development|production`.
 
@@ -190,6 +199,8 @@ This means the design-system TSDown build verifies artifact generation, while `a
 - `@tanstack/devtools-vite` outside test mode for router-development tooling.
 - a dynamic development-only StyleX runtime import.
 - `defaultPreload: "intent"`, which lets the router preload route work after a user shows intent to navigate. Preloading is not the same as making the route part of the HTML entry closure.
+
+`apps/website` uses the same source-resolution and StyleX extraction path without product runtime providers or data dependencies. It loads Instrument Sans as an application asset, publishes the font license under `/licenses`, and uses system light and dark color schemes. [Instrument Sans website delivery](research/instrumentSans/instrumentSans.md) records the font's provenance and maintenance contract.
 
 ## Static and deferred dependency graphs
 

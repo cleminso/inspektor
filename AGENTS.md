@@ -53,6 +53,7 @@ Implementation work is limited to:
 - `packages/design-system`: reusable `@inspektor/ds` components, primitives, and tokens.
 - `apps/design-system`: documentation, playgrounds, and design-system validation.
 - `apps/web`: Inspektor routes, product state, Jazz access, and feature composition.
+- `apps/website`: public website routes, copy, metadata, and brand-page composition.
 - `apps/inspektor-test`: deterministic test schema, data, deployment tooling, and isolated fixtures.
 
 Other workspace packages require an explicit user request.
@@ -69,6 +70,7 @@ Other workspace packages require an explicit user request.
 - `packages/design-system` owns reusable presentation and interaction components.
 - `apps/design-system` consumes public `@inspektor/ds` exports and never imports package-private implementation files at runtime.
 - `apps/web` owns routes, application state, Jazz data access, and feature composition. Move reusable presentation and interaction behavior into `packages/design-system`.
+- `apps/website` owns public website routes, copy, metadata, SEO, analytics, and page assembly. Reusable brand presentation belongs in `packages/design-system/src/brand`.
 - Do not recreate Base UI behavior in `apps/web`.
 - The Inspektor is schema-driven and generic. Do not add table-specific UI or generated query builders for inspected applications.
 

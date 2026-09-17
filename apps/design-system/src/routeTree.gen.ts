@@ -16,6 +16,8 @@ import { Route as ComponentsAlertDialogRouteImport } from './routes/components/a
 import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
+import { Route as ComponentsBrandButtonLinkRouteImport } from './routes/components/brand-button-link'
+import { Route as ComponentsBrandWordmarkRouteImport } from './routes/components/brand-wordmark'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
@@ -97,6 +99,17 @@ const ComponentsBinaryValueRoute = ComponentsBinaryValueRouteImport.update({
 const ComponentsBoxRoute = ComponentsBoxRouteImport.update({
   id: '/components/box',
   path: '/components/box',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsBrandButtonLinkRoute =
+  ComponentsBrandButtonLinkRouteImport.update({
+    id: '/components/brand-button-link',
+    path: '/components/brand-button-link',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComponentsBrandWordmarkRoute = ComponentsBrandWordmarkRouteImport.update({
+  id: '/components/brand-wordmark',
+  path: '/components/brand-wordmark',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
@@ -350,6 +363,8 @@ export interface FileRoutesByFullPath {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
+  '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -406,6 +421,8 @@ export interface FileRoutesByTo {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
+  '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -463,6 +480,8 @@ export interface FileRoutesById {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
+  '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -521,6 +540,8 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
+    | '/components/brand-button-link'
+    | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
     | '/components/checkbox'
@@ -577,6 +598,8 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
+    | '/components/brand-button-link'
+    | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
     | '/components/checkbox'
@@ -633,6 +656,8 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
+    | '/components/brand-button-link'
+    | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
     | '/components/checkbox'
@@ -690,6 +715,8 @@ export interface RootRouteChildren {
   ComponentsBadgeRoute: typeof ComponentsBadgeRoute
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsBoxRoute: typeof ComponentsBoxRoute
+  ComponentsBrandButtonLinkRoute: typeof ComponentsBrandButtonLinkRoute
+  ComponentsBrandWordmarkRoute: typeof ComponentsBrandWordmarkRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
@@ -788,6 +815,20 @@ declare module '@tanstack/react-router' {
       path: '/components/box'
       fullPath: '/components/box'
       preLoaderRoute: typeof ComponentsBoxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/brand-button-link': {
+      id: '/components/brand-button-link'
+      path: '/components/brand-button-link'
+      fullPath: '/components/brand-button-link'
+      preLoaderRoute: typeof ComponentsBrandButtonLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/brand-wordmark': {
+      id: '/components/brand-wordmark'
+      path: '/components/brand-wordmark'
+      fullPath: '/components/brand-wordmark'
+      preLoaderRoute: typeof ComponentsBrandWordmarkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button': {
@@ -1130,6 +1171,8 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsBadgeRoute: ComponentsBadgeRoute,
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsBoxRoute: ComponentsBoxRoute,
+  ComponentsBrandButtonLinkRoute: ComponentsBrandButtonLinkRoute,
+  ComponentsBrandWordmarkRoute: ComponentsBrandWordmarkRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,

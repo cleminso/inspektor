@@ -18,10 +18,11 @@ The sections cover package ownership, build and styling tools, documentation wor
 
 ## Goal
 
-The design system has two jobs:
+The design-system surfaces have three jobs:
 
 1. `packages/design-system` defines reusable Inspektor primitives and tokens.
 2. `apps/design-system` shows those primitives in a small documentation app.
+3. `apps/website` consumes focused brand components in the public website.
 
 The setup is inspired by Polar Orbit, but adapted to this workspace instead of copying its Next.js app structure.
 
@@ -29,7 +30,7 @@ The setup is inspired by Polar Orbit, but adapted to this workspace instead of c
 
 The package stays focused on reusable code. It should not know which app consumes it or how docs are rendered.
 
-The app stays focused on presentation, examples, and navigation. It consumes `@inspektor/ds` the same way `apps/web` will consume it, so documentation catches packaging and integration issues early.
+The documentation app stays focused on examples and navigation. It consumes `@inspektor/ds` through the same public source contract as `apps/web` and `apps/website`, so documentation catches packaging and integration issues early.
 
 This separation keeps the design system useful outside the docs app and prevents docs-only concerns from leaking into the package API. [[lat.md/mental-model-ds-package#Design-system package mental model]] describes the resulting package artifacts.
 
@@ -43,7 +44,7 @@ It fits the design system package because tokens and primitives can live with th
 
 The consuming app needs to compile StyleX imports from `@inspektor/ds` into CSS. Vite does not do that by itself.
 
-`@stylexjs/unplugin` is the correct integration point for Vite because it runs during the bundling pipeline and handles StyleX transformation plus CSS extraction. That means `apps/design-system` and `apps/web` can consume package source files and still get the generated CSS output.
+`@stylexjs/unplugin` is the correct integration point for Vite because it runs during the bundling pipeline and handles StyleX transformation plus CSS extraction. That means all workspace Vite applications can consume package source files and still get the generated CSS output.
 
 We avoided `postcss.config.ts` for this app because PostCSS is not the primary integration point for a Vite-first StyleX setup. The Vite plugin keeps the transformation closer to the module graph, which matters when importing StyleX files from workspace packages.
 
