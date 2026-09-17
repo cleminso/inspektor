@@ -221,7 +221,7 @@ describe('connection route', () => {
     expect(loading.textContent).toBe('')
     expect(loading.getAttribute('aria-live')).toBe('polite')
     expect(loading.getAttribute('aria-atomic')).toBe('true')
-    expect(wordmark?.getAttribute('src')).toBe('/brand/inspektorWordmarkOnLight.png')
+    expect(wordmark?.getAttribute('src')).toBe('/conn/brand/inspektorWordmarkOnLight.png')
     expect(wordmark?.getAttribute('alt')).toBe('')
     expect(wordmark?.getAttribute('aria-hidden')).toBe('true')
     expect(wordmark?.getAttribute('width')).toBe('160')
@@ -235,7 +235,7 @@ describe('connection route', () => {
     render(<PendingComponent />)
 
     expect(document.querySelector('img')?.getAttribute('src')).toBe(
-      '/brand/inspektorWordmarkOnDark.png',
+      '/conn/brand/inspektorWordmarkOnDark.png',
     )
   })
 

@@ -7,8 +7,8 @@ const themeColors = {
 } as const
 
 const faviconHrefs = {
-  dark: '/favicon-dark.svg',
-  light: '/favicon-light.svg',
+  dark: '/conn/favicon-dark.svg',
+  light: '/conn/favicon-light.svg',
 } as const
 
 export function ThemeMetadata(): null {
@@ -30,8 +30,9 @@ export function ThemeMetadata(): null {
       fallbackThemeColor.remove()
     }
 
-    const [themeIcon, ...fallbackThemeIcons] =
-      document.querySelectorAll<HTMLLinkElement>('link[rel="icon"][data-inspektor-theme-icon="true"]')
+    const [themeIcon, ...fallbackThemeIcons] = document.querySelectorAll<HTMLLinkElement>(
+      'link[rel="icon"][data-inspektor-theme-icon="true"]',
+    )
     if (themeIcon !== undefined) {
       themeIcon.href = faviconHrefs[resolvedTheme]
       themeIcon.removeAttribute('media')

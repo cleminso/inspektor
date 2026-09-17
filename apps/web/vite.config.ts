@@ -31,6 +31,7 @@ const createStylexPlugin = () => {
 }
 
 export default defineConfig(({ mode }) => ({
+  base: '/conn/',
   resolve: {
     // Workspace apps consume the public DS API from source so Vite and StyleX can transform it.
     conditions: ['inspektor-source', 'module', 'browser', 'development|production'],
@@ -74,7 +75,7 @@ export default defineConfig(({ mode }) => ({
         test: {
           name: 'node',
           environment: 'node',
-          include: ['src/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
           exclude: ['src/**/*.jsdom.test.ts'],
           sequence: { groupOrder: 1 },
         },

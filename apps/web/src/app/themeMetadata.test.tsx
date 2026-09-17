@@ -42,8 +42,8 @@ describe('ThemeMetadata', () => {
   })
 
   it.each([
-    ['dark', '/favicon-dark.svg'],
-    ['light', '/favicon-light.svg'],
+    ['dark', '/conn/favicon-dark.svg'],
+    ['light', '/conn/favicon-light.svg'],
   ])('synchronizes the %s favicon from the resolved theme', (theme, faviconHref) => {
     const themeIcon = document.createElement('link')
     themeIcon.rel = 'icon'
@@ -64,32 +64,32 @@ describe('ThemeMetadata', () => {
     resolvedTheme = 'dark'
 
     const { rerender } = render(<ThemeMetadata />)
-    expect(themeIcon.getAttribute('href')).toBe('/favicon-dark.svg')
+    expect(themeIcon.getAttribute('href')).toBe('/conn/favicon-dark.svg')
 
     resolvedTheme = 'light'
     rerender(<ThemeMetadata />)
 
-    expect(themeIcon.getAttribute('href')).toBe('/favicon-light.svg')
+    expect(themeIcon.getAttribute('href')).toBe('/conn/favicon-light.svg')
   })
 
   it('preserves system favicon fallbacks before the theme resolves', () => {
     const lightThemeIcon = document.createElement('link')
     lightThemeIcon.rel = 'icon'
-    lightThemeIcon.href = '/favicon-light.svg'
+    lightThemeIcon.href = '/conn/favicon-light.svg'
     lightThemeIcon.media = '(prefers-color-scheme: light)'
     lightThemeIcon.dataset.inspektorThemeIcon = 'true'
     const darkThemeIcon = document.createElement('link')
     darkThemeIcon.rel = 'icon'
-    darkThemeIcon.href = '/favicon-dark.svg'
+    darkThemeIcon.href = '/conn/favicon-dark.svg'
     darkThemeIcon.media = '(prefers-color-scheme: dark)'
     darkThemeIcon.dataset.inspektorThemeIcon = 'true'
     document.head.append(lightThemeIcon, darkThemeIcon)
 
     render(<ThemeMetadata />)
 
-    expect(lightThemeIcon.getAttribute('href')).toBe('/favicon-light.svg')
+    expect(lightThemeIcon.getAttribute('href')).toBe('/conn/favicon-light.svg')
     expect(lightThemeIcon.media).toBe('(prefers-color-scheme: light)')
-    expect(darkThemeIcon.getAttribute('href')).toBe('/favicon-dark.svg')
+    expect(darkThemeIcon.getAttribute('href')).toBe('/conn/favicon-dark.svg')
     expect(darkThemeIcon.media).toBe('(prefers-color-scheme: dark)')
   })
 
@@ -114,12 +114,12 @@ describe('ThemeMetadata', () => {
   it('replaces system favicon fallbacks with one resolved theme icon', () => {
     const lightThemeIcon = document.createElement('link')
     lightThemeIcon.rel = 'icon'
-    lightThemeIcon.href = '/favicon-light.svg'
+    lightThemeIcon.href = '/conn/favicon-light.svg'
     lightThemeIcon.media = '(prefers-color-scheme: light)'
     lightThemeIcon.dataset.inspektorThemeIcon = 'true'
     const darkThemeIcon = document.createElement('link')
     darkThemeIcon.rel = 'icon'
-    darkThemeIcon.href = '/favicon-dark.svg'
+    darkThemeIcon.href = '/conn/favicon-dark.svg'
     darkThemeIcon.media = '(prefers-color-scheme: dark)'
     darkThemeIcon.dataset.inspektorThemeIcon = 'true'
     document.head.append(lightThemeIcon, darkThemeIcon)
@@ -131,7 +131,7 @@ describe('ThemeMetadata', () => {
       'link[rel="icon"][data-inspektor-theme-icon="true"]',
     )
     expect(themeIcons).toHaveLength(1)
-    expect(themeIcons[0]?.getAttribute('href')).toBe('/favicon-dark.svg')
+    expect(themeIcons[0]?.getAttribute('href')).toBe('/conn/favicon-dark.svg')
     expect(themeIcons[0]?.hasAttribute('media')).toBe(false)
   })
 })

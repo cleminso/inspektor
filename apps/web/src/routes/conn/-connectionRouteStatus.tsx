@@ -18,8 +18,8 @@ export function ConnectionRouteLoading(): React.ReactElement {
   const { resolvedTheme } = useTheme()
   const wordmarkSrc =
     resolvedTheme === 'dark'
-      ? '/brand/inspektorWordmarkOnDark.png'
-      : '/brand/inspektorWordmarkOnLight.png'
+      ? '/conn/brand/inspektorWordmarkOnDark.png'
+      : '/conn/brand/inspektorWordmarkOnLight.png'
 
   return (
     <Box

@@ -212,7 +212,7 @@ test('keeps one centered loading view until the first table rows settle', async 
   await expect(page.getByText('Loading schema…', { exact: true })).toBeHidden()
   await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
   const wordmark = loading.locator('img')
-  await expect(wordmark).toHaveAttribute('src', '/brand/inspektorWordmarkOnLight.png')
+  await expect(wordmark).toHaveAttribute('src', '/conn/brand/inspektorWordmarkOnLight.png')
   const [loadingBox, wordmarkBox, viewport] = await Promise.all([
     loading.boundingBox(),
     wordmark.boundingBox(),

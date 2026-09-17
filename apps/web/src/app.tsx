@@ -43,6 +43,7 @@ if (rootElement !== null) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storageKey="theme"
     >
       <ThemeMetadata />
       <Tooltip.Provider>
