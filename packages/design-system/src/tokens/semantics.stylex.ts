@@ -170,7 +170,7 @@ export const spatial = stylex.defineVars({
   'popup-item-inline-padding': spacing.s,
   'popup-width-s': dimensions[240],
   'popup-width-m': dimensions[320],
-  'popup-width-l': dimensions[400],
+  'popup-width-l': dimensions[480],
   'panel-height': dimensions[280],
   'panel-bar-height': dimensions[40],
   'panel-handle-size': dimensions[1],

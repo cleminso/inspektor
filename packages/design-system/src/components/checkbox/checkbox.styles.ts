@@ -44,8 +44,6 @@ export const checkboxStyles = stylex.create({
   },
   labelRow: {
     boxSizing: 'border-box',
-    paddingLeft: spacing.m,
-    paddingRight: spacing.m,
     width: '100%',
   },
   root: {
