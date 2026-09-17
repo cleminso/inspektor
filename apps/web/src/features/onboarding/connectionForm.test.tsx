@@ -13,6 +13,7 @@ describe('ConnectionForm', () => {
     adminSecret: '',
     env: 'dev',
     branch: 'main',
+    credentialRetention: 'memory' as const,
   }
 
   it('renders field errors inline and focuses the invalid field', () => {
@@ -29,6 +30,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -49,6 +51,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -75,6 +78,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -100,6 +104,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -118,6 +123,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -139,6 +145,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -154,6 +161,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -180,6 +188,7 @@ describe('ConnectionForm', () => {
         onCancel={vi.fn()}
         onSubmit={vi.fn()}
         onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
       />,
     )
 
@@ -189,8 +198,32 @@ describe('ConnectionForm', () => {
     expect(serverUrl.getAttribute('autocomplete')).toBe('url')
     expect(serverUrl.getAttribute('type')).toBe('url')
     expect(serverUrl.getAttribute('inputmode')).toBe('url')
-    expect(adminSecret.getAttribute('autocomplete')).toBe('off')
+    expect(adminSecret.getAttribute('autocomplete')).toBe('current-password')
     expect(adminSecret.getAttribute('type')).toBe('password')
+    expect(
+      screen
+        .getByRole('checkbox', { name: /Store admin secret in sessionStorage/u })
+        .getAttribute('aria-checked'),
+    ).toBe('false')
     expect(screen.queryByLabelText('Default branch')).toBeNull()
+  })
+
+  it('lets the user opt in to tab-scoped credential retention', () => {
+    const onCredentialRetentionChange = vi.fn()
+    render(
+      <ConnectionForm
+        error={null}
+        formValues={formValues}
+        isSubmitting={false}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+        onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={onCredentialRetentionChange}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('checkbox', { name: /Store admin secret in sessionStorage/u }))
+
+    expect(onCredentialRetentionChange).toHaveBeenCalledWith('session')
   })
 })

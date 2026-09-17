@@ -1,8 +1,9 @@
 import { useEffect, useRef, type FormEventHandler } from 'react'
 
-import { Box, Button, Fieldset, Text, TextField } from '@inspektor/ds'
+import { Box, Button, Checkbox, Fieldset, Text, TextField } from '@inspektor/ds'
 
 import type { ConnectionError } from '@app/connections/connectionValidation'
+import type { CredentialRetention } from '@app/connections/connections'
 
 import type { ConnectionFormValues } from './connectionFormTypes'
 
@@ -12,7 +13,11 @@ interface ConnectionFormProps {
   isSubmitting: boolean
   onCancel: () => void
   onSubmit: FormEventHandler<HTMLFormElement>
-  onFieldValueChange: (field: keyof ConnectionFormValues, value: string) => void
+  onFieldValueChange: (
+    field: Exclude<keyof ConnectionFormValues, 'credentialRetention'>,
+    value: string,
+  ) => void
+  onCredentialRetentionChange: (credentialRetention: CredentialRetention) => void
 }
 
 export function ConnectionForm({
@@ -22,6 +27,7 @@ export function ConnectionForm({
   onCancel,
   onSubmit,
   onFieldValueChange,
+  onCredentialRetentionChange,
 }: ConnectionFormProps): React.ReactElement {
   const serverUrlRef = useRef<HTMLInputElement>(null)
   const appIdRef = useRef<HTMLInputElement>(null)
@@ -102,7 +108,7 @@ export function ConnectionForm({
           id="connection-admin-secret"
           label="Admin secret"
           name="adminSecret"
-          autoComplete="off"
+          autoComplete="current-password"
           error={error?.field === 'adminSecret' ? error.description : undefined}
           validate={(value) =>
             String(value ?? '').trim().length > 0 ? null : 'Enter an admin secret.'
@@ -116,6 +122,27 @@ export function ConnectionForm({
           }}
           aria-required={true}
         />
+        <Checkbox.Label layout="row">
+          <Box
+            flex={1}
+            flexDirection="column"
+            gap="xs"
+            minWidth={0}
+          >
+            <Text variant="label">Store admin secret in sessionStorage</Text>
+            <Text color="muted">
+              By default, secret is kept in memory, so the connection is lost on refresh.
+              This option uses sessionStorage so connection survives refresh in this tab.
+            </Text>
+          </Box>
+          <Checkbox
+            name="credentialRetention"
+            checked={formValues.credentialRetention === 'session'}
+            onCheckedChange={(checked) => {
+              onCredentialRetentionChange(checked === true ? 'session' : 'memory')
+            }}
+          />
+        </Checkbox.Label>
         <TextField
           id="connection-env"
           label="Environment"

@@ -1,12 +1,11 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { StoredConnection } from '@app/connections/connections'
-
 import { useConnectionFormFlow } from './useConnectionFormFlow'
 
 const {
   fetchSchemaCatalogue,
+  findConnectionByCredentials,
   handoffStoredRuntimeTarget,
   navigate,
   prepareJazzWasm,
@@ -14,13 +13,13 @@ const {
   setConnectionContext,
 } = vi.hoisted(() => ({
   fetchSchemaCatalogue: vi.fn(),
+  findConnectionByCredentials: vi.fn(),
   handoffStoredRuntimeTarget: vi.fn(),
   navigate: vi.fn(),
   prepareJazzWasm: vi.fn(),
   saveConnectionWithContext: vi.fn(),
   setConnectionContext: vi.fn(),
 }))
-let connections: StoredConnection[] = []
 const singleSchemaResponse = [{ hash: 'schema-1', publishedAt: 1 }]
 const schemaChoicesResponse = [
   { hash: 'schema-1', publishedAt: 1 },
@@ -35,7 +34,7 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
 }))
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
-    connections,
+    findConnectionByCredentials,
     saveConnectionWithContext,
     setConnectionContext,
   }),
@@ -43,7 +42,8 @@ vi.mock('@app/providers/inspectorSessionProvider', () => ({
 
 afterEach(() => {
   cleanup()
-  connections = []
+  findConnectionByCredentials.mockReset()
+  findConnectionByCredentials.mockReturnValue(null)
   fetchSchemaCatalogue.mockReset()
   handoffStoredRuntimeTarget.mockReset()
   navigate.mockReset()
@@ -54,6 +54,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
+  findConnectionByCredentials.mockReturnValue(null)
   saveConnectionWithContext.mockReturnValue('accepted')
   setConnectionContext.mockReturnValue('accepted')
 })
@@ -241,10 +242,12 @@ describe('useConnectionFormFlow', () => {
       name: 'Production',
       serverUrl: 'https://self-hosted.example.com',
       appId: 'production-app',
-      adminSecret: 'production-secret',
       env: 'prod',
+      credentialRetention: 'memory' as const,
     }
-    const { result } = renderHook(() => useConnectionFormFlow({ connection, branch: 'release' }))
+    const { result } = renderHook(() =>
+      useConnectionFormFlow({ connection, adminSecret: 'production-secret', branch: 'release' }),
+    )
 
     expect(result.current.formValues).toEqual({
       name: 'Production',
@@ -253,6 +256,7 @@ describe('useConnectionFormFlow', () => {
       adminSecret: 'production-secret',
       env: 'prod',
       branch: 'release',
+      credentialRetention: 'memory',
     })
 
     act(() => result.current.updateFieldValue('name', 'Production app'))
@@ -267,6 +271,7 @@ describe('useConnectionFormFlow', () => {
         appId: 'production-app',
         adminSecret: 'production-secret',
         env: 'prod',
+        credentialRetention: 'memory',
       },
       'connection-2',
       'release',
@@ -284,22 +289,22 @@ describe('useConnectionFormFlow', () => {
       name: 'Production',
       serverUrl: 'https://self-hosted.example.com',
       appId: 'production-app',
-      adminSecret: 'production-secret',
       env: 'prod',
+      credentialRetention: 'memory' as const,
     }
-    connections = [
-      connection,
-      {
-        id: 'connection-1',
-        name: 'Existing',
-        serverUrl: 'https://existing.example.com',
-        appId: 'existing-app',
-        adminSecret: 'existing-secret',
-        env: 'dev',
-      },
-    ]
+    findConnectionByCredentials.mockReturnValue({
+      id: 'connection-1',
+      name: 'Existing',
+      serverUrl: 'https://existing.example.com',
+      appId: 'existing-app',
+      adminSecret: 'existing-secret',
+      env: 'dev',
+      credentialRetention: 'memory',
+    })
     fetchSchemaCatalogue.mockResolvedValue(singleSchemaResponse)
-    const { result } = renderHook(() => useConnectionFormFlow({ connection, branch: 'release' }))
+    const { result } = renderHook(() =>
+      useConnectionFormFlow({ connection, adminSecret: 'production-secret', branch: 'release' }),
+    )
 
     act(() => {
       result.current.updateFieldValue('serverUrl', 'https://existing.example.com')

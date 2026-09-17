@@ -42,7 +42,7 @@ test.afterEach(() => {
   expect(browserErrors, 'unexpected browser errors').toEqual([])
 })
 
-test('connects through the form and restores the connection after reload', async ({ page }) => {
+test('restores an opted-in connection from the current tab session', async ({ page }) => {
   const runtimeMetadataRequests: string[] = []
   page.on('request', (request) => {
     if (request.method() !== 'GET') return
@@ -55,7 +55,7 @@ test('connects through the form and restores the connection after reload', async
     }
   })
 
-  await connectToFixture(page)
+  await connectToFixture(page, { rememberSecretForTab: true })
 
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
   expect(runtimeMetadataRequests).toHaveLength(2)
@@ -65,6 +65,34 @@ test('connects through the form and restores the connection after reload', async
   await expect(page.getByRole('combobox', { name: 'Switch connection' })).toContainText(
     connection.name,
   )
+  const storedCredentials = await page.evaluate(() => ({
+    local: window.localStorage.getItem('inspektor-connections'),
+    session: window.sessionStorage.getItem('inspektor-connection-credentials'),
+  }))
+  expect(storedCredentials.local).not.toContain(connection.adminSecret)
+  expect(storedCredentials.session).toContain(connection.adminSecret)
+})
+
+test('requires secret re-entry after refreshing a memory-only connection', async ({ page }) => {
+  await connectToFixture(page)
+
+  const storedCredentials = await page.evaluate(() => ({
+    local: window.localStorage.getItem('inspektor-connections'),
+    session: window.sessionStorage.getItem('inspektor-connection-credentials'),
+  }))
+  expect(storedCredentials.local).not.toContain(connection.adminSecret)
+  expect(storedCredentials.session).toBeNull()
+
+  await page.reload()
+
+  await expect(page).toHaveURL(/\/conn\/edit\/[^/]+/u)
+  await expect(page.getByRole('textbox', { name: 'Connection name' })).toHaveValue(connection.name)
+  await expect(page.getByRole('textbox', { name: 'Server URL' })).toHaveValue(connection.serverUrl)
+  await expect(page.getByRole('textbox', { name: 'App ID' })).toHaveValue(connection.appId)
+  await expect(page.getByLabel('Admin secret')).toHaveValue('')
+  await expect(
+    page.getByRole('checkbox', { name: /Store admin secret in sessionStorage/u }),
+  ).not.toBeChecked()
 })
 
 test('separates table selection controls from current-table treatment', async ({ page }) => {
@@ -532,6 +560,8 @@ test('does not read connection credentials from the URL', async ({ page }) => {
 
   await page.goto(`/conn/new?${query}#${fragment}`)
 
+  await expect(page).not.toHaveURL(/adminSecret/u)
+  await expect(page).not.toHaveURL(/query-secret|fragment-secret/u)
   await expect(page.getByRole('textbox', { name: 'Connection name' })).toHaveValue('')
   await expect(page.getByRole('textbox', { name: 'Server URL' })).toHaveValue(
     'https://v2.sync.jazz.tools/',
@@ -1223,9 +1253,15 @@ function fixtureConnection(): FixtureConnection {
   }
 }
 
-async function connectToFixture(page: Page): Promise<void> {
+async function connectToFixture(
+  page: Page,
+  options: { rememberSecretForTab?: boolean } = {},
+): Promise<void> {
   await page.goto('/conn/new')
   await fillConnectionForm(page)
+  if (options.rememberSecretForTab === true) {
+    await page.getByRole('checkbox', { name: /Store admin secret in sessionStorage/u }).click()
+  }
   await page.getByRole('button', { name: 'Save connection' }).click()
   await expect(page).toHaveURL(/\/conn\/[^/]+\/tables(?:\/[^/?]+)?/)
 }

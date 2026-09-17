@@ -21,6 +21,7 @@ interface ConnectionFormViewProps {
   edit?: {
     branch: string
     connection: StoredConnection
+    adminSecret: string
   }
   onClose: () => void
 }
@@ -42,6 +43,7 @@ export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): 
         onCancel={onClose}
         onSubmit={flow.submitConnectionForm}
         onFieldValueChange={flow.updateFieldValue}
+        onCredentialRetentionChange={flow.updateCredentialRetention}
       />
     </Box>
   )

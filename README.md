@@ -17,7 +17,7 @@ Inspektor follows the connection model used by the official [Jazz Inspector](htt
 
 ## Credential storage
 
-Connection profiles, including admin secrets, are stored in the browser's local storage. Credentials are used only with the configured Jazz server. Do not share browser profiles that contain saved connections.
+Connection profiles and workspace preferences are stored in the browser's local storage, but admin secrets are not. By default, an admin secret remains in memory and must be entered again after a refresh. Each connection can instead remember its secret in the current tab session. Credentials are used only with the configured Jazz server.
 
 ## Local development
 

@@ -10,7 +10,7 @@ interface EditConnectionViewProps {
 }
 
 export function EditConnectionView({ connectionId }: EditConnectionViewProps): React.ReactElement {
-  const { connections, getConnectionPreferences } = useInspectorSessionContext()
+  const { connections, getConnection, getConnectionPreferences } = useInspectorSessionContext()
   const navigate = useNavigate()
   const connection = connections.find((item) => item.id === connectionId)
 
@@ -29,6 +29,7 @@ export function EditConnectionView({ connectionId }: EditConnectionViewProps): R
       edit={{
         branch: getConnectionPreferences(connection.id).lastBranch,
         connection,
+        adminSecret: getConnection(connection.id)?.adminSecret ?? '',
       }}
       onClose={() => {
         void navigate({ to: appRoutes.connections })

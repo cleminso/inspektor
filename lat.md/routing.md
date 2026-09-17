@@ -117,7 +117,7 @@ Data and Schema items use distinct icons derived from their explicit item kind. 
 
 ## State ownership
 
-URL, local storage, and memory each own state with different sharing and restoration needs.
+URL, local storage, session storage, and memory each own state with different sharing and restoration needs.
 
 ### URL
 
@@ -132,9 +132,9 @@ The URL stores the active connection, resource, representation, and shareable re
 
 ### Local storage
 
-Local storage preserves connection credentials, workspace preferences, item state, layout, and table columns.
+Local storage preserves non-secret connection profiles, workspace preferences, item state, layout, and table columns.
 
-- saved connection profiles and credentials
+- saved connection profiles and credential-retention policy
 - last branch and schema hash per connection
 - open workspace items and recent items
 - item order and representation-specific saved state
@@ -144,17 +144,24 @@ Local storage preserves connection credentials, workspace preferences, item stat
 Workspace state remains scoped by connection, branch, and schema hash. Branch is not part of the visible content route. Schema
 can appear as the parent route's `?schema=` search parameter.
 
+### Session storage
+
+Session storage holds an admin secret only when its connection opts into tab-scoped retention. The credential is keyed by connection id and bound to the profile's server URL and app ID so changed metadata cannot reuse it.
+
+This option lets a connection reopen after refresh in the same browser tab session without making the secret durable across normal browser sessions. Browser-managed tab restoration and opener copying still follow the browser's `sessionStorage` behavior.
+
 ### Memory
 
-Memory holds transient selection, focus, highlights, drag state, and other non-restored interactions.
+Memory holds every active admin secret and other non-restored interactions. Memory is the default credential-retention policy.
 
+- admin secrets for connections using memory-only retention
 - transient row and cell selection
 - focus
 - live-update highlights
 - drag state
 - other interaction state that does not need restoration
 
-Do not add `sessionStorage` unless a specific state must survive navigation without surviving a browser restart.
+Credentials never belong in route state or local storage. A saved profile without an available memory or tab-session credential opens its edit form with profile metadata populated and the secret empty.
 
 ## Key decisions
 
@@ -174,13 +181,12 @@ These decisions keep route identity independent from workspace tabs and local la
 
 ## Browser-tab behavior
 
-Each browser tab mounts an independent React state tree. The connection store is shared through `localStorage`, but Inspektor
+Each browser tab mounts an independent React state tree. Non-secret connection profiles are shared through `localStorage`, but Inspektor does not automatically ingest another tab's writes while mounted.
 
-does not automatically ingest another tab's writes while mounted.
+Memory credentials remain isolated to the current application instance; opted-in credentials use that tab's `sessionStorage`.
 
 This allows two tabs using the same connection to keep independent grid presentation, filters, selection, and editor state.
-After reload, each tab resolves the connection from its route and branch and schema from the saved preferences for that
-connection.
+After reload, each tab resolves the profile from its route and branch and schema from saved preferences. It can reopen directly only when that connection opted into tab-session credential retention; otherwise it opens the edit form for secret re-entry.
 
 The model does not promise that two tabs using the same connection can permanently restore different branch or schema choices.
 That would require branch and schema route identity or a separate per-window workspace id.

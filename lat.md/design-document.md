@@ -222,9 +222,9 @@ runtime local and non-durable, so inspected data is not persisted by the Inspekt
 
 **Connections**:
 
-From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspektor
-introspect a remote server and fetch schema hashes, query subscriptions, and table data. Connections are stored in local
-storage under `inspektor-connections`
+From a user perspective, a connection is a saved profile plus an available admin credential. It lets the Inspektor introspect a remote server and fetch schema hashes, query subscriptions, and table data. Non-secret profiles are stored in local storage under `inspektor-connections`.
+
+Admin secrets stay in memory by default. A per-connection opt-in can also retain the secret in the current tab's session storage so the connection survives refresh without placing the credential in durable browser storage.
 
 An active Jazz client owns the WebSocket transport. The saved connection supplies the configuration used to create that client.
 
@@ -471,8 +471,11 @@ These user contexts explain the needs that shape the feature.
 
 #### How it works
 
-A saved connection is a local profile. It stores the admin credentials and runtime preferences that Inspektor needs to open a
-Jazz runtime. Saved connections are stored in local storage under `inspektor-connections`.
+A saved connection is a local, non-secret profile with runtime preferences and a credential-retention policy.
+
+Profiles are stored in local storage under `inspektor-connections`; admin secrets are held separately in memory or, by explicit per-connection opt-in, the current tab session.
+
+When a saved profile has no available credential, opening it shows the edit connection form with its metadata populated and its secret empty. Revalidation stores the entered credential under the selected retention policy before reopening the runtime.
 
 The saved profile does not contain an active transport. After route and schema resolution succeed,
 `InspectorProvider` creates a privileged diagnostic client and owns its transport for the mounted runtime.
@@ -521,9 +524,9 @@ If validation fails, render the validation error and keep the edit form open. If
 
 #### Saved connection availability
 
-Saved connections persist credentials and preferences in local storage. They do not persist the stored schema payload or the
+Saved connections persist non-secret profile metadata, credential-retention policy, and preferences in local storage.
 
-server's schema hash list.
+Admin secrets default to memory-only retention; opted-in connections retain them in session storage for the current tab session. Neither store persists the schema payload or server schema-hash list.
 
 Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspektor resolves schema hashes,
 fetches the selected stored schema, and creates the admin client.
@@ -581,10 +584,7 @@ This speculative preparation overlaps the credential-independent runtime downloa
 credential validation. Catalogue discovery remains the authority for form errors, persistence, and
 navigation. Invalid local input does not start preparation.
 
-Other accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection
-route also starts preparation after confirming that its saved connection exists and before
-schema-catalogue discovery. This covers saved actions, direct URLs, refreshes, and history navigation
-while avoiding work for unknown connection IDs.
+Other accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved profile has an available credential and before schema-catalogue discovery. This covers unlocked saved actions, direct URLs, refreshes, and history navigation while avoiding work for unknown or locked profiles.
 
 `jazzWasmPreparation.ts` owns one application-wide promise. Development uses Jazz's bundled WASM resolution. Production calls Jazz's public `loadWasmModule()` API with the exact alpha.55 artifact stored under a content-addressed `assets.inspektor.dev` URL. Repeated accepted actions and React remounts share the same attempt. A failed attempt is cleared so retry can fetch it again. `RuntimeAdminClient` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version and publishing remote asset failures through the existing runtime error boundary.
 
@@ -1812,13 +1812,13 @@ These constraints keep startup and deferred interactions out of the initial appl
 
 ## Attack surface
 
-Inspektor is a developer tool that stores admin credentials locally and can connect to arbitrary configured Jazz servers. Its
-
-main risks are credential exposure in browser storage or URLs and unintended transmission outside the configured server.
+Inspektor is a developer tool that handles admin credentials locally and can connect to arbitrary configured Jazz servers. Its main risks are credential exposure in browser storage or URLs and unintended transmission outside the configured server.
 
 - adminSecret is sensitive and must not be logged.
-- Connections are stored locally.
-- Connection routes do not accept credentials through URL parameters or fragments.
+- Non-secret connection profiles and retention policies are stored in local storage.
+- Admin secrets default to memory-only retention and may use session storage only through explicit per-connection opt-in.
+- Admin secrets are never persisted in local storage.
+- Incoming query and fragment credentials are removed before router creation, and route navigation never propagates them.
 - Inspektor should avoid sending credentials anywhere except the configured Jazz server.
 - Saved connections do not persist schema payloads.
 - Inspektor does not provide application authentication or hosting access control.

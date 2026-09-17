@@ -3,7 +3,6 @@ import { useRef, useState, type FormEventHandler } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
-import { findConnectionByCredentials } from '@app/connections/connectionIdentity'
 import {
   createConnectionFromDraft,
   DEFAULT_BRANCH_NAME,
@@ -33,12 +32,19 @@ interface UseConnectionFormFlowResult {
   formValues: ConnectionFormValues
   isSubmitting: boolean
   submitConnectionForm: FormEventHandler<HTMLFormElement>
-  updateFieldValue: (field: keyof ConnectionFormValues, value: string) => void
+  updateFieldValue: (
+    field: Exclude<keyof ConnectionFormValues, 'credentialRetention'>,
+    value: string,
+  ) => void
+  updateCredentialRetention: (
+    credentialRetention: ConnectionFormValues['credentialRetention'],
+  ) => void
 }
 
 interface UseConnectionFormFlowOptions {
   branch: string
   connection: StoredConnection
+  adminSecret: string
 }
 
 /**
@@ -50,7 +56,7 @@ interface UseConnectionFormFlowOptions {
 export function useConnectionFormFlow(
   options?: UseConnectionFormFlowOptions,
 ): UseConnectionFormFlowResult {
-  const { connections, saveConnectionWithContext, setConnectionContext } =
+  const { findConnectionByCredentials, saveConnectionWithContext, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
   const [formValues, setFormValues] = useState<ConnectionFormValues>(() =>
@@ -62,26 +68,37 @@ export function useConnectionFormFlow(
           adminSecret: '',
           env: 'dev',
           branch: DEFAULT_BRANCH_NAME,
+          credentialRetention: 'memory',
         }
       : {
           name: getConnectionDisplayName(options.connection),
           serverUrl: options.connection.serverUrl,
           appId: options.connection.appId,
-          adminSecret: options.connection.adminSecret,
+          adminSecret: options.adminSecret,
           env: options.connection.env,
           branch: options.branch,
+          credentialRetention: options.connection.credentialRetention,
         },
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<ConnectionError | null>(null)
   const isSubmittingRef = useRef(false)
 
-  const updateFieldValue = (field: keyof ConnectionFormValues, value: string) => {
+  const updateFieldValue = (
+    field: Exclude<keyof ConnectionFormValues, 'credentialRetention'>,
+    value: string,
+  ) => {
     setFormValues((currentValues) => ({
       ...currentValues,
       [field]: value,
     }))
     setError((currentError) => (currentError?.field === field ? null : currentError))
+  }
+
+  const updateCredentialRetention = (
+    credentialRetention: ConnectionFormValues['credentialRetention'],
+  ) => {
+    setFormValues((currentValues) => ({ ...currentValues, credentialRetention }))
   }
 
   const openResolvedConnection = async (
@@ -95,8 +112,9 @@ export function useConnectionFormFlow(
       appId: formValues.appId,
       adminSecret: formValues.adminSecret,
       env: normalizeEnvName(formValues.env),
+      credentialRetention: formValues.credentialRetention,
     }
-    const existingConnection = findConnectionByCredentials(connections, draft)
+    const existingConnection = findConnectionByCredentials(draft)
     const opensExistingConnection =
       existingConnection !== null && existingConnection.id !== options?.connection.id
     const connectionId = opensExistingConnection
@@ -171,5 +189,6 @@ export function useConnectionFormFlow(
     formValues,
     isSubmitting,
     updateFieldValue,
+    updateCredentialRetention,
   }
 }

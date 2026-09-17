@@ -9,8 +9,8 @@ const connection = {
   name: 'Production',
   serverUrl: 'https://sync.example.com',
   appId: 'app-1',
-  adminSecret: 'secret',
   env: 'prod',
+  credentialRetention: 'memory' as const,
 }
 let connections = [connection]
 
@@ -22,6 +22,7 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
     connections,
+    getConnection: () => ({ ...connection, adminSecret: 'secret' }),
     getConnectionPreferences: () => ({ lastBranch: 'release' }),
   }),
 }))
@@ -48,7 +49,7 @@ describe('EditConnectionView', () => {
     render(<EditConnectionView connectionId="connection-1" />)
 
     expect(screen.getByRole('status', { name: 'Edit options' }).textContent).toBe(
-      JSON.stringify({ branch: 'release', connection }),
+      JSON.stringify({ branch: 'release', connection, adminSecret: 'secret' }),
     )
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(navigate).toHaveBeenCalledWith({ to: '/conn' })
