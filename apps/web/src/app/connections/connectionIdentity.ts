@@ -4,10 +4,10 @@
  * Dev-tool links can be opened repeatedly, so matching is based on the Jazz admin
  * credentials rather than Inspektor labels or view preferences.
  */
-import type { ConnectionCredentials, StoredConnection } from './connections'
+import type { ConnectionCredentials, RuntimeConnection } from './connections'
 
 /** Compares server identity without treating a trailing slash as a different app. */
-function normalizeServerUrl(serverUrl: string): string {
+export function normalizeServerUrl(serverUrl: string): string {
   return serverUrl.trim().replace(/\/+$/u, '')
 }
 
@@ -35,8 +35,8 @@ export function matchesConnectionCredentials(
 
 /** Finds the saved Inspektor profile for the same Jazz admin credentials. */
 export function findConnectionByCredentials(
-  connections: StoredConnection[],
+  connections: RuntimeConnection[],
   draft: ConnectionCredentials,
-): StoredConnection | null {
+): RuntimeConnection | null {
   return connections.find((connection) => matchesConnectionCredentials(connection, draft)) ?? null
 }

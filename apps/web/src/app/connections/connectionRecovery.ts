@@ -1,9 +1,11 @@
+import { getCredentialSafeRelativeUrl } from '@app/routing/credentialSafeUrl'
+
 const AUTOMATIC_RECOVERY_STORAGE_KEY = 'inspektor-automatic-connection-recovery'
 let reloadRequested = false
 
 export function beginAutomaticConnectionRecovery(): boolean {
   try {
-    const location = window.location.href
+    const location = getCredentialSafeRelativeUrl(window.location)
     if (sessionStorage.getItem(AUTOMATIC_RECOVERY_STORAGE_KEY) === location) return false
 
     sessionStorage.setItem(AUTOMATIC_RECOVERY_STORAGE_KEY, location)

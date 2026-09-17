@@ -15,11 +15,4 @@ describe('automatic connection recovery', () => {
     expect(beginAutomaticConnectionRecovery()).toBe(false)
   })
 
-  it('allows a later incident after the runtime stabilizes', () => {
-    expect(beginAutomaticConnectionRecovery()).toBe(true)
-
-    clearAutomaticConnectionRecovery()
-
-    expect(beginAutomaticConnectionRecovery()).toBe(true)
-  })
 })

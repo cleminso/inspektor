@@ -1,33 +1,40 @@
 /**
  * Local persistence model for Inspektor connection profiles.
  *
- * From the Jazz side, each connection stores the credentials needed to create an admin
- * runtime against a Jazz app: server URL, app ID, admin secret, and env.
+ * Persistent profiles contain the non-secret values needed to identify a Jazz app.
  *
  * From the Inspektor side, the same store keeps UI session preferences separate from
- * credentials so branch/schema selection can change without rewriting connection data.
+ * profile data so branch/schema selection can change without rewriting connection data.
  */
 const CONNECTIONS_STORAGE_KEY = 'inspektor-connections'
 export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
 export const DEFAULT_BRANCH_NAME = 'main'
 const DEFAULT_CONNECTION_NAME = 'my Jazz app'
 
-/** Jazz admin credentials shared by validation, persistence, and runtime clients. */
+/** Jazz admin credentials shared by validation and runtime clients. */
 export interface ConnectionCredentials {
   serverUrl: string
   appId: string
   adminSecret: string
 }
 
+export type CredentialRetention = 'memory' | 'session'
+
 /** Connection values before the Inspektor assigns its local profile ID. */
 export interface ConnectionDraft extends ConnectionCredentials {
   name: string
   env: string
+  credentialRetention: CredentialRetention
 }
 
-/** Saved Jazz admin connection used to start the Inspektor runtime. */
-export interface StoredConnection extends ConnectionDraft {
+/** Saved non-secret Jazz connection profile. */
+export interface StoredConnection extends Omit<ConnectionDraft, 'adminSecret'> {
   id: string
+}
+
+/** Saved profile hydrated with the credential required by privileged Jazz requests. */
+export interface RuntimeConnection extends StoredConnection {
+  adminSecret: string
 }
 
 /** Inspektor view state stored separately from Jazz connection credentials. */
@@ -37,7 +44,7 @@ export interface ConnectionPreferences {
   rememberedBranches: string[]
 }
 
-/** Version 1 localStorage schema for Jazz credentials and Inspektor preferences. */
+/** Version 1 localStorage schema for non-secret profiles and Inspektor preferences. */
 export interface StoredConnectionsStore {
   version: 1
   activeConnectionId: string | null
@@ -73,19 +80,52 @@ export function readStoredConnections(): StoredConnectionsStore {
     }
 
     const parsed = JSON.parse(raw) as unknown
-    return parseStoredConnections(parsed) ?? createEmptyConnectionStore()
+    const store = parseStoredConnections(parsed)
+    if (store !== null) return store
+
+    localStorage.removeItem(CONNECTIONS_STORAGE_KEY)
+    return createEmptyConnectionStore()
   } catch {
+    try {
+      localStorage.removeItem(CONNECTIONS_STORAGE_KEY)
+    } catch {
+      // Storage can be unavailable. Reading still fails closed to an empty profile store.
+    }
     return createEmptyConnectionStore()
   }
 }
 
-/** Persists the complete Inspektor connection store. */
+/** Persists an explicitly projected profile store so runtime credentials cannot leak into it. */
 export function writeStoredConnections(store: StoredConnectionsStore): void {
   if (typeof localStorage === 'undefined') {
     return
   }
 
-  localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(store))
+  const persistedStore: StoredConnectionsStore = {
+    version: 1,
+    activeConnectionId: store.activeConnectionId,
+    connections: store.connections.map(
+      ({ id, name, serverUrl, appId, env, credentialRetention }) => ({
+        id,
+        name,
+        serverUrl,
+        appId,
+        env,
+        credentialRetention,
+      }),
+    ),
+    preferencesByConnectionId: Object.fromEntries(
+      Object.entries(store.preferencesByConnectionId).map(([connectionId, preferences]) => [
+        connectionId,
+        {
+          lastBranch: preferences.lastBranch,
+          lastSchemaHash: preferences.lastSchemaHash,
+          rememberedBranches: preferences.rememberedBranches,
+        },
+      ]),
+    ),
+  }
+  localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(persistedStore))
 }
 
 /** Resolves the active Inspektor profile, falling back when the saved ID is stale. */
@@ -224,8 +264,8 @@ export function createConnectionFromDraft(
     name: draft.name.trim() || DEFAULT_CONNECTION_NAME,
     serverUrl: draft.serverUrl.trim(),
     appId: draft.appId.trim(),
-    adminSecret: draft.adminSecret.trim(),
     env: normalizeEnvName(draft.env),
+    credentialRetention: draft.credentialRetention,
   }
 }
 
@@ -282,13 +322,17 @@ export function resolveDefaultSchemaHash(
 }
 
 function parseStoredConnections(parsed: unknown): StoredConnectionsStore | null {
-  if (isStoredConnectionsStore(parsed) === true) {
+  if (containsAdminSecret(parsed) === false && isStoredConnectionsStore(parsed) === true) {
     return {
       version: 1,
       activeConnectionId: parsed.activeConnectionId,
       connections: parsed.connections.map((connection) => ({
-        ...connection,
+        id: connection.id,
+        name: connection.name,
+        serverUrl: connection.serverUrl,
+        appId: connection.appId,
         env: normalizeEnvName(connection.env),
+        credentialRetention: connection.credentialRetention,
       })),
       preferencesByConnectionId: Object.fromEntries(
         Object.entries(parsed.preferencesByConnectionId).map(([connectionId, preferences]) => [
@@ -304,6 +348,17 @@ function parseStoredConnections(parsed: unknown): StoredConnectionsStore | null 
   }
 
   return null
+}
+
+function containsAdminSecret(value: unknown): boolean {
+  if (Array.isArray(value) === true) {
+    return value.some(containsAdminSecret)
+  }
+  if (typeof value !== 'object' || value === null) return false
+
+  return Object.entries(value).some(
+    ([key, child]) => key.toLowerCase() === 'adminsecret' || containsAdminSecret(child),
+  )
 }
 
 function isStoredConnectionsStore(value: unknown): value is StoredConnectionsStore {
@@ -334,9 +389,14 @@ function isStoredConnection(value: unknown): value is StoredConnection {
     typeof candidate.name === 'string' &&
     typeof candidate.serverUrl === 'string' &&
     typeof candidate.appId === 'string' &&
-    typeof candidate.adminSecret === 'string' &&
-    typeof candidate.env === 'string'
+    typeof candidate.env === 'string' &&
+    isCredentialRetention(candidate.credentialRetention) === true &&
+    'adminSecret' in candidate === false
   )
+}
+
+function isCredentialRetention(value: unknown): value is CredentialRetention {
+  return value === 'memory' || value === 'session'
 }
 
 function isConnectionPreferences(value: unknown): value is ConnectionPreferences {

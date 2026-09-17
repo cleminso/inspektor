@@ -9,6 +9,8 @@ import {
   removeConnection,
   setActiveConnectionContext,
   upsertConnection,
+  writeStoredConnections,
+  type RuntimeConnection,
 } from '@app/connections/connections'
 
 afterEach(() => {
@@ -24,6 +26,7 @@ describe('createConnectionFromDraft', () => {
         appId: 'app-1',
         adminSecret: 'secret',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-1',
     )
@@ -40,6 +43,7 @@ describe('createConnectionFromDraft', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         'connection-1',
       )
@@ -55,26 +59,29 @@ describe('createConnectionFromDraft', () => {
         name: '',
         serverUrl: 'https://sync.example.com',
         appId: 'app-1',
-        adminSecret: 'secret',
         env: 'dev',
+        credentialRetention: 'memory',
       }),
     ).toBe('my Jazz app')
   })
 
-  it('discards unsupported connection store versions', () => {
+  it('discards unsupported connection store versions and removes their payload', () => {
     const storedValue = JSON.stringify({
       version: 2,
       activeConnectionId: 'connection-1',
       connections: [],
     })
+    const removeItem = vi.fn()
     vi.stubGlobal('localStorage', {
       getItem: (key: string) => (key === 'inspektor-connections' ? storedValue : null),
+      removeItem,
     })
 
     expect(readStoredConnections()).toEqual(createEmptyConnectionStore())
+    expect(removeItem).toHaveBeenCalledWith('inspektor-connections')
   })
 
-  it('restores a valid version 1 connection store', () => {
+  it('restores a valid secret-free connection store', () => {
     const store = {
       version: 1 as const,
       activeConnectionId: 'connection-1',
@@ -86,6 +93,7 @@ describe('createConnectionFromDraft', () => {
             appId: 'app-1',
             adminSecret: 'secret',
             env: 'dev',
+            credentialRetention: 'session',
           },
           'connection-1',
         ),
@@ -103,6 +111,7 @@ describe('createConnectionFromDraft', () => {
     })
 
     expect(readStoredConnections()).toEqual(store)
+    expect(JSON.stringify(readStoredConnections())).not.toContain('secret')
   })
 
   it.each([
@@ -123,6 +132,22 @@ describe('createConnectionFromDraft', () => {
           },
         ],
         preferencesByConnectionId: {},
+      }),
+    ],
+    [
+      'credential hidden in otherwise valid preferences',
+      JSON.stringify({
+        version: 1,
+        activeConnectionId: null,
+        connections: [],
+        preferencesByConnectionId: {
+          'connection-1': {
+            lastBranch: 'main',
+            lastSchemaHash: null,
+            rememberedBranches: ['main'],
+            adminSecret: 'credential-marker',
+          },
+        },
       }),
     ],
     [
@@ -150,6 +175,38 @@ describe('createConnectionFromDraft', () => {
   })
 })
 
+describe('writeStoredConnections', () => {
+  it('projects profiles explicitly so an attached runtime secret cannot reach local storage', () => {
+    const setItem = vi.fn()
+    vi.stubGlobal('localStorage', { setItem })
+    const runtimeConnection: RuntimeConnection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://sync.example.com',
+      appId: 'app-1',
+      adminSecret: 'credential-marker',
+      env: 'dev',
+      credentialRetention: 'memory',
+    }
+    const preferencesWithSecret = {
+      lastBranch: 'main',
+      lastSchemaHash: null,
+      rememberedBranches: ['main'],
+      adminSecret: 'preference-credential-marker',
+    }
+
+    writeStoredConnections({
+      ...createEmptyConnectionStore(),
+      connections: [runtimeConnection],
+      preferencesByConnectionId: { 'connection-1': preferencesWithSecret },
+    })
+
+    expect(setItem).toHaveBeenCalledOnce()
+    expect(setItem.mock.calls[0]?.[1]).not.toContain('credential-marker')
+    expect(setItem.mock.calls[0]?.[1]).not.toContain('preference-credential-marker')
+  })
+})
+
 describe('setActiveConnectionContext', () => {
   it('selects the connection and remembers its runtime context atomically', () => {
     const connection = createConnectionFromDraft(
@@ -159,6 +216,7 @@ describe('setActiveConnectionContext', () => {
         appId: 'app-1',
         adminSecret: 'secret',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-1',
     )
@@ -184,6 +242,7 @@ describe('removeConnection', () => {
         appId: 'app-1',
         adminSecret: 'secret',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-1',
     )
@@ -209,6 +268,7 @@ describe('removeConnection', () => {
         appId: 'app-1',
         adminSecret: 'secret-1',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-1',
     )
@@ -219,6 +279,7 @@ describe('removeConnection', () => {
         appId: 'app-2',
         adminSecret: 'secret-2',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-2',
     )
