@@ -9,7 +9,7 @@ import {
 } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
 
-import type { StoredConnection } from '@app/connections/connections'
+import type { RuntimeConnection } from '@app/connections/connections'
 import type { SchemaCatalogueRecord } from '@app/routing/inspectorNavigation'
 import {
   normalizeRuntimeError,
@@ -48,7 +48,7 @@ interface RuntimeMetadataRequests {
 }
 
 interface UseInspectorRuntimeOptions {
-  connection: StoredConnection | null
+  connection: RuntimeConnection | null
   branch: string | null
   schemaHash: string | null
   initialSchemaCatalogue?: readonly SchemaCatalogueRecord[]

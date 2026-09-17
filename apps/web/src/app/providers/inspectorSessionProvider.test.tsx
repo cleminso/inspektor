@@ -59,6 +59,7 @@ const connections = {
     appId: 'app-1',
     adminSecret: 'secret-1',
     env: 'dev',
+    credentialRetention: 'memory',
   },
   'connection-2': {
     id: 'connection-2',
@@ -67,6 +68,7 @@ const connections = {
     appId: 'app-2',
     adminSecret: 'secret-2',
     env: 'dev',
+    credentialRetention: 'memory',
   },
 } as const
 const session = {

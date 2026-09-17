@@ -6,8 +6,13 @@ import {
   createEmptyConnectionStore,
   upsertConnection,
   writeStoredConnections,
+  type ConnectionDraft,
 } from '@app/connections/connections'
 import { useStoredConnections } from '@app/session/useInspectorSession'
+import {
+  clearConnectionCredential,
+  saveConnectionCredential,
+} from '@app/connections/connectionCredentials'
 
 let entries: Map<string, string>
 let writeError: Error | null
@@ -21,15 +26,18 @@ function renderStoredSession(adminSecret = 'secret') {
       appId: 'app-1',
       adminSecret,
       env: 'dev',
+      credentialRetention: 'memory',
     },
     'connection-1',
   )
+  saveConnectionCredential(connection, adminSecret)
   writeStoredConnections(upsertConnection(createEmptyConnectionStore(), connection))
   window.localStorage.setItem(tabsKey, '{}')
   return { connection, ...renderHook(() => useStoredConnections()) }
 }
 
 beforeEach(() => {
+  clearConnectionCredential('connection-1')
   entries = new Map<string, string>()
   writeError = null
   Object.defineProperty(window, 'localStorage', {
@@ -61,6 +69,7 @@ describe('useStoredConnections', () => {
         appId: 'app-1',
         adminSecret: 'secret',
         env: 'dev',
+        credentialRetention: 'memory',
       },
       'connection-1',
     )
@@ -92,12 +101,13 @@ describe('useStoredConnections', () => {
 
   it('does not save a profile or its context when their persistence fails', () => {
     const { result } = renderHook(() => useStoredConnections())
-    const draft = {
+    const draft: ConnectionDraft = {
       name: 'First',
       serverUrl: 'https://sync.example.com',
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     }
     writeError = new Error('Storage unavailable')
 
@@ -133,7 +143,7 @@ describe('useStoredConnections', () => {
 
     act(() => {
       result.current.saveConnectionWithContext(
-        { ...connection, [field]: value },
+        { ...connection, adminSecret: 'secret', [field]: value },
         connection.id,
         'main',
         'schema-1',

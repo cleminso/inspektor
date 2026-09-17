@@ -7,7 +7,7 @@ import {
   useRuntimeRetry,
   useRuntimeSchema,
 } from '@app/providers/inspectorProvider'
-import type { StoredConnection } from '@app/connections/connections'
+import type { RuntimeConnection } from '@app/connections/connections'
 import {
   beginAutomaticConnectionRecovery,
   clearAutomaticConnectionRecovery,
@@ -41,7 +41,7 @@ runtimeHolder.current = runtime
 
 const session = {
   connections: [],
-  activeConnection: null as StoredConnection | null,
+  activeConnection: null as RuntimeConnection | null,
   currentConnectionId: 'connection-1',
   currentBranch: 'main',
   currentSchemaHash: 'schema-1',
@@ -75,7 +75,7 @@ vi.mock('jazz-tools/_dev/inspector-client', () => ({
   createInspectorAdminClient: adminClientMocks.create,
 }))
 
-function connection(overrides: Partial<StoredConnection> = {}): StoredConnection {
+function connection(overrides: Partial<RuntimeConnection> = {}): RuntimeConnection {
   return {
     id: 'connection-1',
     name: 'Local app',
@@ -83,6 +83,7 @@ function connection(overrides: Partial<StoredConnection> = {}): StoredConnection
     appId: 'app-1',
     adminSecret: 'secret',
     env: 'dev',
+    credentialRetention: 'memory',
     ...overrides,
   }
 }

@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Tooltip } from '@inspektor/ds'
 
-import type { StoredConnection } from '@app/connections/connections'
+import type { RuntimeConnection } from '@app/connections/connections'
 
 import {
   projectQuerySubscriptionsTimeline,
@@ -14,7 +14,7 @@ import type { QuerySubscriptionsTelemetry } from './useQuerySubscriptionsTelemet
 import { LiveQueriesView } from './view'
 
 const mocks = vi.hoisted(() => ({
-  connection: null as StoredConnection | null,
+  connection: null as RuntimeConnection | null,
   currentSchemaHash: null as string | null,
   panelResize: null as (() => void) | null,
   telemetry: null as QuerySubscriptionsTelemetry | null,
@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => ({
 const useQuerySubscriptionsTelemetry = vi.hoisted(() => vi.fn())
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  getConnectionIdentityToken: (connection: StoredConnection) => JSON.stringify(connection),
+  getConnectionIdentityToken: (connection: RuntimeConnection) => JSON.stringify(connection),
   useInspectorSessionState: () => ({
     activeConnection: mocks.connection,
     currentSchemaHash: mocks.currentSchemaHash,
@@ -118,6 +118,7 @@ beforeEach(() => {
     serverUrl: 'https://example.com',
     appId: 'app-1',
     adminSecret: 'secret-1',
+    credentialRetention: 'memory',
   }
   mocks.telemetry = telemetry([])
   mocks.currentSchemaHash = null

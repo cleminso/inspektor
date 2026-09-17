@@ -18,7 +18,7 @@ import {
   type JsonViewValue,
 } from '@inspektor/ds'
 
-import type { StoredConnection } from '@app/connections/connections'
+import type { RuntimeConnection } from '@app/connections/connections'
 import {
   getConnectionIdentityToken,
   useInspectorSessionState,
@@ -700,7 +700,7 @@ function ConnectedLiveQueriesView({
   connection,
   selectedSchemaHash,
 }: {
-  connection: StoredConnection
+  connection: RuntimeConnection
   selectedSchemaHash: string | null
 }) {
   const telemetry = useQuerySubscriptionsTelemetry(connection)

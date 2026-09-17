@@ -45,6 +45,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
 
     const { result } = renderHook(
@@ -70,6 +71,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     const { result, rerender } = renderHook(
       ({ catalogue }: { catalogue: readonly { hash: string; publishedAt: number | null }[] }) =>
@@ -110,6 +112,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     const { result } = renderHook(() =>
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
@@ -138,6 +141,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
 
     const { result, rerender } = renderHook(
@@ -179,6 +183,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
@@ -214,6 +219,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     const { result, rerender } = renderHook(
       ({ schemaHash }: { schemaHash: string }) =>
@@ -248,6 +254,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     const { result, rerender } = renderHook(
       ({ schemaHash }: { schemaHash: string }) =>
@@ -273,6 +280,7 @@ describe('useInspectorRuntime', () => {
       appId: 'app-1',
       adminSecret: 'secret',
       env: 'dev',
+      credentialRetention: 'memory',
     } as const
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
@@ -304,6 +312,7 @@ describe('useInspectorRuntime', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         branch: 'main',
         schemaHash: 'schema-1',
@@ -334,6 +343,7 @@ describe('useInspectorRuntime', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         branch: 'main',
         schemaHash: 'schema-1',
@@ -358,6 +368,7 @@ describe('useInspectorRuntime', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         branch: 'main',
         schemaHash: 'schema-1',
@@ -383,6 +394,7 @@ describe('useInspectorRuntime', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         branch: 'main',
         schemaHash: 'schema-1',
@@ -409,6 +421,7 @@ describe('useInspectorRuntime', () => {
           appId: 'app-1',
           adminSecret: 'secret',
           env: 'dev',
+          credentialRetention: 'memory',
         },
         branch: 'main',
         schemaHash: 'schema-1',

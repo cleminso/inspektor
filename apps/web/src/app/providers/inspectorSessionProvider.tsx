@@ -12,6 +12,7 @@ import { useBlocker, useNavigate, useParams, useRouterState } from '@tanstack/re
 import {
   getConnectionDisplayName,
   type ConnectionDraft,
+  type RuntimeConnection,
   type StoredConnection,
 } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
@@ -34,7 +35,7 @@ import {
  */
 export interface InspectorSessionContextValue {
   connections: StoredConnection[]
-  activeConnection: StoredConnection | null
+  activeConnection: RuntimeConnection | null
   currentConnectionId: string | null
   currentBranch: string | null
   currentSchemaHash: string | null
@@ -55,6 +56,10 @@ export interface InspectorSessionContextValue {
     schemaHash: string,
   ) => ConnectionOpenResult
   deleteConnection: ReturnType<typeof useStoredConnections>['deleteConnection']
+  getConnection: ReturnType<typeof useStoredConnections>['getConnection']
+  findConnectionByCredentials: ReturnType<
+    typeof useStoredConnections
+  >['findConnectionByCredentials']
   getConnectionPreferences: ReturnType<typeof useStoredConnections>['getConnectionPreferences']
   setConnectionContext: (
     connectionId: string,
@@ -103,8 +108,13 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const routeConnectionId = routeParams.connectionId ?? null
   const currentConnectionId = routeConnectionId ?? session.activeConnectionId
   const currentTableName = routeParams.tableName ?? null
-  const activeConnection =
-    routeConnectionId !== null ? session.getConnection(routeConnectionId) : session.activeConnection
+  const activeConnection = useMemo(
+    () =>
+      routeConnectionId !== null
+        ? session.getConnection(routeConnectionId)
+        : session.activeConnection,
+    [routeConnectionId, session],
+  )
   const activeConnectionIdRef = useRef(activeConnection?.id ?? null)
   const branchRequestRef = useRef(0)
   const connectionPreferences =
@@ -140,6 +150,14 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         return 'blocked'
       }
 
+      if (session.getConnection(connectionId) === null) {
+        void navigate({
+          to: appRoutes.editConnection,
+          params: { connectionId },
+        })
+        return 'accepted'
+      }
+
       void prepareJazzWasm()
       void navigate({
         to: appRoutes.tables,
@@ -148,7 +166,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       })
       return 'accepted'
     },
-    [currentConnectionId, navigate, runtimeScopeExitGuard],
+    [currentConnectionId, navigate, runtimeScopeExitGuard, session],
   )
 
   const switchBranch = useCallback(
@@ -259,6 +277,8 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       switchSchema,
       saveConnectionWithContext,
       deleteConnection: session.deleteConnection,
+      getConnection: session.getConnection,
+      findConnectionByCredentials: session.findConnectionByCredentials,
       getConnectionPreferences: session.getConnectionPreferences,
       setConnectionContext,
     }),

@@ -13,9 +13,16 @@ import {
   upsertConnection,
   writeStoredConnections,
   type ConnectionDraft,
+  type RuntimeConnection,
   type StoredConnection,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
+import {
+  clearConnectionCredential,
+  resolveRuntimeConnection,
+  saveConnectionCredential,
+} from '@app/connections/connectionCredentials'
+import { findConnectionByCredentials as findRuntimeConnectionByCredentials } from '@app/connections/connectionIdentity'
 import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
 
 /**
@@ -27,9 +34,10 @@ import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStor
  */
 export interface UseStoredConnectionsResult {
   connections: StoredConnection[]
-  activeConnection: StoredConnection | null
+  activeConnection: RuntimeConnection | null
   activeConnectionId: string | null
-  getConnection: (connectionId: string | null | undefined) => StoredConnection | null
+  getConnection: (connectionId: string | null | undefined) => RuntimeConnection | null
+  findConnectionByCredentials: (draft: ConnectionDraft) => RuntimeConnection | null
   getConnectionPreferences: (
     connectionId: string,
   ) => ReturnType<typeof getStoredConnectionPreferences>
@@ -44,7 +52,7 @@ export interface UseStoredConnectionsResult {
     connectionId: string,
     branch: string,
     schemaHash: string,
-  ) => StoredConnection
+  ) => RuntimeConnection
   deleteConnection: (connectionId: string) => void
   setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void
 }
@@ -74,12 +82,27 @@ export function useStoredConnections(): UseStoredConnectionsResult {
   )
 
   const getConnection = useCallback(
-    (connectionId: string | null | undefined) => getConnectionById(store, connectionId),
+    (connectionId: string | null | undefined) =>
+      resolveRuntimeConnection(getConnectionById(store, connectionId)),
     [store],
+  )
+
+  const findConnectionByCredentials = useCallback(
+    (draft: ConnectionDraft) =>
+      findRuntimeConnectionByCredentials(
+        store.connections
+          .map((connection) => resolveRuntimeConnection(connection))
+          .filter((connection): connection is RuntimeConnection => connection !== null),
+        draft,
+      ),
+    [store.connections],
   )
 
   const deleteConnection = useCallback(
     (connectionId: string) => {
+      // Remove secrets first so a blocked browser storage operation cannot leave
+      // a persisted credential behind after the profile has been deleted.
+      clearConnectionCredential(connectionId)
       updateStore((store) => removeConnection(store, connectionId))
       removeConnectionScopedStorage(connectionId)
     },
@@ -89,22 +112,32 @@ export function useStoredConnections(): UseStoredConnectionsResult {
   const saveConnectionWithContext = useCallback(
     (draft: ConnectionDraft, connectionId: string, branch: string, schemaHash: string) => {
       const existingConnection = getConnectionById(storeRef.current, connectionId)
-      const connection = createConnectionFromDraft(draft, connectionId)
-      updateStore((store) =>
-        setActiveConnectionContext(
-          upsertConnection(store, connection),
-          connectionId,
-          branch,
-          schemaHash,
-        ),
-      )
+      const existingRuntimeConnection = resolveRuntimeConnection(existingConnection)
+      const profile = createConnectionFromDraft(draft, connectionId)
+      const connection = saveConnectionCredential(profile, draft.adminSecret)
+      try {
+        updateStore((store) =>
+          setActiveConnectionContext(
+            upsertConnection(store, profile),
+            connectionId,
+            branch,
+            schemaHash,
+          ),
+        )
+      } catch (error) {
+        clearConnectionCredential(connectionId)
+        if (existingConnection !== null && existingRuntimeConnection !== null) {
+          saveConnectionCredential(existingConnection, existingRuntimeConnection.adminSecret)
+        }
+        throw error
+      }
       if (
         existingConnection !== null &&
-        (existingConnection.appId !== connection.appId ||
-          existingConnection.env !== connection.env ||
-          existingConnection.serverUrl !== connection.serverUrl)
+        (existingConnection.appId !== profile.appId ||
+          existingConnection.env !== profile.env ||
+          existingConnection.serverUrl !== profile.serverUrl)
       ) {
-        removeConnectionScopedStorage(connection.id)
+        removeConnectionScopedStorage(profile.id)
       }
       return connection
     },
@@ -122,9 +155,10 @@ export function useStoredConnections(): UseStoredConnectionsResult {
   return useMemo(
     () => ({
       connections: store.connections,
-      activeConnection: getActiveConnection(store),
+      activeConnection: resolveRuntimeConnection(getActiveConnection(store)),
       activeConnectionId: store.activeConnectionId,
       getConnection,
+      findConnectionByCredentials,
       getConnectionPreferences: (connectionId: string) =>
         getStoredConnectionPreferences(store, connectionId),
       getRememberedBranches: (connectionId: string) =>
@@ -139,6 +173,13 @@ export function useStoredConnections(): UseStoredConnectionsResult {
       deleteConnection,
       setConnectionContext,
     }),
-    [deleteConnection, getConnection, saveConnectionWithContext, setConnectionContext, store],
+    [
+      deleteConnection,
+      findConnectionByCredentials,
+      getConnection,
+      saveConnectionWithContext,
+      setConnectionContext,
+      store,
+    ],
   )
 }

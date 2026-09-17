@@ -19,7 +19,7 @@ import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/us
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
-import type { StoredConnection } from '@app/connections/connections'
+import type { RuntimeConnection } from '@app/connections/connections'
 import { clearAutomaticConnectionRecovery } from '@app/connections/connectionRecovery'
 import {
   useInspectorSessionContext,
@@ -66,7 +66,7 @@ function RuntimeAdminClient({
   connection,
   runtime,
 }: {
-  connection: StoredConnection
+  connection: RuntimeConnection
   runtime: InspectorRuntimeStore
 }) {
   const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading)

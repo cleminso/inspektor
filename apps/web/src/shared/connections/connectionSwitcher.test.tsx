@@ -51,8 +51,8 @@ function createConnection(id: string, name: string): StoredConnection {
     name,
     serverUrl: 'https://self-hosted.example.com',
     appId: `${id}-app`,
-    adminSecret: `${id}-secret`,
     env: 'dev',
+    credentialRetention: 'memory',
   }
 }
 
