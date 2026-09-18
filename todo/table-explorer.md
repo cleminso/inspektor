@@ -1093,7 +1093,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Define the expanded side-pane representation for every supported schema type.
 - [ ] Add an application-owned read-presentation adapter shared by compact cells and complete-row details without coupling mutation
       controls to compact rendering.
-- [x] Map Jazz schema metadata to constrained, Jazz-independent design-system value components in `apps/web`.
+- [x] Map Jazz schema metadata to constrained, Jazz-independent design-system value components in `apps/studio`.
 - [x] Create dedicated design-system components for binary preview and inspection, timestamp presentation, structured-value
       preview, and relation presentation and field actions.
 - [x] Add schema-derived browser-local date-time editing for valid timestamp fields while preserving malformed raw text.
@@ -1168,7 +1168,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Expand top-level row fields initially and keep deeper objects and arrays collapsible.
 - [x] Add keyboard tree navigation, selectable text, search highlighting, and whole-row Copy JSON.
 - [x] Add depth, node-count, string-length, and child-count budgets with explicit continuation and unsupported-value nodes.
-- [x] Keep search controls, copy serialization, editing, validation, permissions, and mutation behavior in `apps/web`.
+- [x] Keep search controls, copy serialization, editing, validation, permissions, and mutation behavior in `apps/studio`.
 - [x] Defer whole-row normalization and copy serialization until the `JSON` representation is mounted.
 - [x] Keep read-only structured field normalization stable across unrelated form edits.
 - [x] Avoid native label associations when the read-only structured field is represented by an independently labelled tree.

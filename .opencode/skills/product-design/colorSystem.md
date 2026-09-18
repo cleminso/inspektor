@@ -24,8 +24,8 @@ Shipped code is evidence, not automatic precedent. Confirm that an existing toke
 
 - `packages/design-system/src/tokens/value.stylex.ts` owns palette values.
 - `packages/design-system/src/tokens/semantics.stylex.ts` owns interface semantic roles.
-- `packages/design-system/src/components/{componentName}/*Colors.stylex.ts` owns private component color roles.
-- `apps/design-system/src/components/content/foundations/color.tsx` documents the rendered system.
+- `packages/design-system/src/studio/{componentName}/*Colors.stylex.ts` owns private component color roles.
+- `apps/design-system/src/studio/content/foundations/color.tsx` documents the rendered system.
 - `todo/colorTokens.md` tracks implementation work and unresolved decisions.
 
 Do not duplicate source values in this reference. This file owns the decision model and vocabulary; code owns the active values.

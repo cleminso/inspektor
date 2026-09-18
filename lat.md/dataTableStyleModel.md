@@ -315,7 +315,7 @@ Visual state attributes do not replace semantic state. Row selection remains exp
 
 ## TanStack Table boundary
 
-TanStack Table owns the logical table models and interaction state. [[packages/design-system/src/components/dataGrid/dataGrid.tsx#DataGrid]] owns their reusable presentation.
+TanStack Table owns the logical table models and interaction state. [[packages/design-system/src/studio/dataGrid/dataGrid.tsx#DataGrid]] owns their reusable presentation.
 
 TanStack Table owns:
 
@@ -423,11 +423,11 @@ Visual regression coverage should include border corners and intersections. Beha
 
 These source files and TanStack guides define the implementation and upstream behavior referenced by this model.
 
-- [[packages/design-system/src/components/dataGrid/dataGrid.tsx#DataGrid]]
-- `packages/design-system/src/components/dataGrid/dataGrid.styles.ts`
-- `packages/design-system/src/components/dataGrid/dataGridReorder.tsx`
+- [[packages/design-system/src/studio/dataGrid/dataGrid.tsx#DataGrid]]
+- `packages/design-system/src/studio/dataGrid/dataGrid.styles.ts`
+- `packages/design-system/src/studio/dataGrid/dataGridReorder.tsx`
 - `packages/design-system/src/tokens/semantics.stylex.ts`
-- [[apps/web/src/features/tables/grid/useTableGrid.ts#useTableGrid]]
+- [[apps/studio/src/features/tables/grid/useTableGrid.ts#useTableGrid]]
 - [TanStack Table data guide](https://tanstack.com/table/latest/docs/guide/data)
 - [TanStack Table column sizing guide](https://tanstack.com/table/latest/docs/guide/column-sizing)
 - [TanStack Table column sizing API](https://tanstack.com/table/latest/docs/api/features/column-sizing)

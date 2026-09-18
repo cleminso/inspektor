@@ -1,5 +1,5 @@
 // Components
-export { AlertDialog } from './components/alertDialog/alertDialog'
+export { AlertDialog } from './studio/alertDialog/alertDialog'
 export type {
   AlertDialogActionsProps,
   AlertDialogCloseProps,
@@ -7,8 +7,8 @@ export type {
   AlertDialogDescriptionProps,
   AlertDialogRootProps,
   AlertDialogTitleProps,
-} from './components/alertDialog/alertDialog'
-export { Accordion } from './components/accordion/accordion'
+} from './studio/alertDialog/alertDialog'
+export { Accordion } from './studio/accordion/accordion'
 export type {
   AccordionHeaderProps,
   AccordionHeadingLevel,
@@ -18,16 +18,16 @@ export type {
   AccordionRootProps,
   AccordionTriggerProps,
   AccordionValue,
-} from './components/accordion/accordion'
-export { Tree } from './components/tree/tree'
+} from './studio/accordion/accordion'
+export { Tree } from './studio/tree/tree'
 export type {
   TreeContentProps,
   TreeItemProps,
   TreeRootProps,
   TreeSectionProps,
   TreeTriggerProps,
-} from './components/tree/tree'
-export { FloatingPanel } from './components/floatingPanel/floatingPanel'
+} from './studio/tree/tree'
+export { FloatingPanel } from './studio/floatingPanel/floatingPanel'
 export type {
   FloatingPanelActionsProps,
   FloatingPanelContentSize,
@@ -35,20 +35,20 @@ export type {
   FloatingPanelDetailsProps,
   FloatingPanelRootProps,
   FloatingPanelSummaryProps,
-} from './components/floatingPanel/floatingPanel'
-export { ScrollArea } from './components/scrollArea/scrollArea'
-export type { ScrollAreaAxis, ScrollAreaProps } from './components/scrollArea/scrollArea'
-export { ActionList } from './components/actionList/actionList'
+} from './studio/floatingPanel/floatingPanel'
+export { ScrollArea } from './studio/scrollArea/scrollArea'
+export type { ScrollAreaAxis, ScrollAreaProps } from './studio/scrollArea/scrollArea'
+export { ActionList } from './studio/actionList/actionList'
 export type {
   ActionListActionProps,
   ActionListItemProps,
   ActionListRootProps,
   ActionListSelectionControlProps,
   ActionListTriggerProps,
-} from './components/actionList/actionList'
-export { DataGrid } from './components/dataGrid/dataGrid'
-export { dataGridFeatures } from './components/dataGrid/dataGridFeatures'
-export type { DataGridFeatures, DataGridTable } from './components/dataGrid/dataGridFeatures'
+} from './studio/actionList/actionList'
+export { DataGrid } from './studio/dataGrid/dataGrid'
+export { dataGridFeatures } from './studio/dataGrid/dataGridFeatures'
+export type { DataGridFeatures, DataGridTable } from './studio/dataGrid/dataGridFeatures'
 export type {
   DataGridBodyProps,
   DataGridCellContextMenuHandler,
@@ -74,8 +74,8 @@ export type {
   DataGridRowProps,
   DataGridTableProps,
   DataGridViewportProps,
-} from './components/dataGrid/dataGrid'
-export { SwimlaneTimeline } from './components/swimlaneTimeline/swimlaneTimeline'
+} from './studio/dataGrid/dataGrid'
+export { SwimlaneTimeline } from './studio/swimlaneTimeline/swimlaneTimeline'
 export type {
   SwimlaneTimelineCellProps,
   SwimlaneTimelineCellStatus,
@@ -84,27 +84,27 @@ export type {
   SwimlaneTimelineLaneTriggerProps,
   SwimlaneTimelineRootProps,
   SwimlaneTimelineTrackProps,
-} from './components/swimlaneTimeline/swimlaneTimeline'
-export { Box } from './components/box/box'
-export type { BoxProps } from './components/box/box'
-export { Badge } from './components/badge/badge'
-export type { BadgeProps, BadgeSize } from './components/badge/badge'
-export { Checkbox } from './components/checkbox/checkbox'
+} from './studio/swimlaneTimeline/swimlaneTimeline'
+export { Box } from './studio/box/box'
+export type { BoxProps } from './studio/box/box'
+export { Badge } from './studio/badge/badge'
+export type { BadgeProps, BadgeSize } from './studio/badge/badge'
+export { Checkbox } from './studio/checkbox/checkbox'
 export type {
   CheckboxLabelLayout,
   CheckboxLabelProps,
   CheckboxProps,
   CheckboxSize,
-} from './components/checkbox/checkbox'
-export { CheckboxGroup } from './components/checkboxGroup/checkboxGroup'
+} from './studio/checkbox/checkbox'
+export { CheckboxGroup } from './studio/checkboxGroup/checkboxGroup'
 export type {
   CheckboxGroupItem,
   CheckboxGroupListProps,
   CheckboxGroupRendering,
   CheckboxGroupRootProps,
   CheckboxGroupValueChangeReason,
-} from './components/checkboxGroup/checkboxGroup'
-export { Combobox } from './components/combobox/combobox'
+} from './studio/checkboxGroup/checkboxGroup'
+export { Combobox } from './studio/combobox/combobox'
 export type {
   ComboboxGroupLabelProps,
   ComboboxGroupProps,
@@ -135,8 +135,8 @@ export type {
   ComboboxValueProps,
   ComboboxViewportHeight,
   ComboboxViewportProps,
-} from './components/combobox/combobox'
-export { Command } from './components/command/command'
+} from './studio/combobox/combobox'
+export { Command } from './studio/command/command'
 export type {
   CommandCloseProps,
   CommandDialogProps,
@@ -155,8 +155,8 @@ export type {
   CommandShortcutProps,
   CommandTitleProps,
   CommandValue,
-} from './components/command/command'
-export { DataGridFilterClause } from './components/dataGridFilterClause/dataGridFilterClause'
+} from './studio/command/command'
+export { DataGridFilterClause } from './studio/dataGridFilterClause/dataGridFilterClause'
 export type {
   DataGridFilterClauseColumnProps,
   DataGridFilterClauseListProps,
@@ -166,8 +166,8 @@ export type {
   DataGridFilterClauseRootProps,
   DataGridFilterClauseTriggerProps,
   DataGridFilterClauseValueProps,
-} from './components/dataGridFilterClause/dataGridFilterClause'
-export { ContextSwitcher } from './components/contextSwitcher/contextSwitcher'
+} from './studio/dataGridFilterClause/dataGridFilterClause'
+export { ContextSwitcher } from './studio/contextSwitcher/contextSwitcher'
 export type {
   ContextSwitcherContentProps,
   ContextSwitcherEmptyProps,
@@ -182,8 +182,8 @@ export type {
   ContextSwitcherTriggerWidth,
   ContextSwitcherValueProps,
   ContextSwitcherViewportProps,
-} from './components/contextSwitcher/contextSwitcher'
-export { ContextMenu } from './components/contextMenu/contextMenu'
+} from './studio/contextSwitcher/contextSwitcher'
+export { ContextMenu } from './studio/contextMenu/contextMenu'
 export type {
   ContextMenuCheckboxItemIndicatorProps,
   ContextMenuCheckboxItemProps,
@@ -206,8 +206,8 @@ export type {
   ContextMenuSubmenuRootProps,
   ContextMenuSubmenuTriggerProps,
   ContextMenuTriggerProps,
-} from './components/contextMenu/contextMenu'
-export { Button } from './components/button/button'
+} from './studio/contextMenu/contextMenu'
+export { Button } from './studio/button/button'
 export type {
   ButtonLayout,
   ButtonGlyphProps,
@@ -216,41 +216,41 @@ export type {
   ButtonRadius,
   ButtonSize,
   ButtonVariant,
-} from './components/button/button'
-export { ButtonLink } from './components/buttonLink/buttonLink'
-export type { ButtonLinkProps } from './components/buttonLink/buttonLink'
-export { Icon } from './components/icon/icon'
-export type { IconArtwork, IconArtworkProps, IconProps, IconSize } from './components/icon/icon'
-export { TextLink } from './components/textLink/textLink'
-export type { TextLinkProps } from './components/textLink/textLink'
-export { Spinner } from './components/spinner/spinner'
-export type { SpinnerProps, SpinnerSize } from './components/spinner/spinner'
-export { CopyButton } from './components/copyButton/copyButton'
+} from './studio/button/button'
+export { ButtonLink } from './studio/buttonLink/buttonLink'
+export type { ButtonLinkProps } from './studio/buttonLink/buttonLink'
+export { Icon } from './studio/icon/icon'
+export type { IconArtwork, IconArtworkProps, IconProps, IconSize } from './studio/icon/icon'
+export { TextLink } from './studio/textLink/textLink'
+export type { TextLinkProps } from './studio/textLink/textLink'
+export { Spinner } from './studio/spinner/spinner'
+export type { SpinnerProps, SpinnerSize } from './studio/spinner/spinner'
+export { CopyButton } from './studio/copyButton/copyButton'
 export type {
   CopyButtonProps,
   CopyButtonSize,
   CopyButtonVariant,
-} from './components/copyButton/copyButton'
-export { ThemeSwitch } from './components/themeSwitch/themeSwitch'
-export type { ThemeSwitchProps, ThemeSwitchTheme } from './components/themeSwitch/themeSwitch'
-export { BinaryDetails, BinaryValue } from './components/binaryValue/binaryValue'
+} from './studio/copyButton/copyButton'
+export { ThemeSwitch } from './studio/themeSwitch/themeSwitch'
+export type { ThemeSwitchProps, ThemeSwitchTheme } from './studio/themeSwitch/themeSwitch'
+export { BinaryDetails, BinaryValue } from './studio/binaryValue/binaryValue'
 export type {
   BinaryCopyFormat,
   BinaryDetailsProps,
   BinaryValueProps,
-} from './components/binaryValue/binaryValue'
-export { TimestampValue } from './components/timestampValue/timestampValue'
-export type { TimestampValueProps } from './components/timestampValue/timestampValue'
-export { Calendar } from './components/calendar/calendar'
-export type { CalendarProps } from './components/calendar/calendar'
-export { DatePicker } from './components/datePicker/datePicker'
+} from './studio/binaryValue/binaryValue'
+export { TimestampValue } from './studio/timestampValue/timestampValue'
+export type { TimestampValueProps } from './studio/timestampValue/timestampValue'
+export { Calendar } from './studio/calendar/calendar'
+export type { CalendarProps } from './studio/calendar/calendar'
+export { DatePicker } from './studio/datePicker/datePicker'
 export type {
   DatePickerContentProps,
   DatePickerPanelProps,
   DatePickerRootProps,
   DatePickerTriggerProps,
-} from './components/datePicker/datePicker'
-export { StructuredValuePreview } from './components/structuredValuePreview/structuredValuePreview'
+} from './studio/datePicker/datePicker'
+export { StructuredValuePreview } from './studio/structuredValuePreview/structuredValuePreview'
 export type {
   StructuredValuePreviewArrayModel,
   StructuredValuePreviewContinuation,
@@ -260,28 +260,28 @@ export type {
   StructuredValuePreviewProps,
   StructuredValuePreviewScalarModel,
   StructuredValuePreviewVariant,
-} from './components/structuredValuePreview/structuredValuePreview'
-export { MiddleTruncate } from './components/middleTruncate/middleTruncate'
-export type { MiddleTruncateProps } from './components/middleTruncate/middleTruncate'
-export { RelationValue } from './components/relationValue/relationValue'
+} from './studio/structuredValuePreview/structuredValuePreview'
+export { MiddleTruncate } from './studio/middleTruncate/middleTruncate'
+export type { MiddleTruncateProps } from './studio/middleTruncate/middleTruncate'
+export { RelationValue } from './studio/relationValue/relationValue'
 export type {
   RelationValueNavigation,
   RelationValueProps,
-} from './components/relationValue/relationValue'
-export { CodeEditor, preloadCodeEditor } from './components/codeEditor/codeEditor'
-export type { CodeEditorLayout, CodeEditorProps } from './components/codeEditor/codeEditor'
-export { Field } from './components/field/field'
+} from './studio/relationValue/relationValue'
+export { CodeEditor, preloadCodeEditor } from './studio/codeEditor/codeEditor'
+export type { CodeEditorLayout, CodeEditorProps } from './studio/codeEditor/codeEditor'
+export { Field } from './studio/field/field'
 export type {
   FieldDescriptionProps,
   FieldErrorProps,
   FieldLabelProps,
   FieldRootProps,
-} from './components/field/field'
-export { Fieldset } from './components/fieldset/fieldset'
-export type { FieldsetLegendProps, FieldsetRootProps } from './components/fieldset/fieldset'
-export { Input } from './components/input/input'
-export type { InputFont, InputProps, InputSize, InputVariant } from './components/input/input'
-export { InputGroup } from './components/inputGroup/inputGroup'
+} from './studio/field/field'
+export { Fieldset } from './studio/fieldset/fieldset'
+export type { FieldsetLegendProps, FieldsetRootProps } from './studio/fieldset/fieldset'
+export { Input } from './studio/input/input'
+export type { InputFont, InputProps, InputSize, InputVariant } from './studio/input/input'
+export { InputGroup } from './studio/inputGroup/inputGroup'
 export type {
   InputGroupActionProps,
   InputGroupCheckboxProps,
@@ -289,8 +289,8 @@ export type {
   InputGroupPrefixProps,
   InputGroupRootProps,
   InputGroupSuffixProps,
-} from './components/inputGroup/inputGroup'
-export { JsonView } from './components/jsonView/jsonView'
+} from './studio/inputGroup/inputGroup'
+export { JsonView } from './studio/jsonView/jsonView'
 export type {
   JsonViewObject,
   JsonViewPrimitive,
@@ -298,16 +298,16 @@ export type {
   JsonViewSearch,
   JsonViewSearchResults,
   JsonViewValue,
-} from './components/jsonView/jsonView'
-export { KeyboardInput } from './components/keyboardInput/keyboardInput'
+} from './studio/jsonView/jsonView'
+export { KeyboardInput } from './studio/keyboardInput/keyboardInput'
 export type {
   KeyboardInputHotkey,
   KeyboardInputPlatform,
   KeyboardInputProps,
   KeyboardInputSize,
   KeyboardInputVariant,
-} from './components/keyboardInput/keyboardInput'
-export { Menu } from './components/menu/menu'
+} from './studio/keyboardInput/keyboardInput'
+export { Menu } from './studio/menu/menu'
 export type {
   MenuCheckboxItemIndicatorProps,
   MenuCheckboxItemProps,
@@ -331,8 +331,8 @@ export type {
   MenuSubmenuRootProps,
   MenuSubmenuTriggerProps,
   MenuTriggerProps,
-} from './components/menu/menu'
-export { MultiSelect } from './components/multiSelect/multiSelect'
+} from './studio/menu/menu'
+export { MultiSelect } from './studio/multiSelect/multiSelect'
 export type {
   MultiSelectContentHeight,
   MultiSelectContentProps,
@@ -340,16 +340,16 @@ export type {
   MultiSelectItem,
   MultiSelectRootProps,
   MultiSelectTriggerProps,
-} from './components/multiSelect/multiSelect'
-export { FindBar } from './components/findBar/findBar'
-export type { FindBarProps, FindBarSearchOptions, FindBarState } from './components/findBar/findBar'
-export { SidePanel } from './components/sidePanel/sidePanel'
+} from './studio/multiSelect/multiSelect'
+export { FindBar } from './studio/findBar/findBar'
+export type { FindBarProps, FindBarSearchOptions, FindBarState } from './studio/findBar/findBar'
+export { SidePanel } from './studio/sidePanel/sidePanel'
 export type {
   SidePanelBodyProps,
   SidePanelFooterProps,
   SidePanelHeaderProps,
   SidePanelRootProps,
-} from './components/sidePanel/sidePanel'
+} from './studio/sidePanel/sidePanel'
 export {
   ResizableHandle,
   ResizablePanel,
@@ -359,7 +359,7 @@ export {
   useResizableGroupRef,
   useResizablePanelCallbackRef,
   useResizablePanelRef,
-} from './components/resizablePanel/resizablePanel'
+} from './studio/resizablePanel/resizablePanel'
 export type {
   ResizableGroupImperativeHandle,
   ResizableHandleAppearance,
@@ -370,8 +370,8 @@ export type {
   ResizablePanelImperativeHandle,
   ResizablePanelProps,
   ResizablePanelSize,
-} from './components/resizablePanel/resizablePanel'
-export { ShellLayout, useShellLayout } from './components/shellLayout/shellLayout'
+} from './studio/resizablePanel/resizablePanel'
+export { ShellLayout, useShellLayout } from './studio/shellLayout/shellLayout'
 export type {
   ShellLayoutBodyProps,
   ShellLayoutContextValue,
@@ -385,8 +385,8 @@ export type {
   ShellLayoutRootProps,
   ShellLayoutStorage,
   ShellLayoutViewProps,
-} from './components/shellLayout/shellLayout'
-export { Select } from './components/select/select'
+} from './studio/shellLayout/shellLayout'
+export { Select } from './studio/select/select'
 export type {
   SelectContentProps,
   SelectItemProps,
@@ -395,8 +395,8 @@ export type {
   SelectTriggerSize,
   SelectTriggerProps,
   SelectWidth,
-} from './components/select/select'
-export { Text } from './components/text/text'
+} from './studio/select/select'
+export { Text } from './studio/text/text'
 export type {
   TextAlign,
   TextColor,
@@ -406,12 +406,12 @@ export type {
   TextTag,
   TextVariant,
   TextWrap,
-} from './components/text/text'
-export { TextField } from './components/textField/textField'
-export type { TextFieldProps } from './components/textField/textField'
-export { Switch } from './components/switch/switch'
-export type { SwitchProps, SwitchSize } from './components/switch/switch'
-export { Toaster, toasts } from './components/toaster/toaster'
+} from './studio/text/text'
+export { TextField } from './studio/textField/textField'
+export type { TextFieldProps } from './studio/textField/textField'
+export { Switch } from './studio/switch/switch'
+export type { SwitchProps, SwitchSize } from './studio/switch/switch'
+export { Toaster, toasts } from './studio/toaster/toaster'
 export type {
   ToasterProps,
   ToastDuration,
@@ -420,15 +420,15 @@ export type {
   ToastPromiseOptions,
   ToastStatus,
   Toasts,
-} from './components/toaster/toaster'
-export { Tooltip } from './components/tooltip/tooltip'
+} from './studio/toaster/toaster'
+export { Tooltip } from './studio/tooltip/tooltip'
 export type {
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from './components/tooltip/tooltip'
-export { ToggleGroup } from './components/toggleGroup/toggleGroup'
+} from './studio/tooltip/tooltip'
+export { ToggleGroup } from './studio/toggleGroup/toggleGroup'
 export type {
   ToggleGroupItemProps,
   ToggleGroupOrientation,
@@ -436,8 +436,8 @@ export type {
   ToggleGroupSize,
   ToggleGroupWidth,
   ToggleGroupRootProps,
-} from './components/toggleGroup/toggleGroup'
-export { WorkspaceTabs } from './components/workspaceTabs/workspaceTabs'
+} from './studio/toggleGroup/toggleGroup'
+export { WorkspaceTabs } from './studio/workspaceTabs/workspaceTabs'
 export type {
   WorkspaceTabsBarProps,
   WorkspaceTabsLeadingAreaProps,
@@ -448,7 +448,7 @@ export type {
   WorkspaceTabsTabRetention,
   WorkspaceTabsTrailingAreaProps,
   WorkspaceTabsValue,
-} from './components/workspaceTabs/workspaceTabs'
+} from './studio/workspaceTabs/workspaceTabs'
 
 // Tokens
 export * from './tokens/tokens.stylex'

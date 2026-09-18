@@ -26,12 +26,12 @@ Success means components express interaction and validation through semantic tok
 
 ## Commands
 
-These commands validate the affected package, documentation application, and web application.
+These commands validate the affected package, documentation application, and Studio application.
 
 - `pnpm --filter @inspektor/ds test`
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
-- `pnpm test:web:design`
+- `pnpm test:design-system-docs`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
@@ -42,17 +42,17 @@ These commands validate the affected package, documentation application, and web
 
 Repository directories divide reusable design-system code, executable documentation, and product composition.
 
-- `packages/design-system/src/components/` owns reusable component behavior and StyleX styles.
+- `packages/design-system/src/studio/` owns reusable component behavior and StyleX styles.
 - `packages/design-system/src/tokens/` owns semantic, value, and layer tokens.
 - `packages/design-system/src/primitives/` owns constrained shared component helpers.
 - `apps/design-system/` owns authored MDX documentation and executable TSX scenarios.
-- `apps/web/` consumes public `@inspektor/ds` APIs and owns product composition.
+- `apps/studio/` consumes public `@inspektor/ds` APIs and owns product composition.
 
 ## Code style
 
 Use semantic tokens and explicit state precedence. Public component props must not expose arbitrary styling.
 
-```packages/design-system/src/components/checkbox/checkbox.styles.ts#L1-1
+```packages/design-system/src/studio/checkbox/checkbox.styles.ts#L1-1
 selected: {
   backgroundColor: backgroundColors['bg-selected'],
   color: textColors['text-default'],

@@ -24,7 +24,7 @@ This document explains how the Inspektor frontend is assembled and why its bound
 
 The key model is:
 
-> `apps/web` owns Inspektor product behavior and data. `apps/website` owns the public website. `@inspektor/ds` owns reusable generic and brand UI. `apps/design-system` documents and validates the public design-system contract.
+> `apps/studio` owns Inspektor product behavior and data. `apps/website` owns the public website. `@inspektor/ds` owns reusable generic and brand UI. `apps/design-system` documents and validates the public design-system contract.
 
 The import-boundary rules for optional heavy behavior are specified in [the import-boundary playbook](lat.md/importBoundaryPlaybook.md). Component-level implementation work belongs in the corresponding `todo/*.md` checklist.
 
@@ -34,7 +34,7 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 
 | Location                 | Role                                            | May depend on                                                 |
 | ------------------------ | ----------------------------------------------- | ------------------------------------------------------------- |
-| `apps/web`               | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                |
+| `apps/studio`            | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                |
 | `apps/website`           | Public Inspektor website                        | public `@inspektor/ds` exports and website dependencies       |
 | `apps/design-system`     | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies |
 | `packages/design-system` | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies           |
@@ -43,7 +43,7 @@ Workspace applications are consumers of `@inspektor/ds`. They must use its publi
 
 ## Ownership boundaries
 
-### `apps/web`
+### `apps/studio`
 
 The product application owns concerns specific to inspecting a Jazz application:
 
@@ -68,7 +68,7 @@ The design system owns reusable presentation and interaction behavior:
 
 The public website owns its routes, copy, metadata, SEO, analytics, and assembly. It composes `@inspektor/ds/brand` without moving content or route behavior into the package.
 
-The website is a client-rendered TanStack Router SPA. It owns the root and non-product paths on `inspektor.dev`, while `apps/web` owns `/conn` and descendants.
+The website is a client-rendered TanStack Router SPA. It owns the root and non-product paths on `inspektor.dev`, while `apps/studio` owns `/conn` and descendants.
 
 ### `apps/design-system`
 
@@ -101,7 +101,7 @@ Both applications execute on the same browser origin. This preserves origin-scop
 
 The normal Inspektor path is:
 
-1. The browser loads the HTML entry produced by Vite for `apps/web`.
+1. The browser loads the HTML entry produced by Vite for `apps/studio`.
 2. The entry module mounts React and creates the TanStack Router.
 3. The root route mounts `InspectorSessionProvider`. It accepts connection **intent**, enforces runtime-scope exit policy, and reads persisted selection without creating a Jazz client.
 4. TanStack Router loads route modules according to the current URL. The connection route **resolves** a connection ID into a concrete branch, schema hash, and ordered schema catalogue
@@ -166,7 +166,7 @@ The package provides two valid resolution targets for the same public import pat
 | `import` and `default` | ESM JavaScript in `dist`    | Consumers using the built package |
 | `types`                | Declaration files in `dist` | TypeScript tooling                |
 
-The public API and the resolved file are separate concepts. For example, `@inspektor/ds/tooltip` remains a supported public import whether it resolves to `src/components/tooltip/tooltip.tsx` or `dist/components/tooltip/tooltip.js`.
+The public API and the resolved file are separate concepts. For example, `@inspektor/ds/tooltip` remains a supported public import whether it resolves to `src/studio/tooltip/tooltip.tsx` or `dist/studio/tooltip/tooltip.js`.
 
 The package emits ESM only. There is no CommonJS build because this workspace has no CommonJS consumer. This reduces package-output maintenance, but does not itself reduce web application cost when Vite resolves the source contract.
 
@@ -190,7 +190,7 @@ This is the workspace development path for the current StyleX architecture. The 
 
 Both applications also exclude `@inspektor/ds` from Vite dependency optimization. The dependency optimizer is designed for third-party dependencies that Vite can prebundle as opaque inputs. `@inspektor/ds` is linked workspace source that must remain available to the Vite and StyleX transforms.
 
-This means the design-system TSDown build verifies artifact generation, while `apps/web` and `apps/design-system` builds verify source consumption. Neither check replaces the other.
+This means the design-system TSDown build verifies artifact generation, while `apps/studio` and `apps/design-system` builds verify source consumption. Neither check replaces the other.
 
 ## Vite configuration
 
@@ -209,7 +209,7 @@ This means the design-system TSDown build verifies artifact generation, while `a
 
 ### Web-only configuration
 
-`apps/web` also uses:
+`apps/studio` also uses:
 
 - `@tanstack/devtools-vite` outside test mode for router-development tooling.
 - a dynamic development-only StyleX runtime import.

@@ -16,7 +16,7 @@ import {
   textLoadingStyles,
   textUtilityStyles,
   textWrapStyles,
-} from '../components/text/text-styles'
+} from '../studio/text/text-styles'
 
 export type TextTag =
   | 'p'

@@ -2,16 +2,16 @@
 
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type { ComboboxContentProps, ComboboxPositionerProps } from '../components/combobox/combobox'
+import type { ComboboxContentProps, ComboboxPositionerProps } from '../studio/combobox/combobox'
 import type {
   ContextMenuContentProps,
   ContextMenuPositionerProps,
-} from '../components/contextMenu/contextMenu'
-import type { ContextSwitcherContentProps } from '../components/contextSwitcher/contextSwitcher'
-import type { MenuContentProps, MenuPositionerProps } from '../components/menu/menu'
-import type { MultiSelectContentProps } from '../components/multiSelect/multiSelect'
-import type { SelectContentProps } from '../components/select/select'
-import type { TooltipContentProps } from '../components/tooltip/tooltip'
+} from '../studio/contextMenu/contextMenu'
+import type { ContextSwitcherContentProps } from '../studio/contextSwitcher/contextSwitcher'
+import type { MenuContentProps, MenuPositionerProps } from '../studio/menu/menu'
+import type { MultiSelectContentProps } from '../studio/multiSelect/multiSelect'
+import type { SelectContentProps } from '../studio/select/select'
+import type { TooltipContentProps } from '../studio/tooltip/tooltip'
 
 type ExposesArbitraryOffsets<Props> =
   | ('sideOffset' extends keyof Props ? true : false)

@@ -31,7 +31,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 
 ## Current behavior
 
-- The workspace contains `apps/website` as the public website application and `apps/web` as the inspector product application.
+- The workspace contains `apps/website` as the public website application and `apps/studio` as the inspector product application.
 - The `inspektor` gateway owns `inspektor.dev`, serves website assets at the root, and dispatches `/conn` to the Product Worker.
 - Product assets use the `/conn` namespace while website assets remain root-relative, so the two SPAs retain separate path ownership on one origin.
 - `packages/design-system` publishes generic components and tokens through `@inspektor/ds`.
@@ -66,7 +66,6 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 
 ## Work outside the first iteration
 
-- Rename `apps/web` to `apps/studio`.
 - Classify or move existing design-system components into a studio surface.
 - Build server rendering or static generation.
 - Add route-aware behavior to brand components.
@@ -82,7 +81,7 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - The application path is `apps/website`.
 - The application package name is `inspektor.website`.
 - The website uses TanStack Router as a client-rendered SPA.
-- The intended production ownership is `apps/website` at `inspektor.dev/` and non-product paths, with `apps/web` retaining `/conn` and its descendants on the same origin.
+- The intended production ownership is `apps/website` at `inspektor.dev/` and non-product paths, with `apps/studio` retaining `/conn` and its descendants on the same origin.
 - Same-origin ownership preserves the product's existing origin-scoped connection profiles. Website code and dependencies must therefore be treated as product-trusted code.
 - `pnpm deploy:production` publishes the Product Worker and then the website gateway.
 - `packages/design-system` remains the package owner for generic and branded presentation.
@@ -101,11 +100,11 @@ Create a public Inspektor website as a TanStack Router SPA. The website composes
 - Headings use Instrument Sans default glyphs.
 - Brand text has these responsive roles:
 
-| Role               | Element        | Below 900px | From 900px | From 1471px | Line height              | Tracking  | Wrapping |
-| ------------------ | -------------- | ----------: | ---------: | ----------: | ------------------------ | --------- | -------- |
+| Role               | Element        | Below 900px | From 900px | From 1471px | Line height              | Tracking             | Wrapping |
+| ------------------ | -------------- | ----------: | ---------: | ----------: | ------------------------ | -------------------- | -------- |
 | Primary title      | `span` in `h1` |        40px |       48px |        56px | `48px` / `56px`          | `-0.96px` / `-1.1px` | `pretty` |
 | Muted continuation | `span` in `h1` |        36px |       48px |        56px | `40px` / `48px` / `56px` | `-0.96px` / `-1.1px` | `pretty` |
-| Description        | `p`            |        18px |       18px |        18px | `28px`                   | `0`       | `pretty` |
+| Description        | `p`            |        18px |       18px |        18px | `28px`                   | `0`                  | `pretty` |
 
 - The section heading and description use an opaque muted text treatment that preserves normal-text contrast.
 - The header is 52px tall. Its private content frame positions a 140×20 wordmark with 16px inline padding, leaving the header surface unpadded. The decorative bottom strip is 46px tall and remains wrapperless while empty.

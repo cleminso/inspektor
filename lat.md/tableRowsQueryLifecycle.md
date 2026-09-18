@@ -157,19 +157,19 @@ changes reset both scroll axes without remounting the viewport.
 
 These source modules implement route resolution, Jazz querying, state projection, controls, and grid rendering.
 
-- `apps/web/src/app/runtime/jazzWasmPreparation.ts`: shared best-effort WASM preparation.
-- `apps/web/src/app/providers/inspectorProvider.tsx`: concurrent client ownership and verified publication.
-- `apps/web/src/app/runtime/useInspectorRuntime.tsx`: schema, permissions, client, and error projections.
-- `apps/web/src/app/runtime/connectionContentBoundary.tsx`: mounted-content visibility boundary.
-- `apps/web/src/features/tables/routing/tableRowsSearch.ts`: route query-state resolution.
-- `apps/web/src/features/tables/query/queryOptions.ts`: Jazz query options and cache identity.
-- `apps/web/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction.
-- `apps/web/src/features/tables/query/useJazzQueryState.ts`: React external-store adapter for Jazz cache entries.
-- `apps/web/src/features/tables/query/useTableRows.ts`: query derivation, row preservation, pagination, and status projection.
-- `apps/web/src/features/tables/workspace/useTableViewState.ts`: query-row ownership and table interaction state.
-- `apps/web/src/features/tables/grid/toolbar.tsx`: row status, page-size, page label, and previous/next controls.
-- `apps/web/src/features/tables/workspace/tableView.tsx`: product loading copy and virtual rendering selection.
-- `packages/design-system/src/components/dataGrid/dataGrid.tsx`: reusable loading and virtual table-body presentation.
+- `apps/studio/src/app/runtime/jazzWasmPreparation.ts`: shared best-effort WASM preparation.
+- `apps/studio/src/app/providers/inspectorProvider.tsx`: concurrent client ownership and verified publication.
+- `apps/studio/src/app/runtime/useInspectorRuntime.tsx`: schema, permissions, client, and error projections.
+- `apps/studio/src/app/runtime/connectionContentBoundary.tsx`: mounted-content visibility boundary.
+- `apps/studio/src/features/tables/routing/tableRowsSearch.ts`: route query-state resolution.
+- `apps/studio/src/features/tables/query/queryOptions.ts`: Jazz query options and cache identity.
+- `apps/studio/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction.
+- `apps/studio/src/features/tables/query/useJazzQueryState.ts`: React external-store adapter for Jazz cache entries.
+- `apps/studio/src/features/tables/query/useTableRows.ts`: query derivation, row preservation, pagination, and status projection.
+- `apps/studio/src/features/tables/workspace/useTableViewState.ts`: query-row ownership and table interaction state.
+- `apps/studio/src/features/tables/grid/toolbar.tsx`: row status, page-size, page label, and previous/next controls.
+- `apps/studio/src/features/tables/workspace/tableView.tsx`: product loading copy and virtual rendering selection.
+- `packages/design-system/src/studio/dataGrid/dataGrid.tsx`: reusable loading and virtual table-body presentation.
 
 ## Maintenance constraints
 

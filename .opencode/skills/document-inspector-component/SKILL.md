@@ -41,7 +41,7 @@
 ## Validation
 
 - Focused scenario and page tests
-- `pnpm test:web:design`
+- `pnpm test:design-system-docs`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`

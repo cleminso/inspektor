@@ -459,4 +459,4 @@ These references connect the telemetry contract to its product design and implem
 - [Subscription query implementation checklist](../todo/subscription-query.md)
 - [Swimlane timeline implementation checklist](../todo/swimlaneTimeline.md)
 
-The current implementation validates snapshots in [[apps/web/src/features/live-queries/querySubscriptions.ts#validateQuerySubscriptionsResponse]], projects timeline lanes in [[apps/web/src/features/live-queries/querySubscriptions.ts#projectQuerySubscriptionsTimeline]], and polls in [[apps/web/src/features/live-queries/useQuerySubscriptionsTelemetry.ts#useQuerySubscriptionsTelemetry]].
+The current implementation validates snapshots in [[apps/studio/src/features/live-queries/querySubscriptions.ts#validateQuerySubscriptionsResponse]], projects timeline lanes in [[apps/studio/src/features/live-queries/querySubscriptions.ts#projectQuerySubscriptionsTimeline]], and polls in [[apps/studio/src/features/live-queries/useQuerySubscriptionsTelemetry.ts#useQuerySubscriptionsTelemetry]].

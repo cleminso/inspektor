@@ -1,6 +1,14 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "jsx-a11y", "oxc", "react", "react-perf", "typescript", "unicorn"],
+  "plugins": [
+    "import",
+    "jsx-a11y",
+    "oxc",
+    "react",
+    "react-perf",
+    "typescript",
+    "unicorn"
+  ],
   "jsPlugins": [
     {
       "name": "@stylexjs",
@@ -41,7 +49,10 @@
   },
   "overrides": [
     {
-      "files": ["packages/design-system/**/*.ts", "packages/design-system/**/*.tsx"],
+      "files": [
+        "packages/design-system/**/*.ts",
+        "packages/design-system/**/*.tsx"
+      ],
       "rules": {
         "@stylexjs/valid-styles": [
           "error",
@@ -86,7 +97,7 @@
       }
     },
     {
-      "files": ["apps/web/src/**/*.tsx", "apps/website/src/**/*.tsx"],
+      "files": ["apps/studio/src/**/*.tsx", "apps/website/src/**/*.tsx"],
       "rules": {
         "anti-slop/no-direct-lucide-jsx": "error",
         "react/forbid-elements": [
@@ -113,19 +124,22 @@
       }
     },
     {
-      "files": ["**/components/checkbox/checkbox.tsx", "**/components/inputGroup/inputGroup.tsx"],
+      "files": [
+        "packages/design-system/src/studio/checkbox/checkbox.tsx",
+        "packages/design-system/src/studio/inputGroup/inputGroup.tsx"
+      ],
       "rules": {
         "jsx-a11y/label-has-associated-control": "off"
       }
     },
     {
-      "files": ["**/components/actionList/actionList.tsx"],
+      "files": ["packages/design-system/src/studio/actionList/actionList.tsx"],
       "rules": {
         "jsx-a11y/no-noninteractive-element-interactions": "off"
       }
     },
     {
-      "files": ["**/components/datePicker/datePicker.tsx"],
+      "files": ["packages/design-system/src/studio/datePicker/datePicker.tsx"],
       "rules": {
         "jsx-a11y/no-autofocus": "off"
       }
@@ -140,12 +154,16 @@
       }
     },
     {
-      "files": ["**/components/jsonView/jsonView.tsx"],
+      "files": ["packages/design-system/src/studio/jsonView/jsonView.tsx"],
       "rules": {
         "jsx-a11y/click-events-have-key-events": "off",
         "jsx-a11y/no-static-element-interactions": "off"
       }
     }
   ],
-  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "tools/oxlint/antiSlop/**"]
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "tools/oxlint/antiSlop/**"
+  ]
 }

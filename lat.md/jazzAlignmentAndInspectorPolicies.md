@@ -34,10 +34,10 @@ This note records useful patterns from the official Jazz Inspektor and settled d
 
 Official source reviewed:
 
-- `packages/inspector/src/components/data-explorer/TableDataGrid.tsx`
-- `packages/inspector/src/components/data-explorer/row-mutation-form.ts`
-- `packages/inspector/src/components/data-explorer/TableFilterBuilder.tsx`
-- `packages/inspector/src/components/data-explorer/ColumnCustomizationModal.tsx`
+- `packages/inspector/src/studio/data-explorer/TableDataGrid.tsx`
+- `packages/inspector/src/studio/data-explorer/row-mutation-form.ts`
+- `packages/inspector/src/studio/data-explorer/TableFilterBuilder.tsx`
+- `packages/inspector/src/studio/data-explorer/ColumnCustomizationModal.tsx`
 - `packages/inspector/src/utility/generic-query-builder.ts`
 
 ## Upstream findings
@@ -119,7 +119,7 @@ Jazz evidence:
 
 - `packages/jazz-tools/src/runtime/value-converter.ts` documents and implements top-level `undefined` omission in `toWriteRecord`.
 - `packages/jazz-tools/src/runtime/value-converter.test.ts` covers explicit nullable `null`, skipped `undefined`, unknown columns, required-field `null`, and JSON-schema failures.
-- `packages/inspector/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
+- `packages/inspector/src/studio/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
 
 Omission is operation-dependent: it requests the stored default during insert and means unchanged during update. Unavailable source data is presentation state, not another spelling of omission.
 
@@ -156,7 +156,7 @@ The official Inspektor formats source values when editing begins, then preserves
 
 It formats a source object with `JSON.stringify`, stores later edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft.
 
-See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
+See `packages/inspector/src/studio/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
 
 Inspektor uses the same ownership rule:
 
@@ -250,7 +250,7 @@ The mutation business logic must not depend on the active editing surface. It ow
 - Omitted, explicit null, valid, and invalid insert states.
 - Patch construction and mutation failure state.
 
-[[apps/web/src/features/tables/rowEditor/mutation/draft.ts#createUpdateRowDraft]] and [[apps/web/src/features/tables/rowEditor/mutation/draft.ts#createInsertRowDraft]] create the corresponding provider-owned drafts.
+[[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#createUpdateRowDraft]] and [[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#createInsertRowDraft]] create the corresponding provider-owned drafts.
 
 The core abstraction is a per-row draft. Pane and inline orchestration may decide how many row drafts can be retained, but mutation
 parsing and patch construction operate on one row draft at a time. This avoids coupling the shared model to batch save and retry

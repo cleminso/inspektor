@@ -34,7 +34,7 @@ Absent docks should produce neither a panel nor a resize handle.
 
 ## Application ownership
 
-`apps/web` should own:
+`apps/studio` should own:
 
 - The universal local-storage adapter
 - Storage migration

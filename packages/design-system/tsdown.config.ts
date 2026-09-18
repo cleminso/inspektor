@@ -5,7 +5,7 @@ export default defineConfig({
     index: './src/index.ts',
     'brand/index': './src/brand/index.ts',
     'tokens/tokens.stylex': './src/tokens/tokens.stylex.ts',
-    'components/tooltip/tooltip': './src/components/tooltip/tooltip.tsx',
+    'studio/tooltip/tooltip': './src/studio/tooltip/tooltip.tsx',
   },
   format: ['esm'],
   platform: 'neutral',

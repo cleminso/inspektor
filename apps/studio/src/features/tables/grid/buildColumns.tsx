@@ -59,7 +59,7 @@ interface ColumnSizing {
 
 function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   if (column.id === 'id' || column.column === null) {
-    return { size: 294, minSize: 154 }
+    return { size: 300, minSize: 154 }
   }
 
   if (column.column.references !== undefined) {

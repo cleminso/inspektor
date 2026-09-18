@@ -44,7 +44,7 @@ Inspektor fetches the current server snapshot with:
 
 `fetchServerSubscriptions(serverUrl, { appId, adminSecret })`
 
-[[apps/web/src/features/live-queries/useQuerySubscriptionsTelemetry.ts#useQuerySubscriptionsTelemetry]] owns polling and converts responses into session-local history.
+[[apps/studio/src/features/live-queries/useQuerySubscriptionsTelemetry.ts#useQuerySubscriptionsTelemetry]] owns polling and converts responses into session-local history.
 
 The response contains:
 

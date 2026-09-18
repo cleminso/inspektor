@@ -27,10 +27,10 @@ Install dependencies:
 pnpm install
 ```
 
-Start the web application:
+Start the Studio application:
 
 ```sh
-pnpm dev:web
+pnpm dev:studio
 ```
 
 For an isolated Jazz application, run the fixture in another terminal:

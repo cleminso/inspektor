@@ -126,7 +126,7 @@ Inspektor maps each user-facing operation question to the corresponding compiled
 | can rows generally be updated? | `update.using` + `update.with_check` |
 | can rows generally be deleted? | `delete.using`                       |
 
-[[apps/web/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] loads stored permissions with the selected schema. The historical [[lat.md/table-explorer#Table Explorer research#Stored schema and permissions APIs]] note records that runtime relationship.
+[[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] loads stored permissions with the selected schema. The historical [[lat.md/table-explorer#Table Explorer research#Stored schema and permissions APIs]] note records that runtime relationship.
 
 ## Safe Inspektor outputs
 

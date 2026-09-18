@@ -32,7 +32,7 @@ Design system owns:
 - Checked item background treatment
 - Escape-key dispatch and focus transfer
 
-Consumer (`apps/web`) owns:
+Consumer (`apps/studio`) owns:
 
 - Checked set and range anchor
 - Shift detection from Base UI event details
@@ -42,7 +42,7 @@ Consumer (`apps/web`) owns:
 
 ## Component API
 
-[[packages/design-system/src/components/actionList/actionList.tsx#ActionList]] exposes compound parts for selection, navigation, and trailing actions. `ActionList.Item` has two independent boolean props:
+[[packages/design-system/src/studio/actionList/actionList.tsx#ActionList]] exposes compound parts for selection, navigation, and trailing actions. `ActionList.Item` has two independent boolean props:
 
 - `active`: navigation state, applies `bg-secondary` and `text-default`
 - `checked`: bulk-selection state, applies `bg-selected` and `text-default`

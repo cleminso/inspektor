@@ -52,7 +52,7 @@ Implementation work is limited to:
 
 - `packages/design-system`: reusable `@inspektor/ds` components, primitives, and tokens.
 - `apps/design-system`: documentation, playgrounds, and design-system validation.
-- `apps/web`: Inspektor routes, product state, Jazz access, and feature composition.
+- `apps/studio`: Inspektor routes, product state, Jazz access, and feature composition.
 - `apps/website`: public website routes, copy, metadata, and brand-page composition.
 - `apps/inspektor-test`: deterministic test schema, data, deployment tooling, and isolated fixtures.
 
@@ -69,9 +69,9 @@ Other workspace packages require an explicit user request.
 
 - `packages/design-system` owns reusable presentation and interaction components.
 - `apps/design-system` consumes public `@inspektor/ds` exports and never imports package-private implementation files at runtime.
-- `apps/web` owns routes, application state, Jazz data access, and feature composition. Move reusable presentation and interaction behavior into `packages/design-system`.
+- `apps/studio` owns routes, application state, Jazz data access, and feature composition. Move reusable presentation and interaction behavior into `packages/design-system`.
 - `apps/website` owns public website routes, copy, metadata, SEO, analytics, and page assembly. Reusable brand presentation belongs in `packages/design-system/src/brand`.
-- Do not recreate Base UI behavior in `apps/web`.
+- Do not recreate Base UI behavior in `apps/studio`.
 - The Inspektor is schema-driven and generic. Do not add table-specific UI or generated query builders for inspected applications.
 
 ## Route lifecycle
@@ -84,14 +84,14 @@ Other workspace packages require an explicit user request.
 ## Design-system boundaries
 
 - The design system uses typed tokens with Base UI and StyleX; do not use Tailwind for component styling.
-- `apps/web` imports reusable UI from `@inspektor/ds`; application code owns feature and data logic.
+- `apps/studio` imports reusable UI from `@inspektor/ds`; application code owns feature and data logic.
 - Public components and application code cannot bypass the design system with `className`, inline `style`, raw HTML layout, arbitrary CSS values, or broad styling slot overrides.
 - Add a semantic token, constrained prop, variant, primitive, or composed component when the system cannot express a valid design. Necessary escape hatches require explicit, narrow, auditable lint suppression.
 
 ## Repository invariants
 
 - Treat connection `adminSecret` values, fixture credentials, and persistent browser profiles as sensitive.
-- Never hand-edit `apps/web/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
+- Never hand-edit `apps/studio/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
 
 ## TypeScript conventions
 

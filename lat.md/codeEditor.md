@@ -47,7 +47,7 @@ An `interaction={false}` prop is not part of either API. It cannot distinguish e
 
 ## Editing engine
 
-CodeMirror 6 is the selected editing engine for [[packages/design-system/src/components/codeEditor/codeEditor.tsx#CodeEditor]].
+CodeMirror 6 is the selected editing engine for [[packages/design-system/src/studio/codeEditor/codeEditor.tsx#CodeEditor]].
 
 The side-pane JSON field is a standalone form control, not a code node inside a rich-text document. ProseMirror would add a document schema and rich-text selection model that this field does not need. Monaco is broader and heavier than this use case requires. A custom `contenteditable` or highlighted textarea overlay would require Inspektor to recreate selection, composition, caret, scroll synchronization, and undo behavior.
 

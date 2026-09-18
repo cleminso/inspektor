@@ -35,17 +35,17 @@ For browser verification, fixture ownership, and credential handling, load `insp
 
 ## Preferred commands
 
-- Inspektor web app Node tests: `pnpm test:web:node`
-- Inspektor web app jsdom tests: `pnpm test:web:jsdom`
-- Complete Inspektor web app suite: `pnpm test:web`
-- Design-system documentation app tests: `pnpm test:web:design`
+- Inspektor Studio Node tests: `pnpm test:studio:node`
+- Inspektor Studio jsdom tests: `pnpm test:studio:jsdom`
+- Complete Inspektor Studio suite: `pnpm test:studio`
+- Design-system documentation app tests: `pnpm test:design-system-docs`
 - Design-system Node tests: `pnpm test:design-system:node`
 - Complete design-system suite: `pnpm test:design-system`
 - Default workspace suite excluding design-system documentation app tests: `pnpm test`
-- Complete workspace suite: `pnpm test && pnpm test:web:design`, only for cross-package changes or complete workspace coverage
-- Web package: `pnpm --filter inspektor lint`, `pnpm --filter inspektor typecheck`, `pnpm --filter inspektor build`
+- Complete workspace suite: `pnpm test && pnpm test:design-system-docs`, only for cross-package changes or complete workspace coverage
+- Studio package: `pnpm --filter inspektor lint`, `pnpm --filter inspektor typecheck`, `pnpm --filter inspektor build`
 - Design-system package: `pnpm --filter @inspektor/ds lint`, `pnpm --filter @inspektor/ds typecheck`, `pnpm --filter @inspektor/ds build`
-- Design-system documentation: `pnpm --filter inspektor.design-system lint`, `pnpm --filter inspektor.design-system typecheck`, `pnpm test:web:design`, `pnpm --filter inspektor.design-system build`
+- Design-system documentation: `pnpm --filter inspektor.design-system lint`, `pnpm --filter inspektor.design-system typecheck`, `pnpm test:design-system-docs`, `pnpm --filter inspektor.design-system build`
 - Inspektor Test validation and shared-cloud mutation boundaries are owned by `inspector-testing`.
 
 Package manifests remain authoritative when scripts change.

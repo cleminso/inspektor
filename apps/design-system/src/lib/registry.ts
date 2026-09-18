@@ -47,7 +47,7 @@ export const buttonItem = {
   description: '',
   source: {
     label: 'button.tsx',
-    path: 'packages/design-system/src/components/button/button.tsx',
+    path: 'packages/design-system/src/studio/button/button.tsx',
   },
 } satisfies DocsItem
 
@@ -58,7 +58,7 @@ export const badgeItem = {
   description: '',
   source: {
     label: 'badge.tsx',
-    path: 'packages/design-system/src/components/badge/badge.tsx',
+    path: 'packages/design-system/src/studio/badge/badge.tsx',
   },
 } satisfies DocsItem
 
@@ -69,7 +69,7 @@ export const alertDialogItem = {
   description: '',
   source: {
     label: 'alertDialog.tsx',
-    path: 'packages/design-system/src/components/alertDialog/alertDialog.tsx',
+    path: 'packages/design-system/src/studio/alertDialog/alertDialog.tsx',
   },
 } satisfies DocsItem
 
@@ -80,7 +80,7 @@ export const commandItem = {
   description: '',
   source: {
     label: 'command.tsx',
-    path: 'packages/design-system/src/components/command/command.tsx',
+    path: 'packages/design-system/src/studio/command/command.tsx',
   },
 } satisfies DocsItem
 
@@ -91,7 +91,7 @@ export const dataGridFilterClauseItem = {
   description: '',
   source: {
     label: 'dataGridFilterClause.tsx',
-    path: 'packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx',
+    path: 'packages/design-system/src/studio/dataGridFilterClause/dataGridFilterClause.tsx',
   },
 } satisfies DocsItem
 
@@ -102,7 +102,7 @@ export const buttonLinkItem = {
   description: '',
   source: {
     label: 'buttonLink.tsx',
-    path: 'packages/design-system/src/components/buttonLink/buttonLink.tsx',
+    path: 'packages/design-system/src/studio/buttonLink/buttonLink.tsx',
   },
 } satisfies DocsItem
 
@@ -113,7 +113,7 @@ export const textLinkItem = {
   description: '',
   source: {
     label: 'textLink.tsx',
-    path: 'packages/design-system/src/components/textLink/textLink.tsx',
+    path: 'packages/design-system/src/studio/textLink/textLink.tsx',
   },
 } satisfies DocsItem
 
@@ -124,7 +124,7 @@ export const textItem = {
   description: '',
   source: {
     label: 'text.tsx',
-    path: 'packages/design-system/src/components/text/text.tsx',
+    path: 'packages/design-system/src/studio/text/text.tsx',
   },
 } satisfies DocsItem
 
@@ -135,7 +135,7 @@ export const copyButtonItem = {
   description: '',
   source: {
     label: 'copyButton.tsx',
-    path: 'packages/design-system/src/components/copyButton/copyButton.tsx',
+    path: 'packages/design-system/src/studio/copyButton/copyButton.tsx',
   },
 } satisfies DocsItem
 
@@ -146,7 +146,7 @@ export const themeSwitchItem = {
   description: '',
   source: {
     label: 'themeSwitch.tsx',
-    path: 'packages/design-system/src/components/themeSwitch/themeSwitch.tsx',
+    path: 'packages/design-system/src/studio/themeSwitch/themeSwitch.tsx',
   },
 } satisfies DocsItem
 
@@ -157,7 +157,7 @@ export const toggleGroupItem = {
   description: '',
   source: {
     label: 'toggleGroup.tsx',
-    path: 'packages/design-system/src/components/toggleGroup/toggleGroup.tsx',
+    path: 'packages/design-system/src/studio/toggleGroup/toggleGroup.tsx',
   },
 } satisfies DocsItem
 
@@ -168,7 +168,7 @@ export const workspaceTabsItem = {
   description: '',
   source: {
     label: 'workspaceTabs.tsx',
-    path: 'packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx',
+    path: 'packages/design-system/src/studio/workspaceTabs/workspaceTabs.tsx',
   },
 } satisfies DocsItem
 
@@ -179,7 +179,7 @@ export const checkboxItem = {
   description: '',
   source: {
     label: 'checkbox.tsx',
-    path: 'packages/design-system/src/components/checkbox/checkbox.tsx',
+    path: 'packages/design-system/src/studio/checkbox/checkbox.tsx',
   },
 } satisfies DocsItem
 
@@ -190,7 +190,7 @@ export const checkboxGroupItem = {
   description: '',
   source: {
     label: 'checkboxGroup.tsx',
-    path: 'packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx',
+    path: 'packages/design-system/src/studio/checkboxGroup/checkboxGroup.tsx',
   },
 } satisfies DocsItem
 
@@ -201,7 +201,7 @@ export const switchItem = {
   description: '',
   source: {
     label: 'switch.tsx',
-    path: 'packages/design-system/src/components/switch/switch.tsx',
+    path: 'packages/design-system/src/studio/switch/switch.tsx',
   },
 } satisfies DocsItem
 
@@ -212,7 +212,7 @@ export const tooltipItem = {
   description: '',
   source: {
     label: 'tooltip.tsx',
-    path: 'packages/design-system/src/components/tooltip/tooltip.tsx',
+    path: 'packages/design-system/src/studio/tooltip/tooltip.tsx',
   },
 } satisfies DocsItem
 
@@ -223,7 +223,7 @@ export const toastItem = {
   description: '',
   source: {
     label: 'toaster.tsx',
-    path: 'packages/design-system/src/components/toaster/toaster.tsx',
+    path: 'packages/design-system/src/studio/toaster/toaster.tsx',
   },
 } satisfies DocsItem
 
@@ -234,7 +234,7 @@ export const spinnerItem = {
   description: '',
   source: {
     label: 'spinner.tsx',
-    path: 'packages/design-system/src/components/spinner/spinner.tsx',
+    path: 'packages/design-system/src/studio/spinner/spinner.tsx',
   },
 } satisfies DocsItem
 
@@ -245,7 +245,7 @@ export const iconItem = {
   description: '',
   source: {
     label: 'icon.tsx',
-    path: 'packages/design-system/src/components/icon/icon.tsx',
+    path: 'packages/design-system/src/studio/icon/icon.tsx',
   },
 } satisfies DocsItem
 
@@ -256,7 +256,7 @@ export const inputItem = {
   description: '',
   source: {
     label: 'input.tsx',
-    path: 'packages/design-system/src/components/input/input.tsx',
+    path: 'packages/design-system/src/studio/input/input.tsx',
   },
 } satisfies DocsItem
 
@@ -267,7 +267,7 @@ export const inputGroupItem = {
   description: '',
   source: {
     label: 'inputGroup.tsx',
-    path: 'packages/design-system/src/components/inputGroup/inputGroup.tsx',
+    path: 'packages/design-system/src/studio/inputGroup/inputGroup.tsx',
   },
 } satisfies DocsItem
 
@@ -278,7 +278,7 @@ export const keyboardInputItem = {
   description: '',
   source: {
     label: 'keyboardInput.tsx',
-    path: 'packages/design-system/src/components/keyboardInput/keyboardInput.tsx',
+    path: 'packages/design-system/src/studio/keyboardInput/keyboardInput.tsx',
   },
 } satisfies DocsItem
 
@@ -289,7 +289,7 @@ export const codeEditorItem = {
   description: '',
   source: {
     label: 'codeEditor.tsx',
-    path: 'packages/design-system/src/components/codeEditor/codeEditor.tsx',
+    path: 'packages/design-system/src/studio/codeEditor/codeEditor.tsx',
   },
 } satisfies DocsItem
 
@@ -300,7 +300,7 @@ export const binaryValueItem = {
   description: '',
   source: {
     label: 'binaryValue.tsx',
-    path: 'packages/design-system/src/components/binaryValue/binaryValue.tsx',
+    path: 'packages/design-system/src/studio/binaryValue/binaryValue.tsx',
   },
 } satisfies DocsItem
 
@@ -311,7 +311,7 @@ export const timestampValueItem = {
   description: '',
   source: {
     label: 'timestampValue.tsx',
-    path: 'packages/design-system/src/components/timestampValue/timestampValue.tsx',
+    path: 'packages/design-system/src/studio/timestampValue/timestampValue.tsx',
   },
 } satisfies DocsItem
 
@@ -322,7 +322,7 @@ export const structuredValuePreviewItem = {
   description: '',
   source: {
     label: 'structuredValuePreview.tsx',
-    path: 'packages/design-system/src/components/structuredValuePreview/structuredValuePreview.tsx',
+    path: 'packages/design-system/src/studio/structuredValuePreview/structuredValuePreview.tsx',
   },
 } satisfies DocsItem
 
@@ -333,7 +333,7 @@ export const relationValueItem = {
   description: '',
   source: {
     label: 'relationValue.tsx',
-    path: 'packages/design-system/src/components/relationValue/relationValue.tsx',
+    path: 'packages/design-system/src/studio/relationValue/relationValue.tsx',
   },
 } satisfies DocsItem
 
@@ -344,7 +344,7 @@ export const middleTruncateItem = {
   description: '',
   source: {
     label: 'middleTruncate.tsx',
-    path: 'packages/design-system/src/components/middleTruncate/middleTruncate.tsx',
+    path: 'packages/design-system/src/studio/middleTruncate/middleTruncate.tsx',
   },
 } satisfies DocsItem
 
@@ -355,7 +355,7 @@ export const menuItem = {
   description: '',
   source: {
     label: 'menu.tsx',
-    path: 'packages/design-system/src/components/menu/menu.tsx',
+    path: 'packages/design-system/src/studio/menu/menu.tsx',
   },
 } satisfies DocsItem
 
@@ -366,7 +366,7 @@ export const contextMenuItem = {
   description: '',
   source: {
     label: 'contextMenu.tsx',
-    path: 'packages/design-system/src/components/contextMenu/contextMenu.tsx',
+    path: 'packages/design-system/src/studio/contextMenu/contextMenu.tsx',
   },
 } satisfies DocsItem
 
@@ -377,7 +377,7 @@ export const findBarItem = {
   description: '',
   source: {
     label: 'findBar.tsx',
-    path: 'packages/design-system/src/components/findBar/findBar.tsx',
+    path: 'packages/design-system/src/studio/findBar/findBar.tsx',
   },
 } satisfies DocsItem
 
@@ -388,7 +388,7 @@ export const accordionItem = {
   description: '',
   source: {
     label: 'accordion.tsx',
-    path: 'packages/design-system/src/components/accordion/accordion.tsx',
+    path: 'packages/design-system/src/studio/accordion/accordion.tsx',
   },
 } satisfies DocsItem
 
@@ -399,7 +399,7 @@ export const treeItem = {
   description: '',
   source: {
     label: 'tree.tsx',
-    path: 'packages/design-system/src/components/tree/tree.tsx',
+    path: 'packages/design-system/src/studio/tree/tree.tsx',
   },
 } satisfies DocsItem
 
@@ -410,7 +410,7 @@ export const actionListItem = {
   description: '',
   source: {
     label: 'actionList.tsx',
-    path: 'packages/design-system/src/components/actionList/actionList.tsx',
+    path: 'packages/design-system/src/studio/actionList/actionList.tsx',
   },
 } satisfies DocsItem
 
@@ -421,7 +421,7 @@ export const boxItem = {
   description: '',
   source: {
     label: 'box.tsx',
-    path: 'packages/design-system/src/components/box/box.tsx',
+    path: 'packages/design-system/src/studio/box/box.tsx',
   },
 } satisfies DocsItem
 
@@ -454,7 +454,7 @@ export const sidePanelItem = {
   description: '',
   source: {
     label: 'sidePanel.tsx',
-    path: 'packages/design-system/src/components/sidePanel/sidePanel.tsx',
+    path: 'packages/design-system/src/studio/sidePanel/sidePanel.tsx',
   },
 } satisfies DocsItem
 
@@ -465,7 +465,7 @@ export const floatingPanelItem = {
   description: '',
   source: {
     label: 'floatingPanel.tsx',
-    path: 'packages/design-system/src/components/floatingPanel/floatingPanel.tsx',
+    path: 'packages/design-system/src/studio/floatingPanel/floatingPanel.tsx',
   },
 } satisfies DocsItem
 
@@ -476,7 +476,7 @@ export const scrollAreaItem = {
   description: '',
   source: {
     label: 'scrollArea.tsx',
-    path: 'packages/design-system/src/components/scrollArea/scrollArea.tsx',
+    path: 'packages/design-system/src/studio/scrollArea/scrollArea.tsx',
   },
 } satisfies DocsItem
 
@@ -487,7 +487,7 @@ export const dataGridItem = {
   description: '',
   source: {
     label: 'dataGrid.tsx',
-    path: 'packages/design-system/src/components/dataGrid/dataGrid.tsx',
+    path: 'packages/design-system/src/studio/dataGrid/dataGrid.tsx',
   },
 } satisfies DocsItem
 
@@ -498,7 +498,7 @@ export const swimlaneTimelineItem = {
   description: '',
   source: {
     label: 'swimlaneTimeline.tsx',
-    path: 'packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx',
+    path: 'packages/design-system/src/studio/swimlaneTimeline/swimlaneTimeline.tsx',
   },
 } satisfies DocsItem
 
@@ -509,7 +509,7 @@ export const jsonViewItem = {
   description: '',
   source: {
     label: 'jsonView.tsx',
-    path: 'packages/design-system/src/components/jsonView/jsonView.tsx',
+    path: 'packages/design-system/src/studio/jsonView/jsonView.tsx',
   },
 } satisfies DocsItem
 
@@ -520,7 +520,7 @@ export const resizablePanelItem = {
   description: '',
   source: {
     label: 'resizablePanel.tsx',
-    path: 'packages/design-system/src/components/resizablePanel/resizablePanel.tsx',
+    path: 'packages/design-system/src/studio/resizablePanel/resizablePanel.tsx',
   },
 } satisfies DocsItem
 
@@ -531,7 +531,7 @@ export const shellLayoutItem = {
   description: '',
   source: {
     label: 'shellLayout.tsx',
-    path: 'packages/design-system/src/components/shellLayout/shellLayout.tsx',
+    path: 'packages/design-system/src/studio/shellLayout/shellLayout.tsx',
   },
 } satisfies DocsItem
 
@@ -542,7 +542,7 @@ export const comboboxItem = {
   description: '',
   source: {
     label: 'combobox.tsx',
-    path: 'packages/design-system/src/components/combobox/combobox.tsx',
+    path: 'packages/design-system/src/studio/combobox/combobox.tsx',
   },
 } satisfies DocsItem
 
@@ -553,7 +553,7 @@ export const contextSwitcherItem = {
   description: '',
   source: {
     label: 'contextSwitcher.tsx',
-    path: 'packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx',
+    path: 'packages/design-system/src/studio/contextSwitcher/contextSwitcher.tsx',
   },
 } satisfies DocsItem
 
@@ -564,7 +564,7 @@ export const multiSelectItem = {
   description: '',
   source: {
     label: 'multiSelect.tsx',
-    path: 'packages/design-system/src/components/multiSelect/multiSelect.tsx',
+    path: 'packages/design-system/src/studio/multiSelect/multiSelect.tsx',
   },
 } satisfies DocsItem
 
@@ -575,7 +575,7 @@ export const selectItem = {
   description: '',
   source: {
     label: 'select.tsx',
-    path: 'packages/design-system/src/components/select/select.tsx',
+    path: 'packages/design-system/src/studio/select/select.tsx',
   },
 } satisfies DocsItem
 
@@ -586,7 +586,7 @@ export const datePickerItem = {
   description: '',
   source: {
     label: 'datePicker.tsx',
-    path: 'packages/design-system/src/components/datePicker/datePicker.tsx',
+    path: 'packages/design-system/src/studio/datePicker/datePicker.tsx',
   },
 } satisfies DocsItem
 
@@ -597,7 +597,7 @@ export const fieldItem = {
   description: '',
   source: {
     label: 'field.tsx',
-    path: 'packages/design-system/src/components/field/field.tsx',
+    path: 'packages/design-system/src/studio/field/field.tsx',
   },
 } satisfies DocsItem
 
@@ -608,7 +608,7 @@ export const fieldsetItem = {
   description: '',
   source: {
     label: 'fieldset.tsx',
-    path: 'packages/design-system/src/components/fieldset/fieldset.tsx',
+    path: 'packages/design-system/src/studio/fieldset/fieldset.tsx',
   },
 } satisfies DocsItem
 
@@ -619,7 +619,7 @@ export const textFieldItem = {
   description: '',
   source: {
     label: 'textField.tsx',
-    path: 'packages/design-system/src/components/textField/textField.tsx',
+    path: 'packages/design-system/src/studio/textField/textField.tsx',
   },
 } satisfies DocsItem
 

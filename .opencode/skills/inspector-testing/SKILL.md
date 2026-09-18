@@ -17,15 +17,15 @@ description: Implements and organizes Inspektor tests, browser verification, and
 
 ## Choose the test boundary
 
-1. Use Playwright under `apps/web/e2e` only for behavior that must cross the real browser, built application, or fixture boundary.
+1. Use Playwright under `apps/studio/e2e` only for behavior that must cross the real browser, built application, or fixture boundary.
 2. Otherwise use Vitest beside the source file.
 3. Prefer the Node project when the test does not require DOM or browser globals.
 
 ## Name web Vitest files
 
-- Pure TypeScript tests use `*.test.ts`; `apps/web` runs them in the Node project.
-- TypeScript tests requiring `window`, DOM APIs, or the jsdom setup use `*.jsdom.test.ts`; `apps/web` runs them in the jsdom project.
-- React tests use `*.test.tsx`; `apps/web` runs them in the jsdom project.
+- Pure TypeScript tests use `*.test.ts`; `apps/studio` runs them in the Node project.
+- TypeScript tests requiring `window`, DOM APIs, or the jsdom setup use `*.jsdom.test.ts`; `apps/studio` runs them in the jsdom project.
+- React tests use `*.test.tsx`; `apps/studio` runs them in the jsdom project.
 - Do not add test paths to a central environment allowlist or use `@vitest-environment` comments. The filename owns environment selection.
 
 ## Design-system exception
@@ -50,11 +50,11 @@ Read `apps/inspektor-test/README.md` before changing its schema, permissions, se
 ### Automated acceptance
 
 - Run `pnpm test:browser` from the workspace root.
-- Playwright owns the application server and isolated fixture. Do not start `pnpm dev:web` or `pnpm inspektor-test:fixture` for this mode.
+- Playwright owns the application server and isolated fixture. Do not start `pnpm dev:studio` or `pnpm inspektor-test:fixture` for this mode.
 
 ### Interactive inspection
 
-1. Start `pnpm dev:web` and `pnpm inspektor-test:fixture` from the workspace root as separate owned persistent processes.
+1. Start `pnpm dev:studio` and `pnpm inspektor-test:fixture` from the workspace root as separate owned persistent processes.
 2. Record both process IDs, confirm reachability, and stop only those processes after verification.
 3. Use a fresh isolated Chrome context. Do not rely on persistent profile state.
 4. Open the direct HTTP Vite URL when the fixture endpoint uses `http://` or `ws://`; an HTTPS page would block those fixture connections as mixed content.
@@ -71,10 +71,10 @@ Reserve persistent browser profiles and saved cloud connections for explicit sha
 
 ## Validate
 
-- Inspektor web app Node test: `pnpm test:web:node`
-- Inspektor web app jsdom test: `pnpm test:web:jsdom`
-- Inspektor web app browser test: `pnpm test:browser`
-- Design-system documentation app test: `pnpm test:web:design`
+- Inspektor Studio Node test: `pnpm test:studio:node`
+- Inspektor Studio jsdom test: `pnpm test:studio:jsdom`
+- Inspektor Studio browser test: `pnpm test:browser`
+- Design-system documentation app test: `pnpm test:design-system-docs`
 - Design-system Node allowlist: `pnpm test:design-system:node`
 - Inspektor Test lint: `pnpm --filter inspektor-test lint`
 - Inspektor Test suite: `pnpm --filter inspektor-test test`

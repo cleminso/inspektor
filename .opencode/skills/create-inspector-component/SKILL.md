@@ -1,6 +1,6 @@
 ---
 name: create-inspector-component
-description: Creates or updates `@inspektor/ds` components by wrapping Base UI primitives and applying Inspektor StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
+description: Creates or updates `@inspektor/ds` components by wrapping Base UI primitives and applying Inspektor StyleX tokens and styles. Use when adding components under `packages/design-system/src/studio`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
 ---
 
 # Create Inspektor Component
@@ -30,7 +30,7 @@ For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nest
 
 ## Wrapper workflow
 
-- Create `packages/design-system/src/components/{componentName}/` using camelCase filenames.
+- Create `packages/design-system/src/studio/{componentName}/` using camelCase filenames.
 - Keep behavior in `{componentName}.tsx` and StyleX definitions in `{componentName}.styles.ts`.
 - Import Base UI primitives directly and alias them with a `Base` prefix.
 - Preserve the Base UI prop surface by default, including refs, events, ARIA, DOM attributes, and controlled or uncontrolled state.
@@ -89,7 +89,7 @@ For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nest
 
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
-- Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts`. Include the shared adapter when changing it.
+- Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/studio/{componentName}/{componentName}.tsx src/studio/{componentName}/{componentName}.styles.ts src/index.ts`. Include the shared adapter when changing it.
 - Classify full-package lint findings as changed-file failures or existing repository failures. Fix all changed-file failures without expanding the task into unrelated cleanup.
 - Run package-scoped formatting only when a shared formatter configuration preserves adjacent conventions. Do not normalize unrelated files to formatter defaults.
 - Complete the documentation workflow and its validation commands.

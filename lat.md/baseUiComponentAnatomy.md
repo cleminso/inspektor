@@ -330,7 +330,7 @@ Each wrapper preserves the exact upstream part contract while narrowing unsuppor
 
 Inspektor derives each wrapper from the part it actually renders:
 
-```packages/design-system/src/components/accordion/accordion.tsx#L12-23
+```packages/design-system/src/studio/accordion/accordion.tsx#L12-23
 export interface AccordionRootProps extends Omit<
   WithoutStyles<BaseAccordion.Root.Props<AccordionValue>>,
   'orientation'
@@ -388,7 +388,7 @@ The `details` object is a custom component event description, not merely a React
 
 This answers a need that `onClick` cannot: one state change may come from keyboard input, pointer input, focus movement, dismissal, an effect, or another component mechanism. The reason lets application code respond to intent rather than guessing from one DOM event.
 
-Do not reduce a callback to `(value) => void` in a wrapper. That discards reasons, cancellation, event narrowing, and component-specific details. Use indexed access such as `BaseSelect.Root.Props<Value, false>['onValueChange']` as Inspektor does in `packages/design-system/src/components/select/select.tsx#L20-L34`.
+Do not reduce a callback to `(value) => void` in a wrapper. That discards reasons, cancellation, event narrowing, and component-specific details. Use indexed access such as `BaseSelect.Root.Props<Value, false>['onValueChange']` as Inspektor does in `packages/design-system/src/studio/select/select.tsx#L20-L34`.
 
 Three cancellation mechanisms solve different problems:
 
@@ -408,10 +408,10 @@ See [Base UI customization events](https://base-ui.com/react/handbook/customizat
 
 Examples in Inspektor:
 
-- `BaseButton.State` exposes resolved `disabled` in `packages/design-system/src/components/button/button.tsx#L91-L108`.
-- `BaseAccordion.Trigger.State` exposes `open` and `disabled` in `packages/design-system/src/components/accordion/accordion.tsx#L96-L104`.
-- `BaseAccordion.Panel.State` exposes `transitionStatus` in `packages/design-system/src/components/accordion/accordion.tsx#L121-L128`.
-- `BaseSelect.Item.State` exposes `selected`, `highlighted`, and `disabled` in `packages/design-system/src/components/select/select.tsx#L288-L306`.
+- `BaseButton.State` exposes resolved `disabled` in `packages/design-system/src/studio/button/button.tsx#L91-L108`.
+- `BaseAccordion.Trigger.State` exposes `open` and `disabled` in `packages/design-system/src/studio/accordion/accordion.tsx#L96-L104`.
+- `BaseAccordion.Panel.State` exposes `transitionStatus` in `packages/design-system/src/studio/accordion/accordion.tsx#L121-L128`.
+- `BaseSelect.Item.State` exposes `selected`, `highlighted`, and `disabled` in `packages/design-system/src/studio/select/select.tsx#L288-L306`.
 
 Inspektor's adapter turns one StyleX selector into Base-compatible `className(state)` and `style(state)` callbacks:
 
@@ -452,7 +452,7 @@ Inspektor uses standard TypeScript utilities and focused casts to preserve upstr
 
 Button removes Base styling plus low-level behavior and content decisions:
 
-```packages/design-system/src/components/button/button.tsx#L23-40
+```packages/design-system/src/studio/button/button.tsx#L23-40
 type BaseButtonProps = Omit<
   BaseButton.Props,
   'className' | 'focusableWhenDisabled' | 'nativeButton' | 'prefix' | 'style'
@@ -474,7 +474,7 @@ The need is API shaping. `Omit` is compile-time only: it does not remove a key f
 
 `Pick<Props, Keys>` exposes a small allowed subset of a broad upstream API. Select Positioner permits semantic placement choices while Inspektor owns detailed geometry:
 
-```packages/design-system/src/components/select/select.tsx#L64-67
+```packages/design-system/src/studio/select/select.tsx#L64-67
 export type SelectPositionerProps = Pick<
   WithoutStyles<BaseSelect.Positioner.Props>,
   'align' | 'alignItemWithTrigger' | 'children' | 'ref' | 'side'
@@ -489,7 +489,7 @@ This answers the need to allow meaningful placement without exposing arbitrary o
 
 `SomeType['property']` extracts one exact property type. Inspektor uses it to document a prop locally without copying Base UI's signature:
 
-```packages/design-system/src/components/select/select.tsx#L20-34
+```packages/design-system/src/studio/select/select.tsx#L20-34
 export type SelectRootProps<Value> = Omit<
   BaseSelect.Root.Props<Value, false>,
   'className' | 'style' | 'multiple'
@@ -508,7 +508,7 @@ The need is exactness. Callback details, nullability, and compatible upstream ch
 
 A **discriminated union** is a union whose members are selected by a literal property. It makes invalid combinations fail type checking.
 
-Button uses `iconOnly` as the discriminator. `iconOnly: true` requires an `aria-label` and rejects layout props that make sense only for a labeled button (`packages/design-system/src/components/button/button.tsx#L43-L69`). This answers an accessibility need at the public boundary: an icon-only action must have a name.
+Button uses `iconOnly` as the discriminator. `iconOnly: true` requires an `aria-label` and rejects layout props that make sense only for a labeled button (`packages/design-system/src/studio/button/button.tsx#L43-L69`). This answers an accessibility need at the public boundary: an icon-only action must have a name.
 
 If these states are represented by independent optional booleans, consumers can create contradictory or unnamed controls and the implementation must guess which rule wins.
 
@@ -516,7 +516,7 @@ If these states are represented by independent optional booleans, consumers can 
 
 A **generic value** lets the consumer choose the type represented by a component. Select should preserve an application's value type rather than reduce every option to `string` or `any`.
 
-Inspektor fixes Select Root to single selection with `BaseSelect.Root.Props<Value, false>` and preserves Root's inferred `Value` through its current/default values, items, and callback. Select Item is a separate generic call that preserves the type inferred for that Item (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L83-L97`).
+Inspektor fixes Select Root to single selection with `BaseSelect.Root.Props<Value, false>` and preserves Root's inferred `Value` through its current/default values, items, and callback. Select Item is a separate generic call that preserves the type inferred for that Item (`packages/design-system/src/studio/select/select.tsx#L20-L34`, `L83-L97`).
 
 The current compound API does not create one shared TypeScript generic scope across Root and every nested Item. React context connects their values at runtime, but TypeScript checks each public surface independently. It cannot prove that a nested Item's inferred type equals Root's inferred type.
 
@@ -553,17 +553,17 @@ const SelectItem = React.forwardRef(SelectItemInner) as <Value>(
 ) => React.ReactElement | null
 ```
 
-The real local implementation occupies `packages/design-system/src/components/select/select.tsx#L288-L330`; the shortened body above highlights the type pattern.
+The real local implementation occupies `packages/design-system/src/studio/select/select.tsx#L288-L330`; the shortened body above highlights the type pattern.
 
 The cast restores type information only. It adds no runtime check and no ref behavior. Its correctness depends on the inner generic props, forwarded ref target, and asserted callable signature staying aligned. A broad or distant cast can claim safety the implementation does not provide.
 
-Select Root does not need this pattern because it renders no element and remains a plain generic function at `packages/design-system/src/components/select/select.tsx#L112-L114`.
+Select Root does not need this pattern because it renders no element and remains a plain generic function at `packages/design-system/src/studio/select/select.tsx#L112-L114`.
 
 ### `Object.assign`
 
 Inspektor uses `Object.assign` to package a callable root and related members under one exported symbol:
 
-```packages/design-system/src/components/accordion/accordion.tsx#L132-138
+```packages/design-system/src/studio/accordion/accordion.tsx#L132-138
 export const Accordion = Object.assign(AccordionRoot, {
   Root: AccordionRoot,
   Header: AccordionHeader,
@@ -616,7 +616,7 @@ const SelectTrigger = React.forwardRef<
 })
 ```
 
-The actual implementation includes Inspektor sizing, adornments, and state styles in `packages/design-system/src/components/select/select.tsx#L141-L196`.
+The actual implementation includes Inspektor sizing, adornments, and state styles in `packages/design-system/src/studio/select/select.tsx#L141-L196`.
 
 What breaks:
 
@@ -711,7 +711,7 @@ Destructuring is part of the policy. Removing `size`, `disabled`, or `render` fr
 
 Base UI performs another internal merge inside the primitive. Wrapper JSX precedence and Base UI's renderer merge are separate layers. If several independent owners must keep handlers/classes/styles, use `mergeProps` or deliberate manual control flow rather than hoping spread order composes them.
 
-Inspektor Button demonstrates pass-through props followed by resolved policy and state styles at `packages/design-system/src/components/button/button.tsx#L110-L129`.
+Inspektor Button demonstrates pass-through props followed by resolved policy and state styles at `packages/design-system/src/studio/button/button.tsx#L110-L129`.
 
 ### nativeButton
 
@@ -776,11 +776,11 @@ consumer <Button>
      └─ Inspektor ButtonContent presentation
 ```
 
-**Public API.** Inspektor starts from `BaseButton.Props`, removes direct styling and low-level knobs, adds semantic variants, and uses a discriminated union for icon-only accessibility (`packages/design-system/src/components/button/button.tsx#L23-L69`).
+**Public API.** Inspektor starts from `BaseButton.Props`, removes direct styling and low-level knobs, adds semantic variants, and uses a discriminated union for icon-only accessibility (`packages/design-system/src/studio/button/button.tsx#L23-L69`).
 
-**State and policy.** `loading` is an Inspektor concept. The wrapper resolves `disabled || loading`, keeps a loading control focusable, applies `aria-busy`, and styles from Base's resolved `state.disabled` (`packages/design-system/src/components/button/button.tsx#L71-L108`). Base UI still enforces interaction behavior.
+**State and policy.** `loading` is an Inspektor concept. The wrapper resolves `disabled || loading`, keeps a loading control focusable, applies `aria-busy`, and styles from Base's resolved `state.disabled` (`packages/design-system/src/studio/button/button.tsx#L71-L108`). Base UI still enforces interaction behavior.
 
-**Element boundary.** Inspektor spreads pass-through props onto `BaseButton`, applies its resolved values and state styles, and places presentation inside the Base element (`packages/design-system/src/components/button/button.tsx#L110-L140`). The ref reaches `BaseButton`, not `ButtonContent`.
+**Element boundary.** Inspektor spreads pass-through props onto `BaseButton`, applies its resolved values and state styles, and places presentation inside the Base element (`packages/design-system/src/studio/button/button.tsx#L110-L140`). The ref reaches `BaseButton`, not `ButtonContent`.
 
 **Need answered.** Product code gets one consistent Button API while Base UI remains responsible for button semantics, keyboard behavior, disabled behavior, and render composition.
 
@@ -802,15 +802,15 @@ BaseAccordion.Root
       └─ consumer content
 ```
 
-**Per-part props.** Root uses `BaseAccordion.Root.Props<AccordionValue>`, Item uses `Item.Props`, Header uses `Header.Props`, Trigger uses `Trigger.Props`, and Panel uses `Panel.Props` (`packages/design-system/src/components/accordion/accordion.tsx#L8-L61`). This preserves each part's distinct behavior and state typing.
+**Per-part props.** Root uses `BaseAccordion.Root.Props<AccordionValue>`, Item uses `Item.Props`, Header uses `Header.Props`, Trigger uses `Trigger.Props`, and Panel uses `Panel.Props` (`packages/design-system/src/studio/accordion/accordion.tsx#L8-L61`). This preserves each part's distinct behavior and state typing.
 
-**Root and context.** Root owns expanded values and broad Accordion context. Item registers its value. Trigger and Panel participate in that Item relationship. Inspektor does not copy expanded state into another hook (`packages/design-system/src/components/accordion/accordion.tsx#L63-L85`).
+**Root and context.** Root owns expanded values and broad Accordion context. Item registers its value. Trigger and Panel participate in that Item relationship. Inspektor does not copy expanded state into another hook (`packages/design-system/src/studio/accordion/accordion.tsx#L63-L85`).
 
-**Part state.** Trigger styles `open` and `disabled`; Panel styles `transitionStatus`. Those facts come from the parts that own them (`packages/design-system/src/components/accordion/accordion.tsx#L96-L128`).
+**Part state.** Trigger styles `open` and `disabled`; Panel styles `transitionStatus`. Those facts come from the parts that own them (`packages/design-system/src/studio/accordion/accordion.tsx#L96-L128`).
 
-**Presentation.** Inspektor inserts label, chevron, and suffix inside Base Trigger. It does not create a competing button or heading (`packages/design-system/src/components/accordion/accordion.tsx#L96-L119`). Base Header and Trigger retain their semantic relationship.
+**Presentation.** Inspektor inserts label, chevron, and suffix inside Base Trigger. It does not create a competing button or heading (`packages/design-system/src/studio/accordion/accordion.tsx#L96-L119`). Base Header and Trigger retain their semantic relationship.
 
-**API packaging.** `Object.assign` exposes `Accordion.Root`, `.Item`, `.Header`, `.Trigger`, and `.Panel` (`packages/design-system/src/components/accordion/accordion.tsx#L132-L138`). It does not create or enforce the Root/Item context.
+**API packaging.** `Object.assign` exposes `Accordion.Root`, `.Item`, `.Header`, `.Trigger`, and `.Panel` (`packages/design-system/src/studio/accordion/accordion.tsx#L132-L138`). It does not create or enforce the Root/Item context.
 
 **Need answered.** Consumers control composition and content, Inspektor controls visuals, and Base UI keeps trigger/panel IDs, expansion behavior, and keyboard semantics coherent.
 
@@ -841,13 +841,13 @@ BaseSelect.Root<Value, false>             no root DOM
                   └─ BaseSelect.Item<Value>
 ```
 
-**Generic Root.** Inspektor fixes multiple selection to `false` while preserving caller-selected `Value` through value, default value, items, and callback (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L112-L114`).
+**Generic Root.** Inspektor fixes multiple selection to `false` while preserving caller-selected `Value` through value, default value, items, and callback (`packages/design-system/src/studio/select/select.tsx#L20-L34`, `L112-L114`).
 
-**Trigger.** Inspektor exposes constrained size and width, forwards `nativeButton` and `render` independently, styles Base's open/valid/disabled state, and inserts a standard icon only when one is absent (`packages/design-system/src/components/select/select.tsx#L38-L58`, `L141-L196`). The consumer must ensure that `nativeButton` describes the final render target.
+**Trigger.** Inspektor exposes constrained size and width, forwards `nativeButton` and `render` independently, styles Base's open/valid/disabled state, and inserts a standard icon only when one is absent (`packages/design-system/src/studio/select/select.tsx#L38-L58`, `L141-L196`). The consumer must ensure that `nativeButton` describes the final render target.
 
-**Popup layers.** Portal, Positioner, Popup, and List remain separate direct wrappers. Positioner exposes a picked placement subset while Inspektor fixes the shared offset (`packages/design-system/src/components/select/select.tsx#L223-L263`). `Select.Content` is an Inspektor convenience recipe that assembles those parts (`packages/design-system/src/components/select/select.tsx#L265-L280`). It is not a Base primitive and adds no new context.
+**Popup layers.** Portal, Positioner, Popup, and List remain separate direct wrappers. Positioner exposes a picked placement subset while Inspektor fixes the shared offset (`packages/design-system/src/studio/select/select.tsx#L223-L263`). `Select.Content` is an Inspektor convenience recipe that assembles those parts (`packages/design-system/src/studio/select/select.tsx#L265-L280`). It is not a Base primitive and adds no new context.
 
-**Items.** Item preserves generic `Value`, styles selected/highlighted/disabled state, and inserts ItemText and ItemIndicator when consumers have not supplied them (`packages/design-system/src/components/select/select.tsx#L282-L366`). The generic inner function plus `forwardRef` cast preserves call-site typing.
+**Items.** Item preserves generic `Value`, styles selected/highlighted/disabled state, and inserts ItemText and ItemIndicator when consumers have not supplied them (`packages/design-system/src/studio/select/select.tsx#L282-L366`). The generic inner function plus `forwardRef` cast preserves call-site typing.
 
 **Need answered.** Base UI coordinates selection, label resolution, item registration, keyboard behavior, popup state, and positioning. Inspektor supplies a smaller product vocabulary and a standard visual composition.
 
@@ -855,7 +855,7 @@ BaseSelect.Root<Value, false>             no root DOM
 
 ### ActionList: behavior primitives versus rendering utilities
 
-ActionList is useful because there is no Base UI ActionList primitive. [[packages/design-system/src/components/actionList/actionList.tsx#ActionList]] owns the list-level behavior and structure:
+ActionList is useful because there is no Base UI ActionList primitive. [[packages/design-system/src/studio/actionList/actionList.tsx#ActionList]] owns the list-level behavior and structure:
 
 ```/dev/null/action-list-map.txt#L1-9
 ul                              Inspektor structure and Escape policy
@@ -866,9 +866,9 @@ ul                              Inspektor structure and Escape policy
    └─ Base Button               optional trailing action
 ```
 
-`ActionList.Item` derives from `useRender.ComponentProps<'li'>`, combines independent prop owners with `mergeProps`, and supplies the forwarded ref separately to `useRender` (`packages/design-system/src/components/actionList/actionList.tsx#L26-L35`, `L114-L142`).
+`ActionList.Item` derives from `useRender.ComponentProps<'li'>`, combines independent prop owners with `mergeProps`, and supplies the forwarded ref separately to `useRender` (`packages/design-system/src/studio/actionList/actionList.tsx#L26-L35`, `L114-L142`).
 
-`useRender` supplies composition infrastructure only. It does not turn the Item into a Base collection primitive. Inspektor owns Root's Escape delegation and focus-return policy (`packages/design-system/src/components/actionList/actionList.tsx#L76-L112`). Base Button and Inspektor Checkbox own the interactive leaves (`packages/design-system/src/components/actionList/actionList.tsx#L144-L223`).
+`useRender` supplies composition infrastructure only. It does not turn the Item into a Base collection primitive. Inspektor owns Root's Escape delegation and focus-return policy (`packages/design-system/src/studio/actionList/actionList.tsx#L76-L112`). Base Button and Inspektor Checkbox own the interactive leaves (`packages/design-system/src/studio/actionList/actionList.tsx#L144-L223`).
 
 The checkbox, primary trigger, and trailing action are siblings, avoiding nested interactive controls. This example separates **Base behavior primitives** such as Button from **Base rendering utilities** such as `useRender` and `mergeProps`.
 
@@ -1013,20 +1013,20 @@ These repository-root-relative paths map each local claim to its implementation 
 
 | Local path and lines                                                                    | Evidence                                                                                    |
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `packages/design-system/src/components/button/button.tsx#L23-L69`                       | Exact Base Button props, omissions, indexed access, semantic props, discriminated union.    |
-| `packages/design-system/src/components/button/button.tsx#L71-L108`                      | `forwardRef`, loading translation, and `BaseButton.State`.                                  |
-| `packages/design-system/src/components/button/button.tsx#L110-L140`                     | Prop precedence, Base element boundary, and Inspektor content.                              |
-| `packages/design-system/src/components/accordion/accordion.tsx#L8-L61`                  | Exact per-part props, omissions, controlled values, and selective `render`.                 |
-| `packages/design-system/src/components/accordion/accordion.tsx#L63-L130`                | Per-part refs, Base boundaries, Trigger state, Panel transition state, and visual children. |
-| `packages/design-system/src/components/accordion/accordion.tsx#L132-L138`               | Compound API packaging with `Object.assign`.                                                |
-| `packages/design-system/src/components/select/select.tsx#L9-L109`                       | Generic public types, `Omit`, `Pick`, indexed access, and constrained popup contracts.      |
-| `packages/design-system/src/components/select/select.tsx#L112-L221`                     | Generic non-DOM Root, `ComponentRef`, Trigger state, Value, and Icon.                       |
-| `packages/design-system/src/components/select/select.tsx#L223-L280`                     | Portal, Positioner, Popup, List, and Inspektor Content recipe.                              |
-| `packages/design-system/src/components/select/select.tsx#L282-L366`                     | Generic Item, `Part.State`, standard children, `forwardRef` cast, and Indicator.            |
-| `packages/design-system/src/components/select/select.tsx#L368-L405`                     | Group, GroupLabel, remaining parts, and compound export.                                    |
-| `packages/design-system/src/components/actionList/actionList.tsx#L18-L74`               | Native list props, `useRender.ComponentProps`, and Base Button leaf props.                  |
-| `packages/design-system/src/components/actionList/actionList.tsx#L76-L142`              | Inspektor Escape policy, `useRender`, `mergeProps`, and separate ref path.                  |
-| `packages/design-system/src/components/actionList/actionList.tsx#L144-L231`             | Checkbox/Button leaves, sibling interactive controls, and compound export.                  |
+| `packages/design-system/src/studio/button/button.tsx#L23-L69`                           | Exact Base Button props, omissions, indexed access, semantic props, discriminated union.    |
+| `packages/design-system/src/studio/button/button.tsx#L71-L108`                          | `forwardRef`, loading translation, and `BaseButton.State`.                                  |
+| `packages/design-system/src/studio/button/button.tsx#L110-L140`                         | Prop precedence, Base element boundary, and Inspektor content.                              |
+| `packages/design-system/src/studio/accordion/accordion.tsx#L8-L61`                      | Exact per-part props, omissions, controlled values, and selective `render`.                 |
+| `packages/design-system/src/studio/accordion/accordion.tsx#L63-L130`                    | Per-part refs, Base boundaries, Trigger state, Panel transition state, and visual children. |
+| `packages/design-system/src/studio/accordion/accordion.tsx#L132-L138`                   | Compound API packaging with `Object.assign`.                                                |
+| `packages/design-system/src/studio/select/select.tsx#L9-L109`                           | Generic public types, `Omit`, `Pick`, indexed access, and constrained popup contracts.      |
+| `packages/design-system/src/studio/select/select.tsx#L112-L221`                         | Generic non-DOM Root, `ComponentRef`, Trigger state, Value, and Icon.                       |
+| `packages/design-system/src/studio/select/select.tsx#L223-L280`                         | Portal, Positioner, Popup, List, and Inspektor Content recipe.                              |
+| `packages/design-system/src/studio/select/select.tsx#L282-L366`                         | Generic Item, `Part.State`, standard children, `forwardRef` cast, and Indicator.            |
+| `packages/design-system/src/studio/select/select.tsx#L368-L405`                         | Group, GroupLabel, remaining parts, and compound export.                                    |
+| `packages/design-system/src/studio/actionList/actionList.tsx#L18-L74`                   | Native list props, `useRender.ComponentProps`, and Base Button leaf props.                  |
+| `packages/design-system/src/studio/actionList/actionList.tsx#L76-L142`                  | Inspektor Escape policy, `useRender`, `mergeProps`, and separate ref path.                  |
+| `packages/design-system/src/studio/actionList/actionList.tsx#L144-L231`                 | Checkbox/Button leaves, sibling interactive controls, and compound export.                  |
 | `packages/design-system/src/primitives/createStateStyleProps.ts#L3-L13`                 | Adapter from `Part.State` to Base-compatible StyleX callbacks.                              |
 | `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts#L9-L26`          | Installed Button ref, Props, and State declarations.                                        |
 | `packages/design-system/node_modules/@base-ui/react/use-render/useRender.d.ts#L10-L70`  | Installed `useRender` parameters, component props, state, and ref declarations.             |

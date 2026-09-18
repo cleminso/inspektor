@@ -30,7 +30,7 @@ The setup is inspired by Polar Orbit, but adapted to this workspace instead of c
 
 The package stays focused on reusable code. It should not know which app consumes it or how docs are rendered.
 
-The documentation app stays focused on examples and navigation. It consumes `@inspektor/ds` through the same public source contract as `apps/web` and `apps/website`, so documentation catches packaging and integration issues early.
+The documentation app stays focused on examples and navigation. It consumes `@inspektor/ds` through the same public source contract as `apps/studio` and `apps/website`, so documentation catches packaging and integration issues early.
 
 This separation keeps the design system useful outside the docs app and prevents docs-only concerns from leaking into the package API. [[lat.md/mental-model-ds-package#Design-system package mental model]] describes the resulting package artifacts.
 

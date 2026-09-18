@@ -29,17 +29,17 @@ Baseline: Base UI `v1.6.0` (`b34551d`), which pins `@mui/internal-docs-infra` `0
 
 ## Field provenance
 
-| Field | Source |
-| --- | --- |
-| Prop name | TypeScript property symbol |
-| Type | TypeScript checker type graph, formatted by docs-infra |
-| Required | Optional symbol flag |
-| Default | JSDoc `@default` |
-| Description | Declaration JSDoc, with configured replacements |
-| Component description | JSDoc on exported component |
-| Inherited props | Resolved callable prop object; external-only declarations dropped |
-| Data attributes | `*DataAttributes.ts(x)` enum by filename convention |
-| CSS variables | `*CssVars.ts(x)` enum by filename convention |
+| Field                 | Source                                                            |
+| --------------------- | ----------------------------------------------------------------- |
+| Prop name             | TypeScript property symbol                                        |
+| Type                  | TypeScript checker type graph, formatted by docs-infra            |
+| Required              | Optional symbol flag                                              |
+| Default               | JSDoc `@default`                                                  |
+| Description           | Declaration JSDoc, with configured replacements                   |
+| Component description | JSDoc on exported component                                       |
+| Inherited props       | Resolved callable prop object; external-only declarations dropped |
+| Data attributes       | `*DataAttributes.ts(x)` enum by filename convention               |
+| CSS variables         | `*CssVars.ts(x)` enum by filename convention                      |
 
 Button's documented defaults for `focusableWhenDisabled` and `nativeButton` come from JSDoc `@default`, not from destructuring initializers. `disabled` is inherited through `React.ComponentPropsWithRef<'button'>` and is filtered out because its declarations are external.
 
@@ -73,12 +73,12 @@ The CI workflow in `ci.yml` runs `pnpm release:build` but does not directly invo
 - `docs/src/utils/createTypes.tsx`
 - `docs/src/utils/typeOrder.mjs`
 - `docs/src/mdx-components.tsx`
-- `docs/src/components/ReferenceTable/ReferenceTable.tsx`
-- `docs/src/components/ReferenceTable/ReferenceAccordion.tsx`
-- `docs/src/components/ReferenceTable/AttributesReferenceTable.tsx`
-- `docs/src/components/ReferenceTable/AdditionalTypes.tsx`
-- `docs/src/components/TypeRef/TypeRef.tsx`
-- `docs/src/components/Subtitle/Subtitle.tsx`
+- `docs/src/studio/ReferenceTable/ReferenceTable.tsx`
+- `docs/src/studio/ReferenceTable/ReferenceAccordion.tsx`
+- `docs/src/studio/ReferenceTable/AttributesReferenceTable.tsx`
+- `docs/src/studio/ReferenceTable/AdditionalTypes.tsx`
+- `docs/src/studio/TypeRef/TypeRef.tsx`
+- `docs/src/studio/Subtitle/Subtitle.tsx`
 - `docs/next.config.mjs`
 - `packages/react/src/button/index.ts`
 - `packages/react/src/button/Button.tsx`

@@ -16,7 +16,7 @@
 
 ## Purpose
 
-Use this recipe when implementing or changing `packages/design-system/src/components/scrollArea`, applying it to a bounded layout, or debugging scrollbar gutters, misplaced thumbs, nested scrolling, sticky headers, or content-width shifts.
+Use this recipe when implementing or changing `packages/design-system/src/studio/scrollArea`, applying it to a bounded layout, or debugging scrollbar gutters, misplaced thumbs, nested scrolling, sticky headers, or content-width shifts.
 
 This recipe supplements the installed Base UI documentation. Confirm the installed `@base-ui/react` version, then read Base UI's current Scroll Area API, handbook guidance, and tagged source before changing the wrapper. Do not copy stale anatomy or state assumptions from this file when the installed primitive differs.
 

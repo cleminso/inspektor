@@ -82,7 +82,7 @@ The component vocabulary remains specific while its default visual language stay
 
 ### DataGrid
 
-`packages/design-system/src/components/dataGrid/dataGridColors.stylex.ts` links component roles to interface semantics.
+`packages/design-system/src/studio/dataGrid/dataGridColors.stylex.ts` links component roles to interface semantics.
 
 The contract distinguishes:
 
@@ -96,7 +96,7 @@ Style rule names may retain library state terminology where changing behavior is
 
 ### WorkspaceTabs
 
-`packages/design-system/src/components/workspaceTabs/workspaceTabsColors.stylex.ts` owns tab-specific roles while linking most values to surface, element, ghost element, text, and focus semantics.
+`packages/design-system/src/studio/workspaceTabs/workspaceTabsColors.stylex.ts` owns tab-specific roles while linking most values to surface, element, ghost element, text, and focus semantics.
 
 Its custom hover treatment remains private because it is a WorkspaceTabs visual decision rather than a new interface-wide hover rule.
 

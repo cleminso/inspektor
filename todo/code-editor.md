@@ -55,7 +55,7 @@
 [26/07/26]
 
 - [x] Add the minimal CodeMirror 6 packages required for editor state, editor view, JSON language support, and accessibility behavior.
-- [x] Implement `CodeEditor` under `packages/design-system/src/components/codeEditor/` with behavior in `codeEditor.tsx` and StyleX rules in `codeEditor.styles.ts`.
+- [x] Implement `CodeEditor` under `packages/design-system/src/studio/codeEditor/` with behavior in `codeEditor.tsx` and StyleX rules in `codeEditor.styles.ts`.
 - [x] Map CodeMirror syntax highlighting to Inspektor `syntaxColors` instead of shipping an unrelated editor theme.
 - [x] Support controlled source text through `value` and `onValueChange`.
 - [x] Support `readOnly`, `disabled`, and `invalid` states without exposing `className`, `style`, arbitrary CodeMirror extensions, or editor configuration objects.
@@ -105,7 +105,7 @@
 
 [24/07/26]
 
-- Replacing `apps/design-system/src/components/docs/codeBlock.tsx` is outside the initial `CodeEditor` implementation.
+- Replacing `apps/design-system/src/studio/docs/codeBlock.tsx` is outside the initial `CodeEditor` implementation.
 - Rich-text code blocks embedded in a ProseMirror document are outside the Inspektor form-editor use case.
 - Monaco and a custom `contenteditable` editing engine are outside the selected architecture.
 - Editable languages other than JSON are outside the initial component contract.

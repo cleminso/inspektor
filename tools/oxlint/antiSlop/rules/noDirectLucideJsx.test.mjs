@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 
 test("rejects direct Lucide JSX and accepts Lucide values", () => {
   const fixtures = mkdtempSync(
-    join(root, "apps/web/src/.no-direct-lucide-jsx-"),
+    join(root, "apps/studio/src/.no-direct-lucide-jsx-"),
   );
   const fixture = join(fixtures, "fixture.tsx");
 

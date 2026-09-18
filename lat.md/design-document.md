@@ -64,8 +64,7 @@ I found the Inspektor experience quality does not represent the same quality as 
 
 I want to build an alternative Jazz inspektor that's focus on modern UX and easier to use and it's central piece for a Jazz developer that require attention and cares.
 
-I'm making assumptions about the UX what I think is necessary for the inspektor. The "UX quality" is my own judgment. My end
-goal is to present this work to Jazz team and discuss to join them to work on the official Inspektor. I see myself working on frontend part of Jazz, such as the official Inspektor and Jazz dashboard.
+I'm making assumptions about the UX what I think is necessary for the inspektor. The "UX quality" is my own judgment.
 
 The direction I take for this Inspektor is quite different from the official one, who is more "standalone" about the framework used (pure css). Where I'm going with modern framework choice that I'm more comfortable with, and found more ergonomic. See Architecture
 
@@ -636,14 +635,14 @@ Each startup failure has one owner and a defined effect on the active session.
 
 These source modules own the runtime bootstrap stages.
 
-- `apps/web/src/app/providers/inspectorSessionProvider.tsx`: accepts connection intent, applies runtime-scope blocking, starts WASM preparation, and requests navigation.
-- `apps/web/src/features/onboarding/useConnectionFormFlow.ts`: validates connection input and joins accepted add or edit flows to the same preparation boundary.
-- `apps/web/src/app/runtime/jazzWasmPreparation.ts`: owns the shared retryable `loadWasmModule()` promise and production R2 artifact identity.
-- `apps/web/src/routes/conn/$connectionId.tsx`: starts valid-route preparation and resolves the route-owned runtime target before mounting runtime code.
-- `apps/web/src/app/runtime/inspectorRuntimeBoundary.tsx`: synchronizes the resolved target with session state without starting preparation.
-- `apps/web/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `RuntimeAdminClient`, and publishes the verified client.
-- `apps/web/src/app/runtime/useInspectorRuntime.tsx`: owns stored-schema, permissions, runtime error, and client projections.
-- `apps/web/src/app/runtime/connectionContentBoundary.tsx`: owns the single table-entry loading surface and mounted-content visibility latch.
+- `apps/studio/src/app/providers/inspectorSessionProvider.tsx`: accepts connection intent, applies runtime-scope blocking, starts WASM preparation, and requests navigation.
+- `apps/studio/src/features/onboarding/useConnectionFormFlow.ts`: validates connection input and joins accepted add or edit flows to the same preparation boundary.
+- `apps/studio/src/app/runtime/jazzWasmPreparation.ts`: owns the shared retryable `loadWasmModule()` promise and production R2 artifact identity.
+- `apps/studio/src/routes/conn/$connectionId.tsx`: starts valid-route preparation and resolves the route-owned runtime target before mounting runtime code.
+- `apps/studio/src/app/runtime/inspectorRuntimeBoundary.tsx`: synchronizes the resolved target with session state without starting preparation.
+- `apps/studio/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `RuntimeAdminClient`, and publishes the verified client.
+- `apps/studio/src/app/runtime/useInspectorRuntime.tsx`: owns stored-schema, permissions, runtime error, and client projections.
+- `apps/studio/src/app/runtime/connectionContentBoundary.tsx`: owns the single table-entry loading surface and mounted-content visibility latch.
 
 #### Why memory driver
 
@@ -808,7 +807,7 @@ schema context, and safe edits into one coherent surface.
 
 The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspektor rules.
 
-`@inspektor/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/web`
+`@inspektor/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/studio`
 owns the Inspektor composition, TanStack table construction, Jazz queries, schema-derived columns, filters, relations, routes,
 and mutations. The design-system root receives a controlled feature-aware `DataGridTable<TData>` instance rather than receiving
 duplicate data, columns, sorting, pagination, or selection state.
@@ -949,7 +948,7 @@ whether it targets visible cells or every row matching the active query. Visible
 is a separate query-backed bulk operation.
 
 Column-header, row, and cell context menus use the design-system `ContextMenu` component. `DataGrid` identifies the interaction
-target; `apps/web` derives available actions from the Jazz schema, row state, and navigation context.
+target; `apps/studio` derives available actions from the Jazz schema, row state, and navigation context.
 
 UI representation:
 
@@ -1066,7 +1065,7 @@ binary copy commands name the encoding explicitly. Hex supports byte-level debug
 and text formats. PostgreSQL literals and JavaScript indexed-object serialization are not primary Inspektor representations.
 
 Reusable, type-specific presentation and editor components belong in `packages/design-system`. The components remain independent
-from Jazz schema objects: they receive constrained display values, metadata, states, and callbacks. `apps/web` owns the mapping
+from Jazz schema objects: they receive constrained display values, metadata, states, and callbacks. `apps/studio` owns the mapping
 from Jazz schema metadata to those components, relation resolution and navigation, parsing, validation, and mutation behavior.
 Dedicated design-system components are required for binary preview and inspection, timestamp presentation and date-time editing,
 structured-value preview and JSON viewing, and relation presentation and field actions. Primitive text, numeric, boolean, enum,
@@ -1085,7 +1084,7 @@ The row side pane has three representations:
   never enter mutation drafts or submissions.
 
 The structured tree is an independent design-system component. It owns bounded tree presentation, expansion, keyboard behavior,
-focus, accessible tree semantics, and highlighting. `apps/web` normalizes Jazz values, owns the copy representation, and supplies
+focus, accessible tree semantics, and highlighting. `apps/studio` normalizes Jazz values, owns the copy representation, and supplies
 explicit representations for timestamps, bytes, references, unsupported values, and exhausted rendering budgets. Binary values
 must not become indexed-object `Uint8Array` serialization in the JSON representation.
 

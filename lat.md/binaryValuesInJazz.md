@@ -56,9 +56,9 @@ Chunked file storage uses these records and methods:
 
 Inspektor verifies `Bytea` values, shows their byte count, and keeps mutation fields read-only.
 
-[[apps/web/src/features/tables/grid/valuePresentation.ts#classifySchemaValue]] verifies that a `Bytea` value is a `Uint8Array`. The table cell displays the byte count, such as `12 KB`, instead of arbitrary binary content.
+[[apps/studio/src/features/tables/grid/valuePresentation.ts#classifySchemaValue]] verifies that a `Bytea` value is a `Uint8Array`. The table cell displays the byte count, such as `12 KB`, instead of arbitrary binary content.
 
-The inspection panel supports these actions through [[apps/web/src/features/tables/rowEditor/values/binary.ts#encodeBinaryValue]] and related helpers:
+The inspection panel supports these actions through [[apps/studio/src/features/tables/rowEditor/values/binary.ts#encodeBinaryValue]] and related helpers:
 
 - Copy as hexadecimal.
 - Copy as Base64.

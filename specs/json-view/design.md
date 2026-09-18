@@ -110,13 +110,13 @@ arrays remain collapsed.
 
 ## Architecture
 
-The component lives under `packages/design-system/src/components/jsonView/`:
+The component lives under `packages/design-system/src/studio/jsonView/`:
 
 - `jsonView.tsx` owns markup, expansion, visible-node traversal, keyboard navigation, and public types.
 - `jsonView.styles.ts` owns StyleX rules and semantic token usage.
 - `jsonView.test.tsx` covers rendering, tree semantics, expansion, keyboard behavior, search, and safeguards.
 
-The application adapter remains in `apps/web` and converts Jazz row values into strict JSON presentation data. The design-system
+The application adapter remains in `apps/studio` and converts Jazz row values into strict JSON presentation data. The design-system
 component does not import Jazz packages or know about rows, columns, references, timestamps, permissions, or mutations.
 
 ## Public API
@@ -132,7 +132,7 @@ options, active occurrence index, and result callback.
 `JsonView` accepts strict JSON-compatible objects and arrays. The application adapter performs explicit normalization before data
 crosses the package boundary:
 
-```apps/web/src/components/table-explorer/data/jsonViewValue.ts#L1-18
+```apps/studio/src/studio/table-explorer/data/jsonViewValue.ts#L1-18
 type InspectorJsonValue =
   | null
   | boolean
@@ -229,7 +229,7 @@ Design-system tests cover:
 
 An integration-style interaction test should exercise the complete visible-node model:
 
-```packages/design-system/src/components/jsonView/jsonView.test.tsx#L1-17
+```packages/design-system/src/studio/jsonView/jsonView.test.tsx#L1-17
 it('navigates and collapses the visible JSON tree', async () => {
   render(
     <JsonView

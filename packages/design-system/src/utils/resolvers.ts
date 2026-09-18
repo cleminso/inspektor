@@ -60,8 +60,8 @@ import {
   rowGapStyles,
   userSelectStyles,
   visibilityStyles,
-} from '../components/box/box-styles'
-import { textAlignStyles } from '../components/text/text-styles'
+} from '../studio/box/box-styles'
+import { textAlignStyles } from '../studio/text/text-styles'
 import type { BoxStyleProps, PseudoState, ResponsiveValue } from './types'
 
 const PSEUDO_SELECTOR_MAP: Record<PseudoState, string> = {

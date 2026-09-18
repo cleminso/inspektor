@@ -88,7 +88,7 @@ Normalize Jazz values before crossing into the design-system component:
 - Bounded child rendering and continuation nodes.
 - Generic primitives plus terminal kinds for unsupported or adapted values.
 
-### `apps/web`
+### `apps/studio`
 
 - Convert Jazz row values into the constrained presentation model.
 - Interpret timestamps, binary, references, and unsupported values.

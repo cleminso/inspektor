@@ -235,7 +235,7 @@
 - [x] Use Base UI Dialog for modal containment, focus trapping, dismissal, and trigger focus restoration.
 - [x] Use Base UI Combobox behavior for searchable option lists, active-option management, arrow navigation, Enter selection, empty results, and screen-reader semantics.
 - [x] Do not add `cmdk`, Radix, or a second interaction primitive; borrow only shadcn's compositional command vocabulary and presentation ideas.
-- [x] Implement the command parts under `packages/design-system/src/components/command/` with behavior in `command.tsx` and StyleX rules in `command.styles.ts`.
+- [x] Implement the command parts under `packages/design-system/src/studio/command/` with behavior in `command.tsx` and StyleX rules in `command.styles.ts`.
 - [x] Support a standalone command surface and `Command.Dialog` composition without exposing styling escape hatches.
 - [x] Keep command items compositional so applications provide actions, labels, descriptions, icons, keywords, and shortcuts without passing one broad command registry object into the design system.
 - [x] Support grouped results, an explicit empty state, bounded scrolling, optional footer hints, and a visible back action for staged flows.
@@ -248,7 +248,7 @@
 
 #### 3. Build segmented filter-clause presentation in `@inspektor/ds`
 
-- [x] Implement `DataGridFilterClause.Root`, `Column`, `Operator`, `Value`, and `Remove` under `packages/design-system/src/components/dataGridFilterClause/`.
+- [x] Implement `DataGridFilterClause.Root`, `Column`, `Operator`, `Value`, and `Remove` under `packages/design-system/src/studio/dataGridFilterClause/`.
 - [x] Render the root as a labelled group containing sibling native buttons; never nest the remove button or segment buttons inside another interactive element.
 - [x] Give each segment an independent hover, pressed, and focus-visible state while preserving one visually continuous grouped surface.
 - [x] Keep the remove action available directly in the toolbar with a minimum accessible hit area and a required action-oriented accessible name.

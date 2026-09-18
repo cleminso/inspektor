@@ -16,7 +16,7 @@
 
 [03/08/26]
 
-- Audited all 40 directories under `packages/design-system/src/components`.
+- Audited all 40 directories under `packages/design-system/src/studio`.
 - Compared Base UI wrappers with installed `@base-ui/react@1.6.0`, official component documentation, installed declarations, and installed source.
 - Traced public props, fixed and transformed props, refs, `render`, events, generated ARIA, controlled state, state attributes, transitions, CSS variables, StyleX ownership, exports, tests, and documentation metadata.
 - Classified native and composed components as high-level Inspektor compositions when they intentionally do not mirror an underlying primitive.

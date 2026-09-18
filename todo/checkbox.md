@@ -32,7 +32,7 @@
 
 - [x] Add `:hover` border feedback to the unchecked checkbox root using `border-focused`.
 - [x] Propagate hover from `Checkbox.Label` to nested checkbox borders through `interactiveControlVars`.
-- [ ] Fix the NULL checkbox in `apps/web/src/components/table-explorer/data/rowEditorFields.tsx`: it combines a wrapping `<label>` with an overriding `aria-label` (duplicated name strings that can drift, visible text "NULL" only at the end of the accessible name) and uses a raw Tailwind `className` label, which violates application composition rules.
+- [ ] Fix the NULL checkbox in `apps/studio/src/studio/table-explorer/data/rowEditorFields.tsx`: it combines a wrapping `<label>` with an overriding `aria-label` (duplicated name strings that can drift, visible text "NULL" only at the end of the accessible name) and uses a raw Tailwind `className` label, which violates application composition rules.
 
 ## Work outside the foundation scope
 

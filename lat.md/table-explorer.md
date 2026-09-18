@@ -71,19 +71,19 @@ Current data flow:
    the query state.
 6. `TableExplorerScreen` passes the selected table state into the data or schema view.
 
-The current runtime and query entry points are [[apps/web/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] and [[apps/web/src/features/tables/query/useTableRows.ts#useTableRows]]. [[lat.md/tableRowsQueryLifecycle#Table row query lifecycle]] documents their current ownership.
+The current runtime and query entry points are [[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] and [[apps/studio/src/features/tables/query/useTableRows.ts#useTableRows]]. [[lat.md/tableRowsQueryLifecycle#Table row query lifecycle]] documents their current ownership.
 
 Relevant Inspektor files:
 
-- `apps/web/src/app/runtime/useInspectorRuntime.tsx`
-- `apps/web/src/app/providers/inspectorProvider.tsx`
-- `apps/web/src/routes/conn/$connectionId/tables/$tableName/index.tsx`
-- `apps/web/src/features/tables/view.tsx`
-- `apps/web/src/features/tables/workspace/selectedView.tsx`
-- `apps/web/src/features/tables/query/useTableRows.ts`
-- `apps/web/src/features/tables/query/useJazzQueryState.ts`
-- `apps/web/src/features/tables/workspace/tableView.tsx`
-- `apps/web/src/features/tables/schema/view.tsx`
+- `apps/studio/src/app/runtime/useInspectorRuntime.tsx`
+- `apps/studio/src/app/providers/inspectorProvider.tsx`
+- `apps/studio/src/routes/conn/$connectionId/tables/$tableName/index.tsx`
+- `apps/studio/src/features/tables/view.tsx`
+- `apps/studio/src/features/tables/workspace/selectedView.tsx`
+- `apps/studio/src/features/tables/query/useTableRows.ts`
+- `apps/studio/src/features/tables/query/useJazzQueryState.ts`
+- `apps/studio/src/features/tables/workspace/tableView.tsx`
+- `apps/studio/src/features/tables/schema/view.tsx`
 
 ## Schema metadata
 
@@ -128,12 +128,12 @@ Regarde uses schema metadata to derive:
 
 Relevant Inspektor files:
 
-- `apps/web/src/features/tables/schema/tableSchema.ts`
-- `apps/web/src/features/tables/grid/buildColumns.tsx`
-- `apps/web/src/features/tables/filters/tableFilters.ts`
-- `apps/web/src/features/tables/filters/filterParsing.ts`
-- `apps/web/src/features/tables/rowEditor/mutation/parsing.ts`
-- `apps/web/src/features/tables/schema/view.tsx`
+- `apps/studio/src/features/tables/schema/tableSchema.ts`
+- `apps/studio/src/features/tables/grid/buildColumns.tsx`
+- `apps/studio/src/features/tables/filters/tableFilters.ts`
+- `apps/studio/src/features/tables/filters/filterParsing.ts`
+- `apps/studio/src/features/tables/rowEditor/mutation/parsing.ts`
+- `apps/studio/src/features/tables/schema/view.tsx`
 
 ## Stored schema and permissions APIs
 
@@ -220,7 +220,7 @@ Regarde uses it because the inspektor must support arbitrary app schemas without
 
 Current Inspektor implementation:
 
-- `apps/web/src/features/tables/query/genericQueryBuilder.ts`
+- `apps/studio/src/features/tables/query/genericQueryBuilder.ts`
 
 The builder stores:
 
@@ -258,7 +258,7 @@ Jazz translates this shape to relation IR before execution.
 
 Confirmed source:
 
-- Inspektor: `apps/web/src/features/tables/query/genericQueryBuilder.ts`
+- Inspektor: `apps/studio/src/features/tables/query/genericQueryBuilder.ts`
 - Jazz reference checkout: `packages/jazz-tools/src/runtime/query-adapter.ts`
 - Historical official Jazz Inspektor: `packages/inspector/src/utility/generic-query-builder.ts`
 
@@ -274,12 +274,12 @@ v1 keeps filters and sorting URL-backed for the active tab view and also saves t
 
 Relevant files:
 
-- `apps/web/src/features/tables/routing/useTableSearchParams.ts`
-- `apps/web/src/features/tables/filters/tableFilters.ts`
-- `apps/web/src/features/tables/filters/dataGridFilterBuilder.tsx`
-- `apps/web/src/features/tables/filters/filterParsing.ts`
-- `apps/web/src/features/tables/query/tableRowsQuery.ts`
-- `apps/web/src/features/tables/query/useTableRows.ts`
+- `apps/studio/src/features/tables/routing/useTableSearchParams.ts`
+- `apps/studio/src/features/tables/filters/tableFilters.ts`
+- `apps/studio/src/features/tables/filters/dataGridFilterBuilder.tsx`
+- `apps/studio/src/features/tables/filters/filterParsing.ts`
+- `apps/studio/src/features/tables/query/tableRowsQuery.ts`
+- `apps/studio/src/features/tables/query/useTableRows.ts`
 
 Current supported filter operators:
 
@@ -324,10 +324,10 @@ Relation navigation opens or focuses the referenced table's default unfiltered t
 
 Relevant Inspektor files:
 
-- `apps/web/src/features/tables/grid/buildColumns.tsx`
-- `apps/web/src/features/tables/grid/relationCellLink.tsx`
-- `apps/web/src/features/tables/routing/buildRelationTableLink.ts`
-- `apps/web/src/features/tables/schema/tableSchema.ts`
+- `apps/studio/src/features/tables/grid/buildColumns.tsx`
+- `apps/studio/src/features/tables/grid/relationCellLink.tsx`
+- `apps/studio/src/features/tables/routing/buildRelationTableLink.ts`
+- `apps/studio/src/features/tables/schema/tableSchema.ts`
 
 Current limitation:
 
@@ -356,11 +356,11 @@ Current Regarde flow:
 
 Relevant Inspektor files:
 
-- `apps/web/src/features/tables/rowEditor/mutation/useTableMutation.ts`
-- `apps/web/src/features/tables/rowEditor/mutation/parsing.ts`
-- `apps/web/src/features/tables/rowEditor/editorFields.tsx`
-- `apps/web/src/features/tables/rowEditor/editForm.tsx`
-- `apps/web/src/features/tables/rowEditor/insertForm.tsx`
+- `apps/studio/src/features/tables/rowEditor/mutation/useTableMutation.ts`
+- `apps/studio/src/features/tables/rowEditor/mutation/parsing.ts`
+- `apps/studio/src/features/tables/rowEditor/editorFields.tsx`
+- `apps/studio/src/features/tables/rowEditor/editForm.tsx`
+- `apps/studio/src/features/tables/rowEditor/insertForm.tsx`
 
 Mutation value parsing uses schema metadata:
 
@@ -409,8 +409,8 @@ Historical official Jazz Inspektor source:
 
 - `packages/inspector/src/App.tsx`
 - `packages/inspector/src/pages/data-explorer/index.tsx`
-- `packages/inspector/src/components/data-explorer/TableDataGrid.tsx`
-- `packages/inspector/src/components/data-explorer/TableFilterBuilder.tsx`
+- `packages/inspector/src/studio/data-explorer/TableDataGrid.tsx`
+- `packages/inspector/src/studio/data-explorer/TableFilterBuilder.tsx`
 - `packages/inspector/src/utility/generic-query-builder.ts`
 
 ## Current limitations and risks

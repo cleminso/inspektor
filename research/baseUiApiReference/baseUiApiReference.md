@@ -135,6 +135,6 @@ Defer viewport-triggered highlighting, workers, caching, and build-time highligh
 - [Base UI Button package source](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/button/Button.tsx)
 - [Base UI docs loader config](https://github.com/mui/base-ui/blob/v1.6.0/docs/next.config.mjs)
 - [typescript-api-extractor](https://github.com/michaldudak/typescript-api-extractor/tree/v1.0.0-beta.3)
-- [Base UI reference table](https://github.com/mui/base-ui/blob/v1.6.0/docs/src/components/ReferenceTable/ReferenceTable.tsx)
+- [Base UI reference table](https://github.com/mui/base-ui/blob/v1.6.0/docs/src/studio/ReferenceTable/ReferenceTable.tsx)
 - [Polar Orbit prop extractor](https://github.com/polarsource/polar/blob/c1040c59d9fabb32eeac949b48c917ba6f509193/clients/apps/orbit/scripts/extract-props.mjs)
 - [Shiki JS regex engine](https://shiki.style/guide/regex-engines)

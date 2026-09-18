@@ -22,7 +22,7 @@
   - Reference: [Data model](./design.md#data-model), [Interaction model](./design.md#interaction-model).
 
 - [x] 3. Implement the read-only syntax tree and code-surface presentation.
-  - Add `jsonView.tsx` and `jsonView.styles.ts` under `packages/design-system/src/components/jsonView/`.
+  - Add `jsonView.tsx` and `jsonView.styles.ts` under `packages/design-system/src/studio/jsonView/`.
   - Render quoted keys and strings, JSON punctuation, numbers, booleans, and `null` through semantic syntax treatments.
   - Render empty containers inline and collapsed containers as `{…}` or `[…]`.
   - Add disclosure controls and complete-row pointer toggles for non-empty objects and arrays without selecting non-leaf text.
