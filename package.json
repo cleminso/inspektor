@@ -16,7 +16,7 @@
     "dev": "pnpm -r dev",
     "dev:studio": "pnpm --filter inspektor dev",
     "dev:website": "pnpm --filter inspektor.website dev",
-    "deploy:production": "pnpm --dir apps/studio deploy && pnpm --dir apps/website deploy",
+    "deploy:production": "pnpm --dir apps/studio run deploy:worker && pnpm --dir apps/website run deploy:worker",
     "build": "pnpm -r build",
     "lint": "pnpm -r --if-present lint",
     "inspektor-test:deploy": "pnpm --filter inspektor-test cloud:deploy",
