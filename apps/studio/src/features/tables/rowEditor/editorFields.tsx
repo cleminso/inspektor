@@ -5,7 +5,7 @@
  * dirty comparison and patch construction remain in the shared mutation
  * modules so an inline editor can reuse them without rendering this pane form.
  */
-import { useMemo, useRef, useState, type FormEventHandler } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEventHandler } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -56,6 +56,7 @@ export function useRowEditorFields({
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const isSavingRef = useRef(false)
+  const focusFrameRef = useRef<number | null>(null)
   const fieldStates = useMemo<Record<string, MutationFieldInput>>(
     () =>
       Object.fromEntries(
@@ -63,6 +64,15 @@ export function useRowEditorFields({
       ),
     [draft, schemaColumns],
   )
+
+  useEffect(() => {
+    // Focus is scheduled after the invalid field is rendered; cancel it if the editor disappears.
+    return () => {
+      if (focusFrameRef.current !== null) {
+        cancelAnimationFrame(focusFrameRef.current)
+      }
+    }
+  }, [])
 
   const setFieldInput = (columnName: string, input: MutationFieldInput) => {
     draftController.actions.setFieldInput(columnName, input)
@@ -97,7 +107,12 @@ export function useRowEditorFields({
         (column) => nextErrors[column.name] !== undefined,
       )
       if (firstInvalidField !== undefined) {
-        requestAnimationFrame(() => {
+        if (focusFrameRef.current !== null) {
+          cancelAnimationFrame(focusFrameRef.current)
+        }
+        // Replace an older focus request so repeated submits target the latest validation result.
+        focusFrameRef.current = requestAnimationFrame(() => {
+          focusFrameRef.current = null
           focusRowEditorField(firstInvalidField.name)
         })
       }

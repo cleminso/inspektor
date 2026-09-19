@@ -1,4 +1,13 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  memo,
+  startTransition,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   Accordion,
   Badge,
@@ -790,8 +799,10 @@ function ConnectedLiveQueriesView({
   }, [])
 
   const changeFilters = useCallback((nextFilters: QuerySubscriptionFilters) => {
-    setFilters(nextFilters)
     setSelection(null)
+    // Filtering remaps the captured history and timeline; keep selection feedback urgent while
+    // allowing the derived view to yield to more important input updates.
+    startTransition(() => setFilters(nextFilters))
   }, [])
   const clearHistory = () => {
     clearedFilterOptionsRef.current = filterOptions

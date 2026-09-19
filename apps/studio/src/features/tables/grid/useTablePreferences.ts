@@ -1,5 +1,5 @@
 import type { ColumnOrderState, OnChangeFn } from '@tanstack/react-table'
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import {
   getConnectionScopedStorageKey,
@@ -109,14 +109,18 @@ export function useTablePreferences({
     preferenceState.tableKey === tableKey
       ? preferenceState.preferences
       : readTablePreferences(tableKey, columnIds, defaultHiddenColumnIds)
-  if (preferenceState.tableKey !== tableKey) {
-    setPreferenceState({ tableKey, preferences })
-  }
   const preferencesRef = useRef(preferences)
   // Stable persistence callbacks must read only preferences that reached the committed UI.
   useLayoutEffect(() => {
     preferencesRef.current = preferences
   }, [preferences])
+  // Reading a new table scope during render keeps the UI current without scheduling a render-phase
+  // update. Persist only committed state so localStorage does not block the interaction itself.
+  useEffect(() => {
+    if (preferenceState.tableKey === tableKey) {
+      writeTablePreferences(storageKey, preferenceState.preferences)
+    }
+  }, [preferenceState, storageKey, tableKey])
   const columnOrder = useMemo(
     () => normalizeColumnOrder(preferences.order, columnIds),
     [columnIds, preferences.order],
@@ -144,9 +148,8 @@ export function useTablePreferences({
       const next = { ...current, order: storedOrder }
       preferencesRef.current = next
       setPreferenceState({ tableKey, preferences: next })
-      writeTablePreferences(storageKey, next)
     },
-    [columnIds, storageKey, tableKey],
+    [columnIds, tableKey],
   )
 
   const setColumnVisibility = useCallback(
@@ -171,9 +174,8 @@ export function useTablePreferences({
       const next = { ...current, order, hidden }
       preferencesRef.current = next
       setPreferenceState({ tableKey, preferences: next })
-      writeTablePreferences(storageKey, next)
     },
-    [columnIds, defaultHiddenColumnIds, storageKey, tableKey],
+    [columnIds, defaultHiddenColumnIds, tableKey],
   )
 
   const setPinnedColumnIds = useCallback<OnChangeFn<string[]>>(
@@ -194,9 +196,8 @@ export function useTablePreferences({
       const next = { ...current, pinned: storedPinned }
       preferencesRef.current = next
       setPreferenceState({ tableKey, preferences: next })
-      writeTablePreferences(storageKey, next)
     },
-    [columnIds, storageKey, tableKey],
+    [columnIds, tableKey],
   )
 
   const columnVisibility = useMemo(() => {
