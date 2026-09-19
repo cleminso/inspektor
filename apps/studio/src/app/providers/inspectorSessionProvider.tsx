@@ -252,7 +252,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       if (runtimeScopeExitGuard.isBlocked() === true) {
         return 'blocked'
       }
-      void prepareJazzWasm()
       session.saveConnectionWithContext(draft, connectionId, branch, schemaHash)
       return 'accepted'
     },

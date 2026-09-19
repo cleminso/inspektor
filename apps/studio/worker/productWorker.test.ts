@@ -127,13 +127,15 @@ describe('product Worker routing', () => {
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })
 
-  it('does not store the product document between deployments', async () => {
+  it('caches the product document at shared edges while revalidating browsers', async () => {
     const response = await handleProductRequest(new Request('https://inspektor.dev/conn'), {
       fetchAsset: vi.fn(async (_request: Request) =>
         new Response('product shell', { headers: { 'Content-Type': 'text/html' } }),
       ),
     })
 
-    expect(response.headers.get('Cache-Control')).toBe('no-store')
+    expect(response.headers.get('Cache-Control')).toBe(
+      'public, max-age=0, s-maxage=300, stale-while-revalidate=60, no-transform',
+    )
   })
 })

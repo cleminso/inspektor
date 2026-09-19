@@ -24,6 +24,7 @@ This index links the maintained product, architecture, design-system, Jazz, and 
 - [[runtimeConnectionStartup]] - Jazz runtime connection phases, ownership, measurement, and optimization order.
 - [[shellLayout]] - Application shell ownership and persistence.
 - [[stylexBestPractices]] - StyleX integration and repository practices.
+- [[studioBrowserDataFlow]] - Browser, Cloudflare, React, and Jazz data-flow relationships.
 - [[table-explorer]] - Historical Table Explorer research and proposals.
 - [[tableExplorerBehaviors]] - Maintained Table Explorer interaction rules.
 - [[tableRowsQueryLifecycle]] - Table query execution and subscription lifecycle.

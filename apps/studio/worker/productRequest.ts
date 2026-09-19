@@ -89,7 +89,12 @@ function addProductHeaders(response: Response, pathname: string): Response {
   if (pathname.startsWith(`${productPath}/assets/`) === true && response.status === 200) {
     headers.set('Cache-Control', 'public, max-age=31536000, immutable, no-transform')
   } else if (headers.get('Content-Type')?.includes('text/html') === true) {
-    headers.set('Cache-Control', 'no-store')
+    // Browsers revalidate the shell while the edge can reuse it briefly. Deployments must retain
+    // hashed assets long enough for an older shell to finish its cache lifetime.
+    headers.set(
+      'Cache-Control',
+      'public, max-age=0, s-maxage=300, stale-while-revalidate=60, no-transform',
+    )
   }
 
   return new Response(response.body, {

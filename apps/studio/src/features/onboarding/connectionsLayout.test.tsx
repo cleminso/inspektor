@@ -3,6 +3,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ConnectionsLayout } from './connectionsLayout'
 
+const prepareJazzWasm = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+
+vi.mock('@app/runtime/jazzWasmPreparation', () => ({
+  prepareJazzWasm,
+}))
+
 vi.mock('@shared/connections/connectionSwitcher', () => ({
   ConnectionSwitcher: () => <button type="button">Open connection</button>,
 }))
@@ -10,6 +16,16 @@ vi.mock('@shared/connections/connectionSwitcher', () => ({
 afterEach(cleanup)
 
 describe('ConnectionsLayout', () => {
+  it('starts shared Jazz WASM preparation after the onboarding shell commits', async () => {
+    render(
+      <ConnectionsLayout pageTitle="Connections">
+        <div>Content</div>
+      </ConnectionsLayout>,
+    )
+
+    await vi.waitFor(() => expect(prepareJazzWasm).toHaveBeenCalledOnce())
+  })
+
   it('provides a skip link and a focusable titled main landmark', () => {
     render(
       <ConnectionsLayout pageTitle="Connections">

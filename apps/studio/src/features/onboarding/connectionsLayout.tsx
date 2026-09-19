@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
+
 import { Box, ButtonLink, ShellLayout, Text } from '@inspektor/ds'
 
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
 interface ConnectionsLayoutProps {
@@ -13,6 +16,10 @@ export function ConnectionsLayout({
   connectionTriggerLabel,
   pageTitle,
 }: ConnectionsLayoutProps): React.ReactElement {
+  useEffect(() => {
+    void prepareJazzWasm()
+  }, [])
+
   return (
     <Box
       height="screen-height-small"

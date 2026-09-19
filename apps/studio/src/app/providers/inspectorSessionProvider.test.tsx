@@ -253,7 +253,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       'feature',
       'schema-2',
     )
-    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm).not.toHaveBeenCalled()
   })
 
   it('starts WASM preparation after accepting connection intent and before navigation', () => {
