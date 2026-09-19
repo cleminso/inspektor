@@ -126,4 +126,14 @@ describe('product Worker routing', () => {
     expect(response.headers.get('Referrer-Policy')).toBe('no-referrer')
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })
+
+  it('does not store the product document between deployments', async () => {
+    const response = await handleProductRequest(new Request('https://inspektor.dev/conn'), {
+      fetchAsset: vi.fn(async (_request: Request) =>
+        new Response('product shell', { headers: { 'Content-Type': 'text/html' } }),
+      ),
+    })
+
+    expect(response.headers.get('Cache-Control')).toBe('no-store')
+  })
 })

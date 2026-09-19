@@ -16,6 +16,11 @@ import { ThemeMetadata } from './app/themeMetadata'
 import { reportCaughtReactError } from './app/runtime/runtimeError'
 import { sanitizeCurrentCredentialUrl } from './app/routing/credentialSafeUrl'
 
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  window.location.reload()
+})
+
 if (import.meta.env.DEV === true) {
   // StyleX source is compiled by Vite; its development runtime is only needed while developing.
   void import('virtual:stylex:runtime')

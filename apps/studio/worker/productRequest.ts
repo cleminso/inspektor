@@ -89,7 +89,7 @@ function addProductHeaders(response: Response, pathname: string): Response {
   if (pathname.startsWith(`${productPath}/assets/`) === true && response.status === 200) {
     headers.set('Cache-Control', 'public, max-age=31536000, immutable, no-transform')
   } else if (headers.get('Content-Type')?.includes('text/html') === true) {
-    headers.set('Cache-Control', 'public, max-age=0, must-revalidate, no-transform')
+    headers.set('Cache-Control', 'no-store')
   }
 
   return new Response(response.body, {
