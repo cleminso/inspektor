@@ -3,7 +3,6 @@ import * as stylex from '@stylexjs/stylex'
 import { breakpointQueries } from '../../tokens/breakpoints.stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
 import {
-  borderColors,
   focusColors,
   ghostElementColors,
   spatial,
@@ -44,10 +43,7 @@ export const toasterStyles = stylex.create({
   },
   viewportExpanded: {},
   toast: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     alignItems: 'stretch',
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,

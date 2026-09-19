@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { borderColors, spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
+import { spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -41,10 +41,7 @@ export const alertDialogStyles = stylex.create({
   viewportEnding: {},
   popup: {
     padding: spacing.m,
-    borderColor: borderColors.default,
     borderRadius: borderRadii.s,
-    borderStyle: 'solid',
-    borderWidth: 1,
     gap: spacing.s,
     outline: 'none',
     backgroundColor: surfaceColors.raised,

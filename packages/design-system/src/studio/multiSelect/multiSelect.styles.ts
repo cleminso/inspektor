@@ -1,13 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import {
-  borderColors,
-  focusColors,
-  spatial,
-  surfaceColors,
-  textColors,
-} from '../../tokens/semantics.stylex'
+import { focusColors, spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
 import { borderRadii, shadows } from '../../tokens/value.stylex'
 
 export const multiSelectStyles = stylex.create({
@@ -29,10 +23,7 @@ export const multiSelectStyles = stylex.create({
   positionerAlignCenter: {},
   positionerAlignEnd: {},
   popup: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,
     color: textColors.default,

@@ -17,6 +17,7 @@ import {
   fontSizes,
   fontWeights,
   lineHeights,
+  shadows,
   spacing,
 } from '../../tokens/value.stylex'
 import { comboboxStyleVars } from './comboboxVars.stylex'
@@ -193,12 +194,10 @@ export const comboboxStyles = stylex.create({
   positionerAlignCenter: {},
   positionerAlignEnd: {},
   popup: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     outline: 'none',
     backgroundColor: surfaceColors.raised,
+    boxShadow: shadows.medium,
     color: textColors.default,
     display: 'flex',
     flexDirection: 'column',

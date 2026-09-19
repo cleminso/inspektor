@@ -95,10 +95,7 @@ export const menuStyles = stylex.create({
   positionerInstant: {},
   popup: {
     padding: spatial['popup-collection-padding'],
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     outline: 'none',
     overscrollBehavior: 'contain',
     backgroundColor: surfaceColors.raised,

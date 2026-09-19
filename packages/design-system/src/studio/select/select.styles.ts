@@ -15,6 +15,7 @@ import {
   fontSizes,
   fontWeights,
   lineHeights,
+  shadows,
   spacing,
 } from '../../tokens/value.stylex'
 
@@ -134,12 +135,10 @@ export const selectStyles = stylex.create({
   positionerAlignEnd: {},
   positionerAnchorHidden: {},
   popup: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     outline: 'none',
     backgroundColor: surfaceColors.raised,
+    boxShadow: shadows.medium,
     color: textColors.default,
     transformOrigin: 'var(--transform-origin)',
     minWidth: 'var(--anchor-width)',

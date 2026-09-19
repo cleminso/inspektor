@@ -14,17 +14,16 @@ import {
   fontSizes,
   fontWeights,
   lineHeights,
+  shadows,
   spacing,
 } from '../../tokens/value.stylex'
 
 export const commandStyles = stylex.create({
   surface: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.s,
-    borderStyle: 'solid',
-    borderWidth: 1,
     overflow: 'hidden',
     backgroundColor: surfaceColors.raised,
+    boxShadow: shadows.medium,
     color: textColors.default,
     display: 'flex',
     flexDirection: 'column',

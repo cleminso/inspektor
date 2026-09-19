@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { borderColors, spatial, surfaceColors } from '../../tokens/semantics.stylex'
+import { spatial, surfaceColors } from '../../tokens/semantics.stylex'
 import { borderRadii, dimensions, shadows, spacing } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
@@ -18,10 +18,7 @@ export const floatingPanelStyles = stylex.create({
     right: spacing.xl,
   },
   content: {
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     overflow: 'hidden',
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,

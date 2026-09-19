@@ -75,10 +75,7 @@ export const datePickerStyles = stylex.create({
   positionerAlignEnd: {},
   popup: {
     padding: spacing.s,
-    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
     outline: 'none',
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,

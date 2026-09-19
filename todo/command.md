@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[19/09/26]
+
+- [x] Present the command surface with the shared elevated shadow treatment instead of a solid outer border.
+
 [05/09/26]
 
 - [x] Place command navigation and selection guidance together at the footer end.
