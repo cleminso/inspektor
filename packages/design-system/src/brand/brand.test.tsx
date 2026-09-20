@@ -4,9 +4,12 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   BrandButtonLink,
   BrandHero,
+  BrandNotFoundIllustration,
+  BrandProductPreview,
   BrandSiteFrame,
   BrandWordmark,
   type BrandHeroProps,
+  type BrandProductPreviewProps,
   type BrandSiteFrameProps,
   type BrandWordmarkProps,
 } from './index'
@@ -74,6 +77,27 @@ describe('brand components', () => {
     expect(rendered.queryByText('Consumer markup')).toBeNull()
   })
 
+  it('strips styling escape hatches from the product preview', () => {
+    const { container } = render(
+      <BrandProductPreview
+        {...({
+          className: 'consumer-style',
+          dangerouslySetInnerHTML: { __html: 'Consumer markup' },
+          style: { color: 'red' },
+        } as object)}
+        alt="Preview"
+        height={1660}
+        src="/images/inspektorStudioLight.webp"
+        width={2862}
+      />,
+    )
+
+    const preview = within(container).getByRole('region', { name: 'Inspektor Studio preview' })
+    expect(preview.className).not.toContain('consumer-style')
+    expect(preview.getAttribute('style')).toBeNull()
+    expect(within(container).queryByText('Consumer markup')).toBeNull()
+  })
+
   it('keeps the action region absent when no action is provided', () => {
     const { container } = render(
       <BrandHero
@@ -127,12 +151,42 @@ describe('brand components', () => {
     expect(wordmark.querySelectorAll('use')).toHaveLength(65)
   })
 
+  it('renders the tile-based 404 illustration with an accessible name', () => {
+    render(<BrandNotFoundIllustration />)
+
+    const illustration = screen.getByRole('img', { name: '404' })
+    expect(illustration.getAttribute('viewBox')).toBe('0 0 194 58')
+    expect(illustration.querySelectorAll('use')).toHaveLength(34)
+  })
+
+  it('renders a responsive product preview with intrinsic dimensions', () => {
+    const { container } = render(
+      <BrandProductPreview
+        alt="Inspektor Studio displaying a Jazz table"
+        height={1660}
+        src="/images/inspektorStudioLight.webp"
+        width={2862}
+      />,
+    )
+
+    const image = screen.getByRole('img', { name: 'Inspektor Studio displaying a Jazz table' })
+    expect(image.getAttribute('src')).toBe('/images/inspektorStudioLight.webp')
+    expect(image.getAttribute('width')).toBe('2862')
+    expect(image.getAttribute('height')).toBe('1660')
+    expect(
+      within(container).getByRole('region', { name: 'Inspektor Studio preview' }),
+    ).not.toBeNull()
+  })
+
   it('rejects consumer-owned presentation and hero structure', () => {
     type RootExports = typeof import('../index')
     type BrandLeakedIntoRoot = 'BrandSiteFrame' extends keyof RootExports ? true : false
     type HeroAcceptsClassName = 'className' extends keyof BrandHeroProps ? true : false
     type HeroAcceptsChildren = 'children' extends keyof BrandHeroProps ? true : false
     type HeroAcceptsStyle = 'style' extends keyof BrandHeroProps ? true : false
+    type ProductPreviewAcceptsAriaLabel = 'aria-label' extends keyof BrandProductPreviewProps
+      ? true
+      : false
     type FrameAcceptsUnsafeHtml = 'dangerouslySetInnerHTML' extends keyof BrandSiteFrameProps
       ? true
       : false
@@ -151,6 +205,7 @@ describe('brand components', () => {
     expectTypeOf<HeroAcceptsClassName>().toEqualTypeOf<false>()
     expectTypeOf<HeroAcceptsChildren>().toEqualTypeOf<false>()
     expectTypeOf<HeroAcceptsStyle>().toEqualTypeOf<false>()
+    expectTypeOf<ProductPreviewAcceptsAriaLabel>().toEqualTypeOf<false>()
     expectTypeOf<FrameAcceptsUnsafeHtml>().toEqualTypeOf<false>()
     expectTypeOf<WordmarkAcceptsUnsafeHtml>().toEqualTypeOf<false>()
   })

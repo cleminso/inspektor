@@ -23,11 +23,11 @@ The website is a client-rendered TanStack Router SPA. It consumes only public de
 
 `@inspektor/ds/brand` is a focused package entry that remains separate from the generic root barrel.
 
-The entry exports `BrandSiteFrame`, `BrandHero`, and `BrandWordmark`. Public props exclude consumer styling and content escape hatches.
+The entry exports `BrandSiteFrame`, `BrandHero`, `BrandProductPreview`, and `BrandWordmark`. Public props exclude consumer styling and content escape hatches.
 
 Public components represent reusable visual or semantic units rather than each internal DOM wrapper. Components keep layout-only wrappers private until consumers need to compose or address them independently.
 
-`BrandSiteFrame` accepts header content and ordered main content. It owns the header, continuous main surface, decorative bottom strip, and passive side columns. `BrandHero` accepts route-owned strings and an optional action region. It owns one `h1`, its visual continuation, the supporting paragraph, and the private action layout. Future content regions establish specialized section components when their semantics and layout are known rather than sharing a speculative section wrapper.
+`BrandSiteFrame` accepts header content and ordered main content. It owns the header, continuous main surface, decorative bottom strip, and passive side columns. `BrandHero` accepts route-owned strings and an optional action region. It owns one `h1`, its visual continuation, the supporting paragraph, and the private action layout. `BrandProductPreview` accepts a route-owned image source, accessible description, and intrinsic dimensions. It owns responsive screenshot sizing while leaving the image free of an additional visual frame. The website selects the theme-specific screenshot before passing it to this presentation component. Future content regions establish specialized section components when their semantics and layout are known rather than sharing a speculative section wrapper.
 
 ## Responsive frame
 
