@@ -6,10 +6,10 @@ import './index.css'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { ThemeProvider } from 'next-themes'
 // The app shell only needs Tooltip. Its focused public export avoids importing through the broad
 // design-system barrel at this application-wide boundary.
 import { Tooltip } from '@inspektor/ds/tooltip'
+import { ThemeProvider } from '@inspektor/ds/theme-provider'
 
 import { routeTree } from './routeTree.gen'
 import { ThemeMetadata } from './app/themeMetadata'

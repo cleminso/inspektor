@@ -3,7 +3,7 @@ import './index.css'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider } from '@inspektor/ds/theme-provider'
 import ReactDOM from 'react-dom/client'
 
 import { ThemeMetadata } from './app/themeMetadata'

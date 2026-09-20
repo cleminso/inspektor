@@ -38,6 +38,12 @@
       "import": "./dist/tokens/tokens.stylex.js",
       "default": "./dist/tokens/tokens.stylex.js"
     },
+    "./theme-provider": {
+      "inspektor-source": "./src/themeProvider/themeProvider.tsx",
+      "types": "./dist/themeProvider/themeProvider.d.ts",
+      "import": "./dist/themeProvider/themeProvider.js",
+      "default": "./dist/themeProvider/themeProvider.js"
+    },
     "./baseline.css": {
       "inspektor-source": "./src/styles/baseline.css",
       "default": "./dist/baseline.css"
@@ -86,6 +92,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "jsdom": "catalog:",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tsdown": "catalog:",
@@ -94,6 +101,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "next-themes": "^0.4.6",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   }

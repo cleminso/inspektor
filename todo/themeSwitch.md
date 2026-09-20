@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[20/09/26]
+
+- [x] Provide a shared `ThemeProvider` adapter that restores persisted themes when a document returns from browser history.
+
 [08/09/26]
 
 - [x] Provide a controlled light and dark theme switch through `@inspektor/ds`.
@@ -24,6 +28,10 @@
 - None.
 
 ## Work outside the foundation scope
+
+[20/09/26]
+
+- Application roots own provider placement and configuration, theme activation CSS, and browser metadata.
 
 [08/09/26]
 
