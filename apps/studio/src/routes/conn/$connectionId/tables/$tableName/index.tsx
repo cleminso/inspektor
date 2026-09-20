@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { formatStudioDocumentTitle } from '@shared/documentTitle'
+
 export const Route = createFileRoute('/conn/$connectionId/tables/$tableName/')({
   head: ({ params }) => ({
-    meta: [{ title: `${params.tableName} | Inspektor` }],
+    meta: [{ title: formatStudioDocumentTitle(params.tableName) }],
   }),
   component: TableDataRoute,
 })

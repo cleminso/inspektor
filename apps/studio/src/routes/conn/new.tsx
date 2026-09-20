@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { formatStudioDocumentTitle } from '@shared/documentTitle'
 import { AddConnectionView } from '@onboarding/addConnectionView'
 import { ConnectionsLayout } from '@onboarding/connectionsLayout'
 
 export const Route = createFileRoute('/conn/new')({
   head: () => ({
-    meta: [{ title: 'Add connection | Inspektor' }],
+    meta: [{ title: formatStudioDocumentTitle('Add connection') }],
   }),
   component: AddConnectionRoute,
 })

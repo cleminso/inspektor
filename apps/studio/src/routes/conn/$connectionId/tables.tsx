@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 
+import { formatStudioDocumentTitle } from '@shared/documentTitle'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { ConnectionContentBoundary } from '@app/runtime/connectionContentBoundary'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
@@ -14,7 +15,7 @@ import { ConnectionRouteLoading } from '../-connectionRouteStatus'
 
 export const Route = createFileRoute('/conn/$connectionId/tables')({
   head: () => ({
-    meta: [{ title: 'Tables | Inspektor' }],
+    meta: [{ title: formatStudioDocumentTitle('Tables') }],
   }),
   component: TablesWorkspaceLayout,
   validateSearch: canonicalizeTableRouteSearch,

@@ -85,6 +85,9 @@ function addProductHeaders(response: Response, pathname: string): Response {
   headers.set('Referrer-Policy', 'no-referrer')
   headers.set('X-Content-Type-Options', 'nosniff')
   headers.set('X-Frame-Options', 'DENY')
+  if (headers.get('Content-Type')?.includes('text/html') === true) {
+    headers.set('X-Robots-Tag', 'noindex, nofollow')
+  }
 
   if (pathname.startsWith(`${productPath}/assets/`) === true && response.status === 200) {
     headers.set('Cache-Control', 'public, max-age=31536000, immutable, no-transform')

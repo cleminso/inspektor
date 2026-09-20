@@ -20,6 +20,7 @@ import { InspectorLayout } from '@app/shell/layout'
 import { TableCommands } from '@tables/workspace/tableCommands'
 
 import { ConnectionRouteError, ConnectionRouteLoading } from './-connectionRouteStatus'
+import { ConnectionNotFound } from './-connectionNotFound'
 
 interface ConnectionRouteSearch {
   schema?: string
@@ -78,8 +79,14 @@ export const Route = createFileRoute('/conn/$connectionId')({
   },
   pendingComponent: ConnectionRouteLoading,
   errorComponent: ConnectionRouteError,
+  notFoundComponent: ConnectionNotFoundRoute,
   component: InspectorRuntimeRoute,
 })
+
+function ConnectionNotFoundRoute(): React.ReactElement {
+  const { connectionId } = Route.useParams()
+  return <ConnectionNotFound connectionId={connectionId} />
+}
 
 function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()

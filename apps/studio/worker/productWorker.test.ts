@@ -129,13 +129,15 @@ describe('product Worker routing', () => {
 
   it('caches the product document at shared edges while revalidating browsers', async () => {
     const response = await handleProductRequest(new Request('https://inspektor.dev/conn'), {
-      fetchAsset: vi.fn(async (_request: Request) =>
-        new Response('product shell', { headers: { 'Content-Type': 'text/html' } }),
+      fetchAsset: vi.fn(
+        async (_request: Request) =>
+          new Response('product shell', { headers: { 'Content-Type': 'text/html' } }),
       ),
     })
 
     expect(response.headers.get('Cache-Control')).toBe(
       'public, max-age=0, s-maxage=300, stale-while-revalidate=60, no-transform',
     )
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow')
   })
 })
