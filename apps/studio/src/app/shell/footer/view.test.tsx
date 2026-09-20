@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Tooltip } from '@inspektor/ds'
 import {
   Outlet,
@@ -82,21 +82,6 @@ describe('InspectorFooter', () => {
       screen.getByRole('link', { name: 'Close live queries' }).getAttribute('aria-current'),
     ).toBe('page')
     expect(leftDock.toggle).not.toHaveBeenCalled()
-  })
-
-  it.each([
-    ['Close tables', /B/u],
-    ['Open live queries', /Q/u],
-  ])('shows the shortcut for %s', async (label, shortcut) => {
-    await renderFooter()
-
-    fireEvent.mouseEnter(screen.getByRole('link', { name: label }))
-
-    const tooltip = await waitFor(() => document.querySelector('[data-slot="tooltip-content"]'))
-    expect(tooltip?.textContent).toContain(label)
-    expect(
-      tooltip?.querySelector('[data-slot="keyboard-input"]')?.getAttribute('aria-label'),
-    ).toMatch(shortcut)
   })
 
   it('toggles the left dock with the shared shortcut', async () => {

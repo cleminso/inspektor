@@ -9,7 +9,7 @@ description: Implements and organizes Inspektor tests, browser verification, and
 
 - [Choose the test boundary](#choose-the-test-boundary)
 - [Name web Vitest files](#name-web-vitest-files)
-- [Design-system exception](#design-system-exception)
+- [Workspace ownership](#workspace-ownership)
 - [Inspektor Test](#inspektor-test)
 - [Browser verification](#browser-verification)
 - [Focus indicators](#focus-indicators)
@@ -17,20 +17,29 @@ description: Implements and organizes Inspektor tests, browser verification, and
 
 ## Choose the test boundary
 
-1. Use Playwright under `apps/studio/e2e` only for behavior that must cross the real browser, built application, or fixture boundary.
+1. Use standalone Playwright E2E only for behavior that must cross the built application, routing, server, or fixture boundary.
 2. Otherwise use Vitest beside the source file.
-3. Prefer the Node project when the test does not require DOM or browser globals.
+3. Use the Node project for pure logic and JSX bundle-graph checks.
+4. Use JSDOM for React component, feature, and route-composition behavior.
+
+Do not use Vitest Browser Mode. The repository does not maintain visual snapshots; verify appearance interactively when a visual claim matters.
 
 ## Name web Vitest files
 
-- Pure TypeScript tests use `*.test.ts`; `apps/studio` runs them in the Node project.
-- TypeScript tests requiring `window`, DOM APIs, or the jsdom setup use `*.jsdom.test.ts`; `apps/studio` runs them in the jsdom project.
-- React tests use `*.test.tsx`; `apps/studio` runs them in the jsdom project.
+- Pure Node tests use `*.test.ts`.
+- Node tests that need JSX syntax use `*.node.test.tsx`; reserve this form for bundle and import-graph checks rather than rendered behavior.
+- React, component, and feature JSDOM tests use `*.test.tsx`.
+- Non-React tests that require DOM globals use `*.jsdom.test.ts`.
 - Do not add test paths to a central environment allowlist or use `@vitest-environment` comments. The filename owns environment selection.
 
-## Design-system exception
+## Workspace ownership
 
-`packages/design-system` defaults to jsdom. Keep its existing `@vitest-environment node` annotations and `test:node` allowlist unless that package adopts a measured package-wide convention.
+- `packages/design-system` owns component correctness. Use Node for pure and bundle tests and JSDOM for component behavior.
+- `apps/studio` owns product feature, route-composition, runtime-boundary, and Worker behavior. Use Node for pure, Worker, and bundle tests and JSDOM for React behavior.
+- `apps/design-system` owns only registry and catalog contracts, `AppShell`, and `ComponentDemo`. Do not add page-level tests or use this app to assert `@inspektor/ds` component correctness.
+- `apps/website` uses Node for pure and Worker tests, JSDOM for React behavior, and Playwright E2E for built-site behavior.
+
+Keep standalone Playwright E2E separate from Vitest. Vitest covers source-adjacent behavior; Playwright covers assembled applications and external boundaries.
 
 ## Inspektor Test
 
@@ -49,7 +58,8 @@ Read `apps/inspektor-test/README.md` before changing its schema, permissions, se
 
 ### Automated acceptance
 
-- Run `pnpm test:browser` from the workspace root.
+- Run `pnpm test:e2e` from the workspace root.
+- Install the Playwright browser with `pnpm test:e2e:install`.
 - Playwright owns the application server and isolated fixture. Do not start `pnpm dev:studio` or `pnpm inspektor-test:fixture` for this mode.
 
 ### Interactive inspection
@@ -71,15 +81,15 @@ Reserve persistent browser profiles and saved cloud connections for explicit sha
 
 ## Validate
 
-- Inspektor Studio Node test: `pnpm test:studio:node`
-- Inspektor Studio jsdom test: `pnpm test:studio:jsdom`
-- Inspektor Studio browser test: `pnpm test:browser`
-- Design-system documentation app test: `pnpm test:design-system-docs`
-- Design-system Node allowlist: `pnpm test:design-system:node`
+- Root Vitest suites: `pnpm test`
+- Root Playwright E2E: `pnpm test:e2e`
+- Playwright browser installation: `pnpm test:e2e:install`
+- Complete repository gate: `pnpm check`
+- Package-focused Vitest: `pnpm --filter <package> test`
 - Inspektor Test lint: `pnpm --filter inspektor-test lint`
 - Inspektor Test suite: `pnpm --filter inspektor-test test`
 - Inspektor Test typecheck: `pnpm --filter inspektor-test typecheck`
 - Inspektor Test cloud validation without publishing: `pnpm inspektor-test:validate`
 - The commands above are safe local validation. `pnpm inspektor-test:deploy`, `pnpm inspektor-test:initialize`, and `pnpm inspektor-test:seed` mutate shared cloud state and require explicit task scope.
-- Root `pnpm test` runs Inspektor Test schema, deterministic-data, and permission coverage but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.54` rejects top-level JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
+- Root `pnpm test` runs Inspektor Test schema, deterministic-data, and permission coverage but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.55` rejects top-level JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
 - Run the affected package's complete suite after the focused command passes when the execution scope requires it.

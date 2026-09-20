@@ -47,7 +47,24 @@ export default defineConfig(({ mode }) => ({
     target: 'es2022',
   },
   test: {
-    environment: 'jsdom',
     exclude: ['e2e/**', 'node_modules/**'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['src/**/*.test.tsx'],
+        },
+      },
+    ],
   },
 }))

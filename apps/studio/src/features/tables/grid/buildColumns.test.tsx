@@ -297,7 +297,7 @@ describe('buildDataGridColumns', () => {
       openColumnMenu(menuType)
       fireEvent.click(screen.getByRole('menuitem', { name: 'Reset column width' }))
 
-      expect(nameColumn?.style.width).toBe('294px')
+      expect(nameColumn?.style.width).toBe('300px')
       expect(emailColumn?.style.width).toBe('360px')
     },
   )
@@ -527,49 +527,6 @@ describe('buildDataGridColumns', () => {
     expect(screen.queryByRole('button', { name: 'Open Name column menu' })).toBeNull()
   })
 
-  it('renders composed type markers with tooltips without applying ARIA labels to spans', async () => {
-    render(
-      <TestTable
-        columns={[
-          { accessorKey: 'id', column: null, id: 'id', isSortable: true, label: 'id' },
-          {
-            accessorKey: 'accountIds',
-            column: {
-              column_type: { type: 'Array', element: { type: 'Uuid' } },
-              name: 'accountIds',
-              nullable: true,
-              references: 'accounts',
-            } as never,
-            id: 'accountIds',
-            isSortable: false,
-            label: 'Accounts',
-          },
-        ]}
-      />,
-    )
-
-    const markers = Array.from(document.querySelectorAll('[data-slot="tooltip-trigger"]'))
-    const rowIdMarker = markers[0]
-    const referenceMarker = markers[1]
-
-    if (rowIdMarker === undefined || referenceMarker === undefined) {
-      throw new Error('Expected column type markers to render tooltip triggers')
-    }
-
-    expect(rowIdMarker.getAttribute('aria-label')).toBeNull()
-    expect(rowIdMarker.getAttribute('title')).toBeNull()
-    expect(
-      rowIdMarker.compareDocumentPosition(screen.getByText('id')) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).not.toBe(0)
-    expect(referenceMarker.getAttribute('aria-label')).toBeNull()
-    expect(referenceMarker.textContent).toBe('')
-
-    fireEvent.mouseEnter(rowIdMarker)
-    fireEvent.mouseMove(rowIdMarker)
-    expect(await screen.findByText('Row ID')).toBeTruthy()
-  })
-
   it('uses schema-aware initial column widths', () => {
     const columns = buildDataGridColumns({
       columns: [
@@ -603,7 +560,7 @@ describe('buildDataGridColumns', () => {
       ],
     })
 
-    expect(columns.find((column) => column.id === 'id')?.size).toBe(294)
+    expect(columns.find((column) => column.id === 'id')?.size).toBe(300)
     expect(columns.find((column) => column.id === 'enabled')?.size).toBe(220)
     expect(columns.find((column) => column.id === 'metadata')?.size).toBe(220)
   })

@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 const moduleLoads = vi.hoisted(() => ({ jazz: 0, reactDevtools: 0 }))
 
+vi.mock('@inspektor/ds', () => ({}))
+
 vi.mock('@tanstack/react-devtools', () => {
   moduleLoads.reactDevtools += 1
 

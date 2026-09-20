@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { docsSections } from './registry'
+import { docsItems, docsSections } from './registry'
 
 const routeModules = import.meta.glob('../routes/components/*.tsx')
 const contentModules = import.meta.glob('../content/components/*/page.mdx')
@@ -13,6 +13,13 @@ function toCamelCase(slug: string): string {
 }
 
 describe('component documentation catalog', () => {
+  it('keeps page paths and slugs unique and foundations ordered', () => {
+    expect(new Set(docsItems.map((item) => item.href)).size).toBe(docsItems.length)
+    expect(new Set(docsItems.map((item) => item.slug)).size).toBe(docsItems.length)
+    expect(docsSections.map((section) => section.title)).toEqual(['Foundations', 'Components'])
+    expect(docsSections[0]?.items.map((item) => item.title)).toEqual(['Colors', 'Typography'])
+  })
+
   it('pairs every registered component with a stable route, authored page, and executable demo', () => {
     const componentSection = docsSections.find((section) => section.title === 'Components')
     if (componentSection === undefined) {

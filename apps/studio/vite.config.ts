@@ -7,7 +7,6 @@ import { defineConfig } from 'vitest/config'
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || '5173')
 const designSystemSourceId = /\/packages\/design-system\/src\/.*\.[cm]?[jt]sx?(?:\?.*)?$/
-
 const createStylexPlugin = () => {
   const plugin = stylex.vite({
     importSources: ['@stylexjs/stylex'],
@@ -75,7 +74,7 @@ export default defineConfig(({ mode }) => ({
         test: {
           name: 'node',
           environment: 'node',
-          include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'src/**/*.node.test.tsx', 'worker/**/*.test.ts'],
           exclude: ['src/**/*.jsdom.test.ts'],
           sequence: { groupOrder: 1 },
         },
@@ -88,6 +87,7 @@ export default defineConfig(({ mode }) => ({
           include: ['src/**/*.test.tsx', 'src/**/*.jsdom.test.ts'],
           maxWorkers: 4,
           sequence: { groupOrder: 2 },
+          exclude: ['src/**/*.node.test.tsx'],
           setupFiles: ['./src/__test__/setup.ts'],
         },
       },

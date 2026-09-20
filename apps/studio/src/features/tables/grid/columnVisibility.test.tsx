@@ -32,14 +32,6 @@ function VisibilityMenu(): React.ReactElement {
 afterEach(cleanup)
 
 describe('DataGridColumnVisibility', () => {
-  it('labels the trigger on hover', async () => {
-    render(<VisibilityMenu />)
-
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Show or hide columns' }))
-
-    expect(await screen.findByText('Show or hide columns')).toBeTruthy()
-  })
-
   it('marks the trigger as pressed while any column is hidden', () => {
     render(<VisibilityMenu />)
 

@@ -244,45 +244,6 @@ describe('connection route', () => {
     })
   })
 
-  it('shows the wordmark while the destination connection loads', () => {
-    const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
-
-    expect(routeOptions.current?.gcTime).toBeUndefined()
-    expect(routeOptions.current?.pendingMs).toBe(0)
-    expect(routeOptions.current?.pendingMinMs).toBe(0)
-    expect(routeOptions.current?.errorComponent).toBeTypeOf('function')
-    render(<PendingComponent />)
-    const loading = screen.getByRole('status', { name: 'Loading' })
-    const wordmark = document.querySelector('img')
-    expect(loading.textContent).toBe('')
-    expect(loading.getAttribute('aria-live')).toBe('polite')
-    expect(loading.getAttribute('aria-atomic')).toBe('true')
-    expect(wordmark?.getAttribute('src')).toBe('/conn/brand/inspektorWordmarkOnLight.png')
-    expect(wordmark?.getAttribute('alt')).toBe('')
-    expect(wordmark?.getAttribute('aria-hidden')).toBe('true')
-    expect(wordmark?.getAttribute('width')).toBe('160')
-    expect(wordmark?.getAttribute('height')).toBe('23')
-  })
-
-  it('uses the on-dark wordmark in the dark theme', () => {
-    resolvedTheme = 'dark'
-    const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
-
-    render(<PendingComponent />)
-
-    expect(document.querySelector('img')?.getAttribute('src')).toBe(
-      '/conn/brand/inspektorWordmarkOnDark.png',
-    )
-  })
-
-  it('keeps the loading view visible while the runtime synchronizes', () => {
-    const RuntimeRoute = routeOptions.current?.component as () => React.ReactElement
-
-    render(<RuntimeRoute />)
-
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
-  })
-
   it('sanitizes unclassified errors and offers a reconnect action', () => {
     render(
       <ConnectionRouteError

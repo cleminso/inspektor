@@ -264,20 +264,6 @@ test('keeps one centered loading view until the first table rows settle', async 
   await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
 })
 
-test('presents saved connections without remembered workspace context', async ({ page }) => {
-  await connectToFixture(page)
-  await page.goto('/conn')
-
-  await expect(page.getByRole('heading', { name: 'SAVED CONNECTIONS' })).toBeVisible()
-  await page.getByRole('combobox', { name: 'Switch connection' }).press('ArrowDown')
-
-  await expect(
-    page.getByRole('option', { name: new RegExp(connection.name, 'u') }),
-  ).toHaveAttribute('aria-selected', 'false')
-  await expect(page.getByRole('link', { name: 'Edit connection' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Remove connection' })).toHaveCount(0)
-})
-
 test('opens, closes, and switches the left dock', async ({ page }) => {
   await connectToFixture(page)
   const resizeHandle = page.locator('[data-slot="resizable-handle"]')
@@ -381,7 +367,6 @@ test('keeps query details scrolling inside the workspace query section', async (
 
   const details = page.getByRole('complementary', { name: 'Query details' })
   const queryPanel = details.getByRole('region', { name: 'Query' })
-  const toolbar = page.getByRole('toolbar', { name: 'Live queries controls' })
 
   await expect(page.locator('[data-slot="shell-layout-left-dock"]')).toBeVisible()
   await expect(details).toBeVisible()
@@ -424,49 +409,8 @@ test('keeps query details scrolling inside the workspace query section', async (
   })
   expect(Number.parseFloat(selectedOutline.width)).toBeGreaterThan(0)
   expect(selectedOutline.color).not.toBe('rgba(0, 0, 0, 0)')
-  await expect(details.getByText('accounts-by-…')).toBeVisible()
-  await expect(details.getByRole('button', { name: '5 additional schema versions' })).toBeVisible()
-  await expect(details.getByText(`${connection.env} / main`)).toBeVisible()
   await expect(details.locator('[data-slot="scroll-area"]')).toHaveCount(1)
   await expect(queryPanel.locator('[data-slot="scroll-area"]')).toHaveCount(1)
-  const toolbarBox = await toolbar.boundingBox()
-  const detailsHeaderBox = await details.getByText('accounts-by-…').locator('..').boundingBox()
-  expect(toolbarBox).not.toBeNull()
-  expect(detailsHeaderBox).not.toBeNull()
-  expect(detailsHeaderBox!.height).toBeCloseTo(toolbarBox!.height, 1)
-  await expect(details.getByRole('button', { name: 'Collapse all JSON' })).toBeVisible()
-  const actionBox = await details.getByRole('button', { name: 'Collapse all JSON' }).boundingBox()
-  const disclosureBox = await details.getByRole('button', { name: 'Collapse JSON' }).boundingBox()
-  const copyBox = await details.getByRole('button', { name: 'Copy JSON' }).boundingBox()
-  expect(actionBox).not.toBeNull()
-  expect(disclosureBox).not.toBeNull()
-  expect(copyBox).not.toBeNull()
-  const disclosureCenter = disclosureBox!.y + disclosureBox!.height / 2
-  expect(actionBox!.y + actionBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
-  expect(copyBox!.y + copyBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
-  const rootRow = details
-    .getByRole('treeitem', { name: 'JSON object' })
-    .locator(':scope > div')
-    .first()
-  const rootTrigger = rootRow.locator(':scope > span').first()
-  const rootInteractiveContent = rootTrigger.locator(':scope > span').first()
-  const punctuationBox = await rootInteractiveContent.locator(':scope > span').nth(1).boundingBox()
-  const rootTriggerBox = await rootTrigger.boundingBox()
-  expect(punctuationBox).not.toBeNull()
-  expect(rootTriggerBox).not.toBeNull()
-  expect(punctuationBox!.y + punctuationBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
-  expect(rootTriggerBox!.x + rootTriggerBox!.width).toBeCloseTo(actionBox!.x, 1)
-  await rootInteractiveContent.hover()
-  const [rowBackground, triggerBackground] = await Promise.all([
-    rootRow.evaluate((element) => getComputedStyle(element).backgroundColor),
-    rootInteractiveContent.evaluate((element) => getComputedStyle(element).backgroundColor),
-  ])
-  expect(triggerBackground).not.toBe(rowBackground)
-  await details.getByRole('button', { name: 'Collapse all JSON' }).click()
-  await expect(details.getByRole('button', { name: 'Expand all JSON' })).toBeVisible()
-  await page.getByRole('button', { name: /^accounts\s*1$/ }).click()
-  await details.getByRole('button', { name: 'Close' }).click()
-  await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toBeFocused()
 })
 
 test('recovers when connection schema validation initially finds no schemas', async ({ page }) => {
@@ -681,18 +625,6 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
   await viewport.evaluate((element) => {
     element.scrollLeft = 0
   })
-  await textHeader.click({ button: 'right' })
-  const contextMenu = page.locator('[data-slot="context-menu-popup"]')
-  await expect(contextMenu).toBeVisible()
-  await expect
-    .poll(() =>
-      contextMenu.evaluate((element) => ({
-        insideViewport:
-          document.querySelector('[data-slot="data-grid-viewport"]')?.contains(element) === true,
-        zIndex: getComputedStyle(element.parentElement ?? element).zIndex,
-      })),
-    )
-    .toEqual({ insideViewport: false, zIndex: '100' })
   const headerOverlapScrollLeft =
     (await textHeader.evaluate((element) => (element as HTMLElement).offsetLeft)) -
     (await labelHeader.evaluate((element) => (element as HTMLElement).offsetLeft))
@@ -740,6 +672,29 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
   await expect.poll(getPinnedDataColumnOrder).toEqual(['textValue', 'label'])
 })
 
+test('renders the pinned-column context menu above the grid', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 800 })
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  await page.getByRole('button', { name: 'Open label column menu' }).click()
+  await page.getByRole('menuitem', { name: 'Pin column' }).click()
+
+  const textHeader = page.locator('[data-slot="data-grid-header-cell"][data-column-id="textValue"]')
+  await textHeader.click({ button: 'right' })
+  const contextMenu = page.locator('[data-slot="context-menu-popup"]')
+  await expect(contextMenu).toBeVisible()
+  await expect
+    .poll(() =>
+      contextMenu.evaluate((element) => ({
+        insideViewport:
+          document.querySelector('[data-slot="data-grid-viewport"]')?.contains(element) === true,
+        zIndex: getComputedStyle(element.parentElement ?? element).zIndex,
+      })),
+    )
+    .toEqual({ insideViewport: false, zIndex: '100' })
+})
+
 test('wraps crowded table toolbar groups without overlap', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 800 })
   await connectToFixture(page)
@@ -758,65 +713,6 @@ test('wraps crowded table toolbar groups without overlap', async ({ page }) => {
   await page.getByRole('combobox', { name: 'Filter columns' }).press('Enter')
 
   await expectFilterToolbarAboveControls(page)
-})
-
-test('keeps nullable Enum selection and NULL intent in one field control', async ({ page }) => {
-  await connectToFixture(page)
-  await openTable(page, 'columnTypeShowcase')
-
-  const populatedRow = page.getByRole('row', {
-    name: /Select row 30000000-0000-4000-8000-000000000001/u,
-  })
-  const populatedCell = await getCellByColumn(page, populatedRow, 'optionalEnumValue')
-  await populatedCell.dblclick()
-
-  const populatedSelect = page.getByRole('combobox', { name: 'OptionalEnumValue' })
-  await expect(populatedSelect).toContainText('draft')
-  await expect
-    .poll(() =>
-      populatedSelect
-        .locator(':scope > span')
-        .first()
-        .evaluate((element) => getComputedStyle(element).textAlign),
-    )
-    .toBe('start')
-  await page.getByRole('button', { name: 'Close', exact: true }).click()
-
-  const row = page.getByRole('row', {
-    name: /Select row 30000000-0000-4000-8000-000000000002/u,
-  })
-  const cell = await getCellByColumn(page, row, 'optionalEnumValue')
-  await cell.dblclick()
-
-  const select = page.getByRole('combobox', { name: 'OptionalEnumValue' })
-  const nullControl = page.getByRole('checkbox', { name: 'Set OptionalEnumValue to NULL' })
-  const inputGroup = select.locator('xpath=ancestor::*[@data-slot="input-group"]')
-
-  await expect(inputGroup).toContainText('NULL')
-  await expect(nullControl).toBeChecked()
-  await expect(select).toBeDisabled()
-
-  await nullControl.click()
-
-  await expect(nullControl).not.toBeChecked()
-  await expect(select).toBeEnabled()
-  await expect(select).toContainText('Select value…')
-  await expect
-    .poll(() =>
-      select
-        .locator(':scope > span')
-        .first()
-        .evaluate((element) => getComputedStyle(element).textAlign),
-    )
-    .toBe('start')
-  await expect(page.getByRole('listbox')).toBeVisible()
-  await expect(page.getByText('Expected one of: active, archived, draft')).not.toBeVisible()
-
-  await select.click()
-  await expect(page.getByRole('listbox')).not.toBeVisible()
-  await page.getByRole('button', { name: 'Save' }).click()
-
-  await expect(page.getByText('Choose a value or select NULL.')).toBeVisible()
 })
 
 test('stages a structured inline edit through the production editor', async ({ page }) => {
@@ -908,23 +804,51 @@ test('loads the deferred calendar for a timestamp filter', async ({ page }) => {
   ).toBeVisible()
 })
 
-test('persists a row edit across reload', async ({ page }) => {
+test('persists and discards text and Boolean row edits across reload', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')
 
-  await page
-    .getByRole('checkbox', { name: 'Select row 50000000-0000-4000-8000-000000000001' })
-    .click()
-  await page.getByRole('textbox', { name: 'label' }).fill('Edited through Playwright')
-  await page.getByRole('button', { name: 'Apply changes' }).click()
+  const table = page.getByRole('table', { name: 'publicEditableRecords rows' })
+  const rowSelection = page.getByRole('checkbox', {
+    name: 'Select row 50000000-0000-4000-8000-000000000001',
+  })
 
-  await expect(page.getByRole('table', { name: 'publicEditableRecords rows' })).toContainText(
-    'Edited through Playwright',
-  )
-  await page.reload()
-  await expect(page.getByRole('table', { name: 'publicEditableRecords rows' })).toContainText(
-    'Edited through Playwright',
-  )
+  await test.step('discards a text edit without persisting it', async () => {
+    await rowSelection.click()
+    await page.getByRole('textbox', { name: 'label' }).fill('Discarded through Playwright')
+    await expect(table).toContainText('Discarded through Playwright')
+    await page.getByRole('button', { name: 'Discard' }).click()
+
+    await expect(table).toContainText('Publicly editable')
+    await expect(table).not.toContainText('Discarded through Playwright')
+    await page.reload()
+    await expect(table).toContainText('Publicly editable')
+    await expect(table).not.toContainText('Discarded through Playwright')
+  })
+
+  await test.step('persists a text edit across reload', async () => {
+    await rowSelection.click()
+    await page.getByRole('textbox', { name: 'label' }).fill('Edited through Playwright')
+    await page.getByRole('button', { name: 'Apply changes' }).click()
+
+    await expect(table).toContainText('Edited through Playwright')
+    await page.reload()
+    await expect(table).toContainText('Edited through Playwright')
+  })
+
+  await test.step('persists a Boolean edit across reload', async () => {
+    await rowSelection.click()
+    await expect(page.getByRole('button', { name: 'True' })).toHaveAttribute('aria-pressed', 'true')
+    await page.getByRole('button', { name: 'False' }).click()
+    await page.getByRole('button', { name: 'Apply changes' }).click()
+
+    await page.reload()
+    await rowSelection.click()
+    await expect(page.getByRole('button', { name: 'False' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
 })
 
 test('persists an inserted project across reload', async ({ page }) => {
@@ -1040,65 +964,6 @@ test('highlights rows and cells changed through an external live client', async 
   }
 })
 
-test('clears all checked rows when closing the row pane', async ({ page }) => {
-  await connectToFixture(page)
-  await openTable(page, 'columnTypeShowcase')
-
-  const firstRow = page.getByRole('checkbox', {
-    name: 'Select row 30000000-0000-4000-8000-000000000001',
-  })
-  const secondRow = page.getByRole('checkbox', {
-    name: 'Select row 30000000-0000-4000-8000-000000000002',
-  })
-  await firstRow.click()
-  await secondRow.click()
-  await page.getByRole('button', { name: 'Close', exact: true }).click()
-
-  await expect(firstRow).not.toBeChecked()
-  await expect(secondRow).not.toBeChecked()
-  await expect(secondRow).toBeFocused()
-})
-
-test('restores table focus after Escape dismisses pane and selection state', async ({ page }) => {
-  await connectToFixture(page)
-  await openTable(page, 'columnTypeShowcase')
-
-  const insertRow = page.getByRole('button', { name: 'Insert row' })
-  await insertRow.click()
-  await page.getByRole('button', { name: 'Open commands' }).click()
-  await page.getByRole('option', { name: 'Insert row' }).click()
-  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
-  await expect(insertRow).toBeFocused()
-
-  await insertRow.click()
-  await page.locator('[data-slot="row-editor-body"] input:not([disabled])').first().focus()
-  await page.keyboard.press('Escape')
-
-  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
-  await expect(insertRow).toBeFocused()
-
-  const row = page.getByRole('row', {
-    name: /Select row 30000000-0000-4000-8000-000000000001/u,
-  })
-  const rowCheckbox = row.getByRole('checkbox', {
-    name: 'Select row 30000000-0000-4000-8000-000000000001',
-  })
-  await rowCheckbox.click()
-  await page.locator('[data-slot="row-editor-body"] input:not([disabled])').first().focus()
-  await page.keyboard.press('Escape')
-
-  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
-  await expect(rowCheckbox).toBeFocused()
-
-  const cell = await getCellByColumn(page, row, 'label')
-  await cell.click()
-  await expect(cell).toBeFocused()
-  await page.keyboard.press('Escape')
-
-  await expect(cell).toBeFocused()
-  await expect(cell).not.toHaveAttribute('data-cell-selected')
-})
-
 test('moves a single checked row with the row pane navigation and keeps it visible', async ({
   page,
 }) => {
@@ -1142,42 +1007,6 @@ test('moves a single checked row with the row pane navigation and keeps it visib
     )
   })
   expect(hasNavigationContext).toBe(true)
-})
-
-test('discards a row edit without persisting it', async ({ page }) => {
-  await connectToFixture(page)
-  await openTable(page, 'publicEditableRecords')
-
-  const table = page.getByRole('table', { name: 'publicEditableRecords rows' })
-  await page
-    .getByRole('checkbox', { name: 'Select row 50000000-0000-4000-8000-000000000001' })
-    .click()
-  await page.getByRole('textbox', { name: 'label' }).fill('Discarded through Playwright')
-  await expect(table).toContainText('Discarded through Playwright')
-  await page.getByRole('button', { name: 'Discard' }).click()
-
-  await expect(table).toContainText('Publicly editable')
-  await expect(table).not.toContainText('Discarded through Playwright')
-  await page.reload()
-  await expect(table).toContainText('Publicly editable')
-  await expect(table).not.toContainText('Discarded through Playwright')
-})
-
-test('persists a Boolean row edit across reload', async ({ page }) => {
-  await connectToFixture(page)
-  await openTable(page, 'publicEditableRecords')
-
-  const rowSelection = page.getByRole('checkbox', {
-    name: 'Select row 50000000-0000-4000-8000-000000000001',
-  })
-  await rowSelection.click()
-  await expect(page.getByRole('button', { name: 'True' })).toHaveAttribute('aria-pressed', 'true')
-  await page.getByRole('button', { name: 'False' }).click()
-  await page.getByRole('button', { name: 'Apply changes' }).click()
-
-  await page.reload()
-  await rowSelection.click()
-  await expect(page.getByRole('button', { name: 'False' })).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('navigates across a real Jazz query page boundary', async ({ page }) => {

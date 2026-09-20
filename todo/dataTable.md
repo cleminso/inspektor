@@ -301,7 +301,7 @@
 
 [29/07/26]
 
-- [ ] Add visual regression coverage for header corners, active cells, active columns, resizing, and drag states.
+- [ ] Inspect header corners, active cells, active columns, resizing, and drag states in a real browser; do not add visual snapshots until the repository adopts an image-baseline workflow.
 - [ ] Define and implement keyboard-operable column resizing.
 - [ ] Define forced-colors fallbacks for active-cell and selection presentation.
 - [ ] Define sticky offsets and associations before supporting grouped sticky headers.

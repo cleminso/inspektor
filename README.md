@@ -7,6 +7,7 @@ Inspektor is a browser-based inspector for Jazz applications. Use it at [inspekt
 - [Use Inspektor](#use-inspektor)
 - [Credential storage](#credential-storage)
 - [Local development](#local-development)
+- [Validation](#validation)
 - [Project documentation](#project-documentation)
 
 ## Use Inspektor
@@ -41,11 +42,21 @@ pnpm inspektor-test:fixture
 
 Use the direct HTTP Vite URL when connecting to the fixture. The fixture prints ephemeral credentials for local use and deletes its data when stopped. See [Inspektor Test](./apps/inspektor-test/README.md) for its scenarios and security rules.
 
-Run browser acceptance tests against an isolated fixture:
+## Validation
+
+Run the workspace Vitest suites:
 
 ```sh
-pnpm test:browser
+pnpm test
 ```
+
+Run standalone Playwright E2E tests against built applications:
+
+```sh
+pnpm test:e2e
+```
+
+Install the Playwright browser before its first local run with `pnpm test:e2e:install`. Run the complete lint, typecheck, test, and build gate with `pnpm check`. For a focused Vitest suite, use `pnpm --filter <package> test`.
 
 ## Project documentation
 

@@ -34,8 +34,9 @@ and browser gates remain blocked by native top-level JSON writes.
 
 ## Known blocker
 
-Jazz alpha.55 rejects native writes to top-level `s.json()` fixture columns. Keep the fixture and its
-coverage intact rather than removing JSON fields or skipping assertions.
+Jazz alpha.55 rejects native writes to top-level `s.json()` fixture columns. This is tracked upstream in
+[Jazz issue #1865](https://github.com/garden-co/jazz/issues/1865). Keep the fixture and its coverage intact
+rather than changing JSON fields or skipping assertions.
 
 This blocks:
 

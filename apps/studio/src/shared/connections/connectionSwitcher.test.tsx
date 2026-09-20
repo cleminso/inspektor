@@ -158,7 +158,7 @@ describe('ConnectionSwitcher', () => {
 
     expect(deleteConnection).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
 
     expect(deleteConnection).toHaveBeenCalledWith('one')
     expect(navigate).toHaveBeenCalledWith({ to: '/conn' })
@@ -171,7 +171,7 @@ describe('ConnectionSwitcher', () => {
     render(<ConnectionSwitcher />)
     openSwitcher()
     fireEvent.click(screen.getByRole('button', { name: 'Delete connection' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Keep saved connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Keep connection' }))
 
     expect(deleteConnection).not.toHaveBeenCalled()
   })

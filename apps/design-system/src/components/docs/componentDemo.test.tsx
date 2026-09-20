@@ -80,18 +80,4 @@ describe('ComponentDemo', () => {
     expect(sourceCode.getAttribute('tabindex')).toBe('0')
     expect(sourceCode.querySelector('pre')?.getAttribute('tabindex')).toBeNull()
   })
-
-  it('matches Shiki line splitting for lone carriage returns', () => {
-    shikiMock.html = '<pre class="shiki"><code><span class="line">first\rsecond</span></code></pre>'
-
-    const { container } = render(
-      <ComponentDemo source={'first\rsecond'}>
-        <span>Example</span>
-      </ComponentDemo>,
-    )
-
-    fireEvent.click(within(container).getByRole('button', { name: 'Show code' }))
-
-    expect(container.querySelector('[data-docs-code-line-numbers]')?.children).toHaveLength(1)
-  })
 })

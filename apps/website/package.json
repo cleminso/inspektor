@@ -11,7 +11,7 @@
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "test:browser": "playwright test",
+    "test:e2e": "playwright test",
     "types:worker": "wrangler types --include-runtime false",
     "types:worker:check": "wrangler types --include-runtime false --check",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.worker.json --noEmit && pnpm types:worker:check"

@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 const codeMirrorModuleLoads = vi.hoisted(() => ({ count: 0 }))
 
+vi.mock('@inspektor/ds', () => ({}))
+
 vi.mock('@codemirror/view', () => {
   codeMirrorModuleLoads.count += 1
 

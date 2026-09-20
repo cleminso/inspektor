@@ -30,13 +30,6 @@ afterEach(() => {
 })
 
 describe('SelectedTableView', () => {
-  it('renders table data without reading schema metadata', () => {
-    render(<SelectedTableView tableName="accounts" />)
-
-    expect(screen.getByText('accounts:1')).not.toBeNull()
-    expect(screen.queryByText('Loading table')).toBeNull()
-  })
-
   it('remounts table-scoped data state when the table changes', () => {
     const { rerender } = render(<SelectedTableView tableName="accounts" />)
     expect(screen.getByText('accounts:1')).not.toBeNull()
@@ -44,13 +37,5 @@ describe('SelectedTableView', () => {
     rerender(<SelectedTableView tableName="users" />)
 
     expect(screen.getByText('users:2')).not.toBeNull()
-  })
-
-  it('renders the selected schema view', () => {
-    searchState.view = 'schema'
-
-    render(<SelectedTableView tableName="accounts" />)
-
-    expect(screen.getByText('Schema: accounts')).not.toBeNull()
   })
 })

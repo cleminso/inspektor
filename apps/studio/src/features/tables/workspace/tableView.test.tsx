@@ -126,7 +126,6 @@ const editRowFormProps = vi.hoisted(() => ({ current: null as Record<string, unk
 const fieldEditorProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
-const preloadCodeEditor = vi.hoisted(() => vi.fn())
 const useConnectionContentReady = vi.hoisted(() => vi.fn())
 const schemaColumns = vi.hoisted(
   (): Array<{
@@ -551,7 +550,6 @@ vi.mock('@inspektor/ds', () => {
       Viewport: Container,
     },
     KeyboardInput: () => null,
-    preloadCodeEditor,
     ResizableHandle: Container,
     ResizablePanel: Container,
     ResizablePanelGroup: Container,
@@ -622,7 +620,6 @@ afterEach(() => {
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
-  preloadCodeEditor.mockReset()
   useConnectionContentReady.mockReset()
   schemaColumns.splice(1)
   if (initialClipboardDescriptor === undefined) {
@@ -925,14 +922,6 @@ describe('TableView composition boundary', () => {
     rerenderTableView()
 
     expect(useConnectionContentReady).toHaveBeenLastCalledWith(true)
-  })
-
-  it('keeps CodeMirror deferred until a structured editor opens', () => {
-    schemaColumns.push({ name: 'metadata', column_type: { type: 'Json' }, nullable: false })
-
-    renderTableView()
-
-    expect(preloadCodeEditor).not.toHaveBeenCalled()
   })
 
   it('tracks the active row checkbox when it mounts after the pane opens', async () => {
@@ -1262,10 +1251,9 @@ describe('TableView query status', () => {
 
     expect(screen.getAllByText('This table is empty')).toHaveLength(2)
     expect(screen.getByRole('status').textContent).toBe('This table is empty')
-    const table = screen.getByRole('table', { name: 'accounts rows' })
-    const contextualInsert = within(table).getByRole('button', { name: 'Insert row' })
+    const insertRow = screen.getByRole('button', { name: 'Insert row' })
 
-    fireEvent.click(contextualInsert)
+    fireEvent.click(insertRow)
     expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledOnce()
   })
 

@@ -167,18 +167,18 @@ Inspektor uses the same ownership rule:
 
 ### Verification scope
 
-The official Inspektor separates focused component coverage from browser acceptance.
+The official Inspektor separates focused Vitest JSDOM component coverage from standalone Playwright E2E acceptance.
 
 Component tests cover Enum editor activation, NULL actions, insert omission and default behavior, queued overlays, and live-source reconciliation.
 
-Browser tests cover the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
+Playwright E2E covers the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
 
 Inspektor follows this acceptance split:
 
 - Pure tests cover state transitions, parsing, nested Row validation, omission, NULL, dirty equality, and payload construction.
 - Component tests cover control composition, validation timing, focus, keyboard behavior, and local draft preservation.
-- Browser tests cover production-only boundaries: route activation, the real deferred structured editor, local staging or discard, and a representative persisted mutation observed after reload.
-- Browser tests do not repeat every column type when focused tests exercise the same mutation contract. Add a type-specific browser case only when that type crosses a distinct browser, deferred-module, focus, or runtime serialization boundary.
+- Playwright E2E covers production-only boundaries: route activation, the real deferred structured editor, local staging or discard, and a representative persisted mutation observed after reload.
+- Playwright E2E does not repeat every column type when focused tests exercise the same mutation contract. Add a type-specific E2E case only when that type crosses a distinct browser, deferred-module, focus, or runtime serialization boundary.
 
 For structured inline editing, routing alone is insufficient because it can pass while the production editor boundary is broken. Opening the real editor and recovering its staged text is the minimum browser contract. A separate representative Apply-and-reload test owns general persistence.
 

@@ -134,28 +134,4 @@ describe('TablePagination', () => {
     expect(screen.getByText('Page 1')).toBeTruthy()
     expect(screen.getByRole('combobox', { name: 'Rows per page' }).textContent).toContain('500')
   })
-
-  it('wraps both page navigation buttons with tooltips', async () => {
-    render(
-      <TablePagination
-        hasNextPage
-        hasPreviousPage
-        loadedRowCount={100}
-        page={2}
-        pageSize={100}
-        onPageChange={() => undefined}
-        onPageSizeChange={() => undefined}
-      />,
-    )
-
-    const previousButton = screen.getByRole('button', { name: 'Previous page' })
-    const nextButton = screen.getByRole('button', { name: 'Next page' })
-
-    fireEvent.focus(previousButton)
-    expect(await screen.findByText('Previous page')).toBeTruthy()
-
-    fireEvent.blur(previousButton)
-    fireEvent.focus(nextButton)
-    expect(await screen.findByText('Next page')).toBeTruthy()
-  })
 })

@@ -35,17 +35,18 @@ For browser verification, fixture ownership, and credential handling, load `insp
 
 ## Preferred commands
 
-- Inspektor Studio Node tests: `pnpm test:studio:node`
-- Inspektor Studio jsdom tests: `pnpm test:studio:jsdom`
-- Complete Inspektor Studio suite: `pnpm test:studio`
-- Design-system documentation app tests: `pnpm test:design-system-docs`
-- Design-system Node tests: `pnpm test:design-system:node`
-- Complete design-system suite: `pnpm test:design-system`
-- Default workspace suite excluding design-system documentation app tests: `pnpm test`
-- Complete workspace suite: `pnpm test && pnpm test:design-system-docs`, only for cross-package changes or complete workspace coverage
+- Workspace Vitest suites: `pnpm test`
+- Standalone Playwright E2E: `pnpm test:e2e`
+- Playwright browser installation: `pnpm test:e2e:install`
+- Complete repository gate: `pnpm check`
+- Package-focused Vitest: `pnpm --filter <package> test`
 - Studio package: `pnpm --filter inspektor lint`, `pnpm --filter inspektor typecheck`, `pnpm --filter inspektor build`
 - Design-system package: `pnpm --filter @inspektor/ds lint`, `pnpm --filter @inspektor/ds typecheck`, `pnpm --filter @inspektor/ds build`
-- Design-system documentation: `pnpm --filter inspektor.design-system lint`, `pnpm --filter inspektor.design-system typecheck`, `pnpm test:design-system-docs`, `pnpm --filter inspektor.design-system build`
+- Design-system documentation: `pnpm --filter inspektor.design-system test`, `pnpm --filter inspektor.design-system lint`, `pnpm --filter inspektor.design-system typecheck`, `pnpm --filter inspektor.design-system build`
 - Inspektor Test validation and shared-cloud mutation boundaries are owned by `inspector-testing`.
+
+Vitest uses Node for pure logic, Worker behavior, and bundle checks, and JSDOM for React component and feature behavior. Do not use Vitest Browser Mode. Playwright E2E owns built-application and real-browser behavior. The repository does not maintain visual snapshots.
+
+The design-system documentation app owns only registry and catalog contracts, `AppShell`, and `ComponentDemo`. It has no page-level tests; component correctness belongs to `packages/design-system`.
 
 Package manifests remain authoritative when scripts change.

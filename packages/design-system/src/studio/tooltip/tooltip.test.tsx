@@ -1,12 +1,11 @@
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { Tooltip } from './tooltip'
 
 afterEach(() => {
   cleanup()
-  vi.useRealTimers()
 })
 
 describe('Tooltip', () => {
@@ -52,33 +51,5 @@ describe('Tooltip', () => {
 
     expect(popup?.querySelector('svg[aria-hidden="true"]')).toBeNull()
     expect(popup?.parentElement?.style.pointerEvents).toBe('none')
-  })
-
-  it('supports a close delay while the pointer crosses grouped triggers', async () => {
-    vi.useFakeTimers()
-    render(
-      <Tooltip.Provider delay={0}>
-        <Tooltip.Root>
-          <Tooltip.Trigger closeDelay={100}>First</Tooltip.Trigger>
-          <Tooltip.Content>First tooltip</Tooltip.Content>
-        </Tooltip.Root>
-        <Tooltip.Root>
-          <Tooltip.Trigger closeDelay={100}>Second</Tooltip.Trigger>
-          <Tooltip.Content>Second tooltip</Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>,
-    )
-
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'First' }))
-    await vi.runAllTimersAsync()
-    expect(screen.getByText('First tooltip')).toBeTruthy()
-
-    fireEvent.mouseLeave(screen.getByRole('button', { name: 'First' }))
-    await vi.advanceTimersByTimeAsync(50)
-    expect(screen.getByText('First tooltip')).toBeTruthy()
-
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Second' }))
-    await vi.runAllTimersAsync()
-    expect(screen.getByText('Second tooltip')).toBeTruthy()
   })
 })

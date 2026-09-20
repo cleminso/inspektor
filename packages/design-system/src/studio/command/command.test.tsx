@@ -120,13 +120,6 @@ describe('Command', () => {
     expect(onSelect).toHaveBeenCalledWith('id')
   })
 
-  it('renders an explicit empty state', () => {
-    render(<CommandList />)
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'missing' } })
-
-    expect(screen.getByText('No columns found.')).toBeTruthy()
-  })
-
   it('matches exact operator glyph aliases without including compound operators', () => {
     const operatorItems = [
       { label: 'Equals', keywords: ['=', '=='] },

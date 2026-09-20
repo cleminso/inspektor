@@ -14,6 +14,7 @@
 - [Static and deferred dependency graphs](#static-and-deferred-dependency-graphs)
 - [Runtime boundaries in the Inspektor](#runtime-boundaries-in-the-inspektor)
 - [Dependency roles](#dependency-roles)
+- [Test boundaries](#test-boundaries)
 - [Adding a dependency or export](#adding-a-dependency-or-export)
 - [Validation](#validation)
 - [Glossary](#glossary)
@@ -277,6 +278,30 @@ Dependencies are selected for a role and an owning layer, not simply because the
 | Documentation         | Shiki                                      | Documentation app only; not a DS runtime concern                                    |
 | Build output          | Vite, TSDown, TypeScript                   | Vite builds applications; TSDown emits design-system artifacts                      |
 | Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows |
+
+## Test boundaries
+
+Web workspace tests use two Vitest environments. Node owns pure logic, Worker behavior, and bundle-graph checks. JSDOM owns React component, feature, and route-composition behavior.
+
+Filename conventions select the environment:
+
+- `*.test.ts` is a pure Node test.
+- `*.node.test.tsx` is a Node test that needs JSX syntax, usually for bundle or import-graph assertions.
+- `*.test.tsx` is a React or component test that runs in JSDOM.
+- `*.jsdom.test.ts` is a non-React test that requires DOM globals.
+
+The package and application boundaries are:
+
+| Workspace                | Vitest ownership                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/design-system` | Node for pure and bundle tests; JSDOM for reusable component behavior                                                           |
+| `apps/studio`            | Node for pure, Worker, and bundle tests; JSDOM for product feature and route-composition behavior                               |
+| `apps/design-system`     | Registry and catalog contracts, plus `AppShell` and `ComponentDemo`; no page-level tests or assertions of component correctness |
+| `apps/website`           | Node for pure and Worker tests; JSDOM for website component behavior                                                            |
+
+`apps/design-system` tests its own registry, catalog, shell, and demo-rendering contracts. The documentation application does not own `@inspektor/ds` component correctness; that coverage belongs beside the component in `packages/design-system`.
+
+Standalone Playwright E2E owns behavior that must cross the built application, routing, server, real-browser, or fixture boundary. The repository does not use Vitest Browser Mode and does not maintain visual snapshots.
 
 ## Adding a dependency or export
 

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const viewports = [
   {
@@ -53,96 +54,85 @@ const viewports = [
   },
 ]
 
+const readGeometry = async (page: Page) =>
+  page.evaluate(() => {
+    const getElement = (slot: string): HTMLElement => {
+      const element = document.querySelector<HTMLElement>(`[data-slot="${slot}"]`)
+      if (element === null) throw new Error(`Missing ${slot}`)
+      return element
+    }
+
+    const center = getElement('brand-site-frame-center')
+    const startRail = getElement('brand-site-frame-start-rail')
+    const endRail = getElement('brand-site-frame-end-rail')
+    const header = getElement('brand-site-frame-header')
+    const headerContent = getElement('brand-site-frame-header-content')
+    const footerStrip = getElement('brand-site-frame-footer-strip')
+    const heroContent = getElement('brand-hero-content')
+    const description = getElement('brand-hero-description')
+    const heroStyles = getComputedStyle(heroContent)
+    const headerStyles = getComputedStyle(header)
+    const headerContentStyles = getComputedStyle(headerContent)
+    const title = getElement('brand-hero-title')
+    const continuation = getElement('brand-hero-continuation')
+    const titleStyles = getComputedStyle(title)
+    const continuationStyles = getComputedStyle(continuation)
+
+    return {
+      centerWidth: center.getBoundingClientRect().width,
+      continuationLineHeight: continuationStyles.lineHeight,
+      continuationSize: continuationStyles.fontSize,
+      descriptionMaxWidth: getComputedStyle(description).maxWidth,
+      endRailWidth: endRail.getBoundingClientRect().width,
+      footerHeight: footerStrip.getBoundingClientRect().height,
+      headerHeight: header.getBoundingClientRect().height,
+      headerPaddingInline: headerStyles.paddingInline,
+      headerContentPaddingInline: headerContentStyles.paddingInline,
+      heroPaddingInline: heroStyles.paddingInline,
+      heroPaddingTop: heroStyles.paddingTop,
+      startRailWidth: startRail.getBoundingClientRect().width,
+      titleLineHeight: titleStyles.lineHeight,
+      titleSize: titleStyles.fontSize,
+    }
+  })
+
 test('renders the website without viewport overflow', async ({ page }) => {
   for (const viewport of viewports) {
-    await page.setViewportSize(viewport)
-    await page.goto('/')
+    await test.step(`${viewport.width}px viewport`, async () => {
+      await page.setViewportSize(viewport)
+      await page.goto('/')
 
-    await expect(page.getByRole('img', { name: 'Inspektor' })).toBeVisible()
-    await expect(
-      page.getByRole('heading', {
-        level: 1,
-        name: 'inspektor studio explore your Jazz application data',
-      }),
-    ).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2 })).toHaveCount(0)
-    await expect(
-      page.getByText(
-        /Connect to your Jazz sync server from your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries\./,
-      ),
-    ).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Open Inspektor' })).toHaveAttribute(
-      'href',
-      '/conn',
-    )
+      await page.locator('[data-slot="brand-site-frame-center"]').waitFor()
 
-    const geometry = await page.evaluate(() => {
-      const getElement = (slot: string): HTMLElement => {
-        const element = document.querySelector<HTMLElement>(`[data-slot="${slot}"]`)
-        if (element === null) throw new Error(`Missing ${slot}`)
-        return element
-      }
+      const geometry = await readGeometry(page)
 
-      const center = getElement('brand-site-frame-center')
-      const startRail = getElement('brand-site-frame-start-rail')
-      const endRail = getElement('brand-site-frame-end-rail')
-      const header = getElement('brand-site-frame-header')
-      const headerContent = getElement('brand-site-frame-header-content')
-      const footerStrip = getElement('brand-site-frame-footer-strip')
-      const heroContent = getElement('brand-hero-content')
-      const description = getElement('brand-hero-description')
-      const heroStyles = getComputedStyle(heroContent)
-      const headerStyles = getComputedStyle(header)
-      const headerContentStyles = getComputedStyle(headerContent)
-      const title = getElement('brand-hero-title')
-      const continuation = getElement('brand-hero-continuation')
-      const titleStyles = getComputedStyle(title)
-      const continuationStyles = getComputedStyle(continuation)
+      expect(geometry).toEqual({
+        centerWidth: viewport.centerWidth,
+        continuationLineHeight: viewport.continuationLineHeight,
+        continuationSize: viewport.continuationSize,
+        descriptionMaxWidth: '710px',
+        endRailWidth: viewport.railWidth,
+        footerHeight: 46,
+        headerHeight: 52,
+        headerPaddingInline: '0px',
+        headerContentPaddingInline: '16px',
+        heroPaddingInline: '16px',
+        heroPaddingTop: '42px',
+        startRailWidth: viewport.railWidth,
+        titleLineHeight: viewport.titleLineHeight,
+        titleSize: viewport.titleSize,
+      })
 
-      return {
-        centerWidth: center.getBoundingClientRect().width,
-        continuationLineHeight: continuationStyles.lineHeight,
-        continuationSize: continuationStyles.fontSize,
-        descriptionMaxWidth: getComputedStyle(description).maxWidth,
-        endRailWidth: endRail.getBoundingClientRect().width,
-        footerHeight: footerStrip.getBoundingClientRect().height,
-        headerHeight: header.getBoundingClientRect().height,
-        headerPaddingInline: headerStyles.paddingInline,
-        headerContentPaddingInline: headerContentStyles.paddingInline,
-        heroPaddingInline: heroStyles.paddingInline,
-        heroPaddingTop: heroStyles.paddingTop,
-        startRailWidth: startRail.getBoundingClientRect().width,
-        titleLineHeight: titleStyles.lineHeight,
-        titleSize: titleStyles.fontSize,
-      }
+      const viewportSize = await page.evaluate(() => ({
+        height: window.innerHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+        scrollWidth: document.documentElement.scrollWidth,
+        width: window.innerWidth,
+      }))
+
+      expect(viewportSize.scrollHeight).toBe(viewportSize.height)
+      expect(viewportSize.scrollWidth).toBe(viewportSize.width)
     })
-
-    expect(geometry).toEqual({
-      centerWidth: viewport.centerWidth,
-      continuationLineHeight: viewport.continuationLineHeight,
-      continuationSize: viewport.continuationSize,
-      descriptionMaxWidth: '710px',
-      endRailWidth: viewport.railWidth,
-      footerHeight: 46,
-      headerHeight: 52,
-      headerPaddingInline: '0px',
-      headerContentPaddingInline: '16px',
-      heroPaddingInline: '16px',
-      heroPaddingTop: '42px',
-      startRailWidth: viewport.railWidth,
-      titleLineHeight: viewport.titleLineHeight,
-      titleSize: viewport.titleSize,
-    })
-
-    const viewportSize = await page.evaluate(() => ({
-      height: window.innerHeight,
-      scrollHeight: document.documentElement.scrollHeight,
-      scrollWidth: document.documentElement.scrollWidth,
-      width: window.innerWidth,
-    }))
-
-    expect(viewportSize.scrollHeight).toBe(viewportSize.height)
-    expect(viewportSize.scrollWidth).toBe(viewportSize.width)
   }
 })
 

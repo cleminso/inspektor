@@ -417,7 +417,7 @@ Rendering checks cover themes, zoom, forced colors, and supported text direction
 - Forced-colors mode.
 - Left-to-right and right-to-left direction when supported.
 
-Visual regression coverage should include border corners and intersections. Behavioral tests should separately verify state attributes, focus transfer, resize state, and column identity after keyboard or pointer reordering.
+Interactive browser inspection should include border corners and intersections because the repository does not maintain visual snapshots. Behavioral tests should separately verify state attributes, focus transfer, resize state, and column identity after keyboard or pointer reordering.
 
 ## References
 

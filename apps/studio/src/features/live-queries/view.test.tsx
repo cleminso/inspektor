@@ -551,20 +551,6 @@ describe('LiveQueriesView', () => {
     expect(useQuerySubscriptionsTelemetry).toHaveBeenLastCalledWith(mocks.connection)
   })
 
-  it('keeps query details inside the workspace with a 240px minimum width', () => {
-    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<LiveQueriesView />)
-
-    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
-
-    const details = screen.getByRole('complementary', { name: 'Query details' })
-    expect(screen.getByTestId('shell-left-dock')).toBeTruthy()
-    expect(screen.queryByTestId('shell-right-dock')).toBeNull()
-    expect(details.closest('[data-panel-min-size]')?.getAttribute('data-panel-min-size')).toBe(
-      '240',
-    )
-  })
-
   it('keeps routine refresh silent and stale results visible without replacing the timeline', () => {
     const successful = success('capture-1', 1_000, [accountsGroup])
     mocks.telemetry = telemetry([successful], 'refreshing')

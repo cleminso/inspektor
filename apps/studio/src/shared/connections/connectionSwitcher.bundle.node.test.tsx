@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 const runtimeProviderLoads = vi.hoisted(() => ({ count: 0 }))
 
+vi.mock('@inspektor/ds', () => ({}))
+
 vi.mock('@app/providers/inspectorProvider', () => {
   runtimeProviderLoads.count += 1
 

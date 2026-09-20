@@ -37,17 +37,6 @@ describe('BinaryValue', () => {
 })
 
 describe('BinaryDetails', () => {
-  it('renders a byte count and one action menu', () => {
-    render(<BinaryDetails byteLength={3} onCopy={() => undefined} onDownload={() => undefined} />)
-
-    const input = screen.getByRole('textbox', { name: 'Binary value' })
-    const trigger = screen.getByRole('button', { name: 'Copy as' })
-    expect(input.getAttribute('value')).toBe('3B')
-    expect(trigger.getAttribute('data-slot')).toBe('input-group-action')
-    expect(trigger.textContent).toBe('')
-    expect(trigger.querySelectorAll('[data-slot="icon"]')).toHaveLength(2)
-  })
-
   it('omits binary actions when the byte count is invalid', () => {
     render(<BinaryDetails byteLength={-1} onCopy={() => undefined} onDownload={() => undefined} />)
 

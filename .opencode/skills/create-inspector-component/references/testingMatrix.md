@@ -90,7 +90,8 @@ Do not test generic TypeScript inference, exhaustive typed lookup keys, direct r
 - run the focused component test file
 - run focused lint from `packages/design-system`
 - verify the component playground and its displayed source
-- run `pnpm test:design-system-docs`
+- run `pnpm --filter @inspektor/ds test`
+- run `pnpm --filter inspektor.design-system test` when registry, `ComponentDemo`, or `AppShell` contracts change; do not add page-level component correctness tests
 - run `pnpm --filter inspektor.design-system typecheck`
 - run `pnpm --filter inspektor.design-system build`
 

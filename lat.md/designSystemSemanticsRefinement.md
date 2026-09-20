@@ -31,7 +31,7 @@ These commands validate the affected package, documentation application, and Stu
 - `pnpm --filter @inspektor/ds test`
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
-- `pnpm test:design-system-docs`
+- `pnpm --filter inspektor.design-system test`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
@@ -64,10 +64,13 @@ selected: {
 Tests cover Inspektor-owned behavior, accessibility outcomes, state combinations, and documentation scenario contracts.
 
 - Add a failing component test before behavior changes.
+- Use Vitest JSDOM for React and component behavior and Vitest Node for pure or bundle behavior. Do not use Vitest Browser Mode.
+- Reserve standalone Playwright E2E for built-application and real-browser boundaries. The repository does not maintain visual snapshots.
 - Test Inspektor-owned behavior and accessibility outcomes, not Base UI implementation details.
 - Cover field state combinations: default, hover, focus-visible, invalid, invalid-focus, read-only, and disabled.
 - Cover selection state combinations: unchecked, checked, selected, pressed, checked-disabled, and selected-disabled.
 - Keep executable documentation scenarios and their `?raw` displayed source synchronized after public API changes.
+- Keep documentation-app tests limited to registry and catalog contracts, `ComponentDemo`, and `AppShell`; component correctness belongs to `packages/design-system`, not page-level documentation tests.
 
 ## Boundaries
 

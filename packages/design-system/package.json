@@ -56,8 +56,6 @@
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "test:json-view": "vitest run src/studio/jsonView",
-    "test:node": "vitest run src/primitives/popupPositioning.test.ts src/tokens/tokens.stylex.test.ts src/studio/jsonView/jsonViewRenderPlan.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

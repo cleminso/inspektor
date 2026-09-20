@@ -40,12 +40,12 @@
 
 ## Validation
 
-- Focused scenario and page tests
-- `pnpm test:design-system-docs`
+- Focused registry, `ComponentDemo`, or `AppShell` tests when their contracts change; do not add page-level component correctness tests
+- `pnpm --filter inspektor.design-system test`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
-- Browser verification in both color schemes and relevant viewport widths
+- Interactive browser verification in both color schemes and relevant viewport widths
 - `pnpm --filter @inspektor/ds build` when package source or public APIs change
 
 See [REFERENCE.md](REFERENCE.md) for page structure and completion criteria.
