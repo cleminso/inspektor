@@ -9,6 +9,11 @@ import ReactDOM from 'react-dom/client'
 import { ThemeMetadata } from './app/themeMetadata'
 import { routeTree } from './routeTree.gen'
 
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  window.location.reload()
+})
+
 if (import.meta.env.DEV === true) {
   void import('virtual:stylex:runtime')
 }

@@ -43,8 +43,9 @@ export const BrandProductPreview = forwardRef<HTMLElement, BrandProductPreviewPr
           <img
             alt={alt}
             decoding="async"
+            fetchPriority="high"
             height={height}
-            loading="lazy"
+            loading="eager"
             src={src}
             width={width}
             {...stylex.props(brandProductPreviewStyles.image)}

@@ -141,7 +141,7 @@ test('renders the website without horizontal viewport overflow', async ({ page }
       expect(viewportSize.scrollWidth).toBe(viewportSize.width)
       const previewImage = page.locator('[data-slot="brand-product-preview"] img')
       await expect(previewImage).toHaveAttribute('alt', /Inspektor Studio displaying a Jazz table/)
-      await expect(previewImage).toHaveAttribute('src', /inspektorStudioLight\.webp/)
+      await expect(previewImage).toHaveAttribute('src', /inspektorStudioLight-[^/]+\.webp/)
       await previewImage.scrollIntoViewIfNeeded()
       await expect
         .poll(() =>
@@ -180,7 +180,7 @@ test('renders without console errors in dark mode', async ({ page }) => {
     .toBe('dark')
   await expect(page.locator('[data-slot="brand-product-preview"] img')).toHaveAttribute(
     'src',
-    /inspektorStudioDark\.webp/,
+    /inspektorStudioDark-[^/]+\.webp/,
   )
   await expect
     .poll(() =>

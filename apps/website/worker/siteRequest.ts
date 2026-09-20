@@ -36,7 +36,7 @@ export async function handleSiteRequest(
     response = await dependencies.fetchWebsiteAsset(
       new Request(new URL('/index.html', request.url), request),
     )
-    response = withStatus(response, 404)
+    response = withStatus(response, pathname === '/' ? 200 : 404)
   }
 
   return addWebsiteHeaders(response, pathname)

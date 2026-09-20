@@ -56,6 +56,27 @@ describe('website Worker routing', () => {
     expect(new URL(fetchWebsiteAsset.mock.calls[1]?.[0].url ?? '').pathname).toBe('/index.html')
   })
 
+  it('serves the website shell with a 200 status at the root', async () => {
+    const fetchWebsiteAsset = vi.fn(async (request: Request) => {
+      const pathname = new URL(request.url).pathname
+      return pathname === '/index.html'
+        ? new Response('website shell', { headers: { 'Content-Type': 'text/html' } })
+        : new Response(null, { status: 404 })
+    })
+
+    const response = await handleSiteRequest(
+      new Request('https://inspektor.dev/', { headers: { Accept: 'text/html' } }),
+      {
+        fetchProduct: vi.fn(async (_request: Request) => new Response('product')),
+        fetchWebsiteAsset,
+      },
+    )
+
+    expect(await response.text()).toBe('website shell')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('X-Robots-Tag')).toBeNull()
+  })
+
   it('keeps missing website subresources as errors', async () => {
     const fetchWebsiteAsset = vi.fn(async (_request: Request) =>
       Promise.resolve(new Response(null, { status: 404 })),
