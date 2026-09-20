@@ -1,6 +1,6 @@
 # Inspektor
 
-Inspektor is a browser-based inspector for Jazz applications. It displays published schemas, tables, rows, permissions, and live-query activity.
+Inspektor is a browser-based inspector for developers building Jazz applications. It displays published schemas, tables, rows, permissions, and live-query activity.
 
 ## Links
 

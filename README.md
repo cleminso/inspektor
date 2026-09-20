@@ -1,6 +1,31 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./apps/studio/public/brand/inspektorWordmarkOnDark.png" />
+    <img alt="Inspektor" src="./apps/studio/public/brand/inspektorWordmark.svg" width="432" height="62" />
+  </picture>
+</p>
+
+<p align="center">
+  <a href="https://inspektor.dev">Website</a> ·
+  <a href="https://inspektor.dev/conn">Studio</a> ·
+  <a href="https://github.com/cleminso/inspektor">Source</a>
+</p>
+
+<p align="center">
+  <a href="./LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+</p>
+
 # Inspektor
 
-Inspektor is a browser-based inspector for Jazz applications. Use it at [inspektor.dev](https://inspektor.dev).
+Inspektor is a browser-based inspector for developers building Jazz applications.
+
+Inspect your application's published schema and data without building a separate admin interface.
+
+<p align="center">
+  <img alt="Inspektor Studio displaying a Jazz table with its schema, records, and selected row details" src="./apps/website/public/images/inspektorStudioLight.webp" width="1024" />
+</p>
+
+Use [Inspektor Studio](https://inspektor.dev/conn) in your browser to inspect schemas and records, filter data, edit supported rows, and monitor live queries.
 
 ## Table of contents
 
@@ -9,18 +34,23 @@ Inspektor is a browser-based inspector for Jazz applications. Use it at [inspekt
 - [Local development](#local-development)
 - [Validation](#validation)
 - [Project documentation](#project-documentation)
+- [License](#license)
 
 ## Use Inspektor
 
-Open [inspektor.dev](https://inspektor.dev), create a connection, and enter the Jazz server URL, app ID, admin secret, environment, and branch. Inspektor loads the published schema so you can inspect tables, rows, permissions, and live queries.
+Inspektor is for Jazz developers who need to understand application data while they build and debug. It helps you inspect the published schema, browse tables and rows, review permissions, edit supported data, and monitor live queries.
+
+Open [Inspektor Studio](https://inspektor.dev/conn) and create a connection with your Jazz server URL, app ID, admin secret, and environment. Inspektor loads the published schema from your configured server.
 
 Inspektor follows the connection model used by the official [Jazz Inspector](https://jazz2-inspector.vercel.app).
 
 ## Credential storage
 
-Connection profiles and workspace preferences are stored in the browser's local storage, but admin secrets are not. By default, an admin secret remains in memory and must be entered again after a refresh. Each connection can instead remember its secret in the current tab session. Credentials are used only with the configured Jazz server.
+Connection profiles and workspace preferences are stored in the browser's local storage. Admin secrets are not. By default, an admin secret remains in memory and must be entered again after a refresh. Each connection can instead remember its secret in the current tab session. Credentials are used only with the configured Jazz server.
 
 ## Local development
+
+Requires Node.js `^22.18.0 || ^24.11.0 || >=26.0.0` and pnpm `12.4.2`.
 
 Install dependencies:
 
@@ -44,7 +74,7 @@ Use the direct HTTP Vite URL when connecting to the fixture. The fixture prints 
 
 ## Validation
 
-Run the workspace Vitest suites:
+Run the default workspace test suites:
 
 ```sh
 pnpm test
@@ -56,7 +86,7 @@ Run standalone Playwright E2E tests against built applications:
 pnpm test:e2e
 ```
 
-Install the Playwright browser before its first local run with `pnpm test:e2e:install`. Run the complete lint, typecheck, test, and build gate with `pnpm check`. For a focused Vitest suite, use `pnpm --filter <package> test`.
+Install the Playwright browser before its first local run with `pnpm test:e2e:install`. The `pnpm check` command does not run Playwright. For a focused Vitest suite, use `pnpm --filter <package> test`.
 
 ## Project documentation
 
@@ -67,3 +97,7 @@ Install the Playwright browser before its first local run with `pnpm test:e2e:in
 - [Implementation checklists](./todo/)
 - [Specifications](./specs/)
 - [Research](./research/)
+
+## License
+
+Inspektor is available under the [MIT License](./LICENSE).

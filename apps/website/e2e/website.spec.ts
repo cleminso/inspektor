@@ -69,6 +69,9 @@ const readGeometry = async (page: Page) =>
     const headerContent = getElement('brand-site-frame-header-content')
     const footerStrip = getElement('brand-site-frame-footer-strip')
     const heroContent = getElement('brand-hero-content')
+    const preview = getElement('brand-product-preview')
+    const previewImage = preview.querySelector<HTMLImageElement>('img')
+    if (previewImage === null) throw new Error('Missing preview image')
     const description = getElement('brand-hero-description')
     const heroStyles = getComputedStyle(heroContent)
     const headerStyles = getComputedStyle(header)
@@ -96,7 +99,11 @@ const readGeometry = async (page: Page) =>
     }
   })
 
-test('renders the website without viewport overflow', async ({ page }) => {
+test('renders the website without horizontal viewport overflow', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('theme', 'light')
+  })
+
   for (const viewport of viewports) {
     await test.step(`${viewport.width}px viewport`, async () => {
       await page.setViewportSize(viewport)
@@ -130,8 +137,26 @@ test('renders the website without viewport overflow', async ({ page }) => {
         width: window.innerWidth,
       }))
 
-      expect(viewportSize.scrollHeight).toBe(viewportSize.height)
+      expect(viewportSize.scrollHeight).toBeGreaterThanOrEqual(viewportSize.height)
       expect(viewportSize.scrollWidth).toBe(viewportSize.width)
+      const previewImage = page.locator('[data-slot="brand-product-preview"] img')
+      await expect(previewImage).toHaveAttribute('alt', /Inspektor Studio displaying a Jazz table/)
+      await expect(previewImage).toHaveAttribute('src', /inspektorStudioLight\.webp/)
+      await previewImage.scrollIntoViewIfNeeded()
+      await expect
+        .poll(() =>
+          previewImage.evaluate(
+            (image) => image instanceof HTMLImageElement && image.naturalWidth > 0,
+          ),
+        )
+        .toBe(true)
+      await expect
+        .poll(() =>
+          previewImage.evaluate((image) =>
+            image instanceof HTMLImageElement ? [image.naturalWidth, image.naturalHeight] : [],
+          ),
+        )
+        .toEqual([2862, 1660])
     })
   }
 })
@@ -144,12 +169,35 @@ test('renders without console errors in dark mode', async ({ page }) => {
   page.on('pageerror', (error) => pageErrors.push(error.message))
 
   await page.emulateMedia({ colorScheme: 'dark' })
+  await page.addInitScript(() => {
+    window.localStorage.setItem('theme', 'dark')
+  })
   await page.goto('/')
-  await page.evaluate(() => document.documentElement.classList.add('dark'))
   await expect(page.getByRole('main')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Inspektor home' })).toHaveAttribute('href', '/')
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme))
     .toBe('dark')
+  await expect(page.locator('[data-slot="brand-product-preview"] img')).toHaveAttribute(
+    'src',
+    /inspektorStudioDark\.webp/,
+  )
+  await expect
+    .poll(() =>
+      page.locator('[data-slot="brand-product-preview"] img').evaluate((image) => {
+        return image instanceof HTMLImageElement && image.naturalWidth > 0
+      }),
+    )
+    .toBe(true)
+  await expect
+    .poll(() =>
+      page
+        .locator('[data-slot="brand-product-preview"] img')
+        .evaluate((image) =>
+          image instanceof HTMLImageElement ? [image.naturalWidth, image.naturalHeight] : [],
+        ),
+    )
+    .toEqual([2862, 1660])
   expect(pageErrors).toEqual([])
 })
 
@@ -161,4 +209,56 @@ test('preloads the hero font before rendering', async ({ page }) => {
   await expect
     .poll(() => page.evaluate(() => document.fonts.check('450 56px "Instrument Sans Variable"')))
     .toBe(true)
+})
+
+test('publishes crawlable homepage metadata', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page).toHaveTitle('Inspektor — Inspect Jazz application data in your browser')
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content',
+    'Inspect Jazz application data in your browser. Explore schemas and records, edit supported rows, and monitor live queries.',
+  )
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://inspektor.dev/',
+  )
+})
+
+test('does not publish an unstyled application fallback', async ({ request }) => {
+  const response = await request.get('/')
+  const document = await response.text()
+
+  expect(document).not.toContain('Inspektor Studio — explore your Jazz application data')
+})
+
+test('renders the styled 404 page for missing website routes', async ({ page }) => {
+  await page.goto('/missing-page')
+
+  await expect(page.getByRole('img', { name: '404' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: "The page you're looking for does not exist." }),
+  ).toBeVisible()
+  await expect(page.getByRole('link')).toHaveCount(2)
+  await expect(page.getByRole('link', { name: 'Inspektor home' })).toHaveAttribute('href', '/')
+  await expect(page.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/')
+})
+
+test('returns home without reloading from the website 404 page', async ({ page }) => {
+  await page.goto('/missing-page')
+
+  let documentRequests = 0
+  page.on('request', (request) => {
+    if (request.isNavigationRequest() === true && request.frame() === page.mainFrame()) {
+      documentRequests += 1
+    }
+  })
+
+  await page.getByRole('link', { name: 'Back home' }).click()
+
+  await expect(page).toHaveURL(/\/$/)
+  expect(documentRequests).toBe(0)
+  await expect(
+    page.getByRole('heading', { name: /explore your Jazz application data/i }),
+  ).toBeVisible()
 })

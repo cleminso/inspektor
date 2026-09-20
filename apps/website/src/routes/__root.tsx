@@ -1,15 +1,12 @@
 import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router'
 
+import { NotFoundPage } from '../pages/notFound/notFoundPage'
+
 export const Route = createRootRoute({
   head: () => ({
-    meta: [
-      { title: 'Inspektor Studio' },
-      {
-        name: 'description',
-        content: 'Explore your Jazz application data locally in your browser.',
-      },
-    ],
+    meta: [{ title: 'Inspektor | Inspect Jazz application data in your browser' }],
   }),
+  notFoundComponent: NotFoundPage,
   component: RootComponent,
 })
 

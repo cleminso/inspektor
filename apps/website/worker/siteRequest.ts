@@ -36,6 +36,7 @@ export async function handleSiteRequest(
     response = await dependencies.fetchWebsiteAsset(
       new Request(new URL('/index.html', request.url), request),
     )
+    response = withStatus(response, 404)
   }
 
   return addWebsiteHeaders(response, pathname)
@@ -54,10 +55,21 @@ function addWebsiteHeaders(response: Response, pathname: string): Response {
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   headers.set('X-Content-Type-Options', 'nosniff')
   headers.set('X-Frame-Options', 'DENY')
+  if (response.status >= 400) {
+    headers.set('X-Robots-Tag', 'noindex, nofollow')
+  }
 
   return new Response(response.body, {
     headers,
     status: response.status,
+    statusText: response.statusText,
+  })
+}
+
+function withStatus(response: Response, status: number): Response {
+  return new Response(response.body, {
+    headers: response.headers,
+    status,
     statusText: response.statusText,
   })
 }
@@ -76,6 +88,7 @@ function isStaticWebsitePath(pathname: string): boolean {
     pathname === '/favicon-light.svg' ||
     pathname === '/favicon-dark.svg' ||
     pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
     pathname === '/llms.txt'
   )
 }

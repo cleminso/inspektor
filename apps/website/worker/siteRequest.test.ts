@@ -33,7 +33,7 @@ describe('website Worker routing', () => {
     },
   )
 
-  it('serves the website shell for a missing website navigation route', async () => {
+  it('serves the website shell with a 404 status for a missing navigation route', async () => {
     const fetchWebsiteAsset = vi.fn(async (request: Request) => {
       const pathname = new URL(request.url).pathname
       return pathname === '/index.html'
@@ -50,6 +50,8 @@ describe('website Worker routing', () => {
     )
 
     expect(await response.text()).toBe('website shell')
+    expect(response.status).toBe(404)
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow')
     expect(fetchWebsiteAsset).toHaveBeenCalledTimes(2)
     expect(new URL(fetchWebsiteAsset.mock.calls[1]?.[0].url ?? '').pathname).toBe('/index.html')
   })
@@ -107,5 +109,22 @@ describe('website Worker routing', () => {
     )
     expect(response.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff')
+  })
+
+  it('does not rewrite the sitemap to the website shell', async () => {
+    const fetchWebsiteAsset = vi.fn(async (request: Request) => {
+      return new URL(request.url).pathname === '/sitemap.xml'
+        ? new Response('<urlset />', { headers: { 'Content-Type': 'application/xml' } })
+        : new Response(null, { status: 404 })
+    })
+
+    const response = await handleSiteRequest(new Request('https://inspektor.dev/sitemap.xml'), {
+      fetchProduct: vi.fn(async (_request: Request) => new Response('product')),
+      fetchWebsiteAsset,
+    })
+
+    expect(response.status).toBe(200)
+    expect(await response.text()).toBe('<urlset />')
+    expect(fetchWebsiteAsset).toHaveBeenCalledOnce()
   })
 })

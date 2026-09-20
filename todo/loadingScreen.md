@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+### [20/09/26]
+
+- [x] Keep the website document shell free of unstyled application content while React loads.
+
 ### [13/09/26]
 
 - [x] Replace the spinner and visible loading text with the Inspektor wordmark.
@@ -44,6 +48,10 @@
 - None.
 
 ## Validation checklist
+
+### [20/09/26]
+
+- [x] Confirm the website document does not contain the replaced application fallback.
 
 ### [13/09/26]
 
