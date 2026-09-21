@@ -6,4 +6,5 @@ export {
 } from './notFoundIllustration/notFoundIllustration'
 export { BrandProductPreview, type BrandProductPreviewProps } from './productPreview/productPreview'
 export { BrandSiteFrame, type BrandSiteFrameProps } from './page/siteFrame'
+export { BrandTextLink, type BrandTextLinkProps } from './textLink/textLink'
 export { BrandWordmark, type BrandWordmarkProps } from './wordmark/wordmark'

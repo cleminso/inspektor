@@ -175,6 +175,27 @@ test('renders without console errors in dark mode', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('main')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Inspektor home' })).toHaveAttribute('href', '/')
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'href',
+    'https://github.com/cleminso/inspektor',
+  )
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'target',
+    '_blank',
+  )
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'rel',
+    'noopener noreferrer',
+  )
+  await expect(page.getByRole('link', { name: 'open source' })).toHaveAttribute(
+    'href',
+    'https://github.com/cleminso/inspektor',
+  )
+  await expect(page.getByRole('link', { name: 'open source' })).toHaveAttribute('target', '_blank')
+  await expect(page.getByRole('link', { name: 'open source' })).toHaveAttribute(
+    'rel',
+    'noopener noreferrer',
+  )
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme))
     .toBe('dark')
@@ -239,8 +260,20 @@ test('renders the styled 404 page for missing website routes', async ({ page }) 
   await expect(
     page.getByRole('heading', { name: "The page you're looking for does not exist." }),
   ).toBeVisible()
-  await expect(page.getByRole('link')).toHaveCount(2)
+  await expect(page.getByRole('link')).toHaveCount(3)
   await expect(page.getByRole('link', { name: 'Inspektor home' })).toHaveAttribute('href', '/')
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'href',
+    'https://github.com/cleminso/inspektor',
+  )
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'target',
+    '_blank',
+  )
+  await expect(page.getByRole('link', { name: 'Inspektor on GitHub' })).toHaveAttribute(
+    'rel',
+    'noopener noreferrer',
+  )
   await expect(page.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/')
 })
 

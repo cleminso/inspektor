@@ -3,6 +3,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { handleProductRequest } from './productRequest'
 
 describe('product Worker routing', () => {
+  it('redirects the preview root to the product path', async () => {
+    const fetchAsset = vi.fn(async (_request: Request) => new Response('asset'))
+
+    const response = await handleProductRequest(new Request('https://inspektor.dev/'), {
+      fetchAsset,
+    })
+
+    expect(response.status).toBe(302)
+    expect(response.headers.get('Location')).toBe('https://inspektor.dev/conn')
+    expect(fetchAsset).not.toHaveBeenCalled()
+  })
+
   it.each([
     ['/conn', '/'],
     ['/conn/', '/'],

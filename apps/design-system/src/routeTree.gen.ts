@@ -17,6 +17,7 @@ import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsBrandButtonLinkRouteImport } from './routes/components/brand-button-link'
+import { Route as ComponentsBrandTextLinkRouteImport } from './routes/components/brand-text-link'
 import { Route as ComponentsBrandWordmarkRouteImport } from './routes/components/brand-wordmark'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
@@ -107,6 +108,11 @@ const ComponentsBrandButtonLinkRoute =
     path: '/components/brand-button-link',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComponentsBrandTextLinkRoute = ComponentsBrandTextLinkRouteImport.update({
+  id: '/components/brand-text-link',
+  path: '/components/brand-text-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsBrandWordmarkRoute = ComponentsBrandWordmarkRouteImport.update({
   id: '/components/brand-wordmark',
   path: '/components/brand-wordmark',
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-text-link': typeof ComponentsBrandTextLinkRoute
   '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-text-link': typeof ComponentsBrandTextLinkRoute
   '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -481,6 +489,7 @@ export interface FileRoutesById {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/brand-button-link': typeof ComponentsBrandButtonLinkRoute
+  '/components/brand-text-link': typeof ComponentsBrandTextLinkRoute
   '/components/brand-wordmark': typeof ComponentsBrandWordmarkRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -541,6 +550,7 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/brand-button-link'
+    | '/components/brand-text-link'
     | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/brand-button-link'
+    | '/components/brand-text-link'
     | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
@@ -657,6 +668,7 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/brand-button-link'
+    | '/components/brand-text-link'
     | '/components/brand-wordmark'
     | '/components/button'
     | '/components/button-link'
@@ -716,6 +728,7 @@ export interface RootRouteChildren {
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsBrandButtonLinkRoute: typeof ComponentsBrandButtonLinkRoute
+  ComponentsBrandTextLinkRoute: typeof ComponentsBrandTextLinkRoute
   ComponentsBrandWordmarkRoute: typeof ComponentsBrandWordmarkRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
@@ -822,6 +835,13 @@ declare module '@tanstack/react-router' {
       path: '/components/brand-button-link'
       fullPath: '/components/brand-button-link'
       preLoaderRoute: typeof ComponentsBrandButtonLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/brand-text-link': {
+      id: '/components/brand-text-link'
+      path: '/components/brand-text-link'
+      fullPath: '/components/brand-text-link'
+      preLoaderRoute: typeof ComponentsBrandTextLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/brand-wordmark': {
@@ -1172,6 +1192,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsBrandButtonLinkRoute: ComponentsBrandButtonLinkRoute,
+  ComponentsBrandTextLinkRoute: ComponentsBrandTextLinkRoute,
   ComponentsBrandWordmarkRoute: ComponentsBrandWordmarkRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,

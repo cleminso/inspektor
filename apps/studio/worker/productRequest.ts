@@ -25,6 +25,10 @@ export async function handleProductRequest(
   dependencies: ProductRequestDependencies,
 ): Promise<Response> {
   const url = new URL(request.url)
+  if (url.pathname === '/') {
+    return Response.redirect(new URL(productPath, request.url), 302)
+  }
+
   if (isProductPath(url.pathname) === false) {
     return addProductHeaders(new Response(null, { status: 404 }), url.pathname)
   }

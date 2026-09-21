@@ -1,9 +1,10 @@
-import { Box, Text } from '@inspektor/ds'
+import { Box, GithubGlyph, Icon, Text } from '@inspektor/ds'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   BrandButtonLink,
   BrandNotFoundIllustration,
   BrandSiteFrame,
+  BrandTextLink,
   BrandWordmark,
 } from '@inspektor/ds/brand'
 
@@ -13,12 +14,27 @@ export function NotFoundPage(): React.ReactElement {
   return (
     <BrandSiteFrame
       header={
-        <Link
-          to="/"
-          aria-label="Inspektor home"
+        <Box
+          alignItems="center"
+          justifyContent="between"
+          width="full"
         >
-          <BrandWordmark />
-        </Link>
+          <Link
+            to="/"
+            aria-label="Inspektor home"
+          >
+            <BrandWordmark />
+          </Link>
+          <BrandTextLink
+            href="https://github.com/cleminso/inspektor"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Inspektor on GitHub"
+            iconOnly
+          >
+            <Icon artwork={GithubGlyph} />
+          </BrandTextLink>
+        </Box>
       }
     >
       <Box
