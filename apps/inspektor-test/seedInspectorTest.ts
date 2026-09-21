@@ -4,6 +4,7 @@ import {
   type QueryBuilder,
   type TableProxy,
 } from "jazz-tools/backend";
+import permissions from "./permissions.js";
 import { inspectorTestRows } from "./inspectorTestData.js";
 import { app } from "./schema.js";
 
@@ -49,6 +50,7 @@ export async function seedInspectorTest(connection: InspectorTestConnection): Pr
     driver: { type: "memory" },
     env: "dev",
     initial: { backendSecret: connection.backendSecret },
+    permissions,
     serverUrl: connection.serverUrl,
   });
 

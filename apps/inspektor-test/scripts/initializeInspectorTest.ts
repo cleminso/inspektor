@@ -1,4 +1,4 @@
-import { deploy, pushSchema } from "jazz-tools/dev";
+import { deploy } from "jazz-tools/dev";
 
 import permissions from "../permissions.js";
 import { app } from "../schema.js";
@@ -17,7 +17,6 @@ const connection = {
   serverUrl: getRequiredEnvironmentValue("VITE_JAZZ_SERVER_URL"),
 };
 
-await pushSchema({ ...connection, schema: app });
 const result = await deploy({ ...connection, permissions, schema: app });
 
 console.log(`Initialized Inspektor Test with schema ${result.schema.hash}.`);

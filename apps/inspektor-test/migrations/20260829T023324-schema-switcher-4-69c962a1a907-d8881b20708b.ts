@@ -9,20 +9,20 @@ export default s.defineMigration({
   fromHash: "69c962a1a907",
   toHash: "d8881b20708b",
   from: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
     "migrationMarkerOne": s.string().optional(),
     "migrationMarkerTwo": s.string().optional(),
     "migrationMarkerThree": s.string().optional(),
-  })
+  }
 },
   to: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
     "migrationMarkerOne": s.string().optional(),
     "migrationMarkerTwo": s.string().optional(),
     "migrationMarkerThree": s.string().optional(),
     "migrationMarkerFour": s.string().optional(),
-  })
+  }
 },
 });

@@ -12,17 +12,17 @@ export default s.defineMigration({
   fromHash: "e7ebacf3577c",
   toHash: "8b0b0be20153",
   from: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
-  })
+  }
 },
   to: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
     "migrationMarkerOne": s.string().optional(),
-  }),
-  "paginationRecords": s.table({
+  },
+  "paginationRecords": {
     "label": s.string(),
-  })
+  }
 },
 });

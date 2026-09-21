@@ -1,4 +1,4 @@
-# Jazz alpha.55 adoption
+# Jazz alpha.55 adoption (historical)
 
 ## Table of contents
 
@@ -12,9 +12,9 @@
 
 ## Summary
 
-The workspace resolves Jazz `2.0.0-alpha.55`. Table subscriptions use remote authority settlement,
-and production WASM loading references the matching content-addressed artifact. The complete fixture
-and browser gates remain blocked by native top-level JSON writes.
+This document records the historical alpha.55 adoption. The workspace now resolves Jazz
+`2.0.0-alpha.56`; its explicit relationship migration and current validation are recorded in the
+current schema, package, and Inspektor Test documentation.
 
 ## Release behavior
 

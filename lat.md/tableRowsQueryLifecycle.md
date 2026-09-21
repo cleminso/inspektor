@@ -104,7 +104,7 @@ The Jazz subscription store decides how long an entry remains available after it
 
 ## Authority-settled openings
 
-Jazz alpha.55 remote subscriptions suppress the provisional empty local opening from a fresh
+Jazz alpha.56 remote subscriptions suppress the provisional empty local opening from a fresh
 memory-backed admin client. The first fulfilled result contains the authority's requested rows or its
 confirmed empty result.
 

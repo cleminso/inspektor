@@ -91,5 +91,5 @@ Reserve persistent browser profiles and saved cloud connections for explicit sha
 - Inspektor Test typecheck: `pnpm --filter inspektor-test typecheck`
 - Inspektor Test cloud validation without publishing: `pnpm inspektor-test:validate`
 - The commands above are safe local validation. `pnpm inspektor-test:deploy`, `pnpm inspektor-test:initialize`, and `pnpm inspektor-test:seed` mutate shared cloud state and require explicit task scope.
-- Root `pnpm test` runs Inspektor Test schema, deterministic-data, and permission coverage but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.55` rejects top-level JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
+- Root `pnpm test` runs Inspektor Test schema, deterministic-data, and permission coverage but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.56` rejects top-level JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
 - Run the affected package's complete suite after the focused command passes when the execution scope requires it.

@@ -9,16 +9,16 @@ export default s.defineMigration({
   fromHash: "8b0b0be20153",
   toHash: "4444a49d011b",
   from: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
     "migrationMarkerOne": s.string().optional(),
-  })
+  }
 },
   to: {
-  "emptyRecords": s.table({
+  "emptyRecords": {
     "label": s.string(),
     "migrationMarkerOne": s.string().optional(),
     "migrationMarkerTwo": s.string().optional(),
-  })
+  }
 },
 });

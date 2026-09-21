@@ -96,7 +96,7 @@ Inspektor browser acceptance tests run with `pnpm test:e2e`. Playwright owns a b
 | `pnpm test:e2e` | Run standalone Playwright E2E against built applications and isolated fixtures |
 | `pnpm test:e2e:install` | Install the Playwright Chromium browser |
 
-The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.55` rejects native writes to top-level `s.json()` columns; this is tracked upstream in [Jazz issue #1865](https://github.com/garden-co/jazz/issues/1865). The complete fixture suite and Playwright acceptance remain blocked until a compatible Jazz release is available. Do not skip or remove those fixture tests to make the package command pass.
+The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.56` still rejects native writes to top-level `s.json()` columns; this is tracked upstream in [Jazz issue #1865](https://github.com/garden-co/jazz/issues/1865). The complete fixture suite and Playwright acceptance remain blocked until a compatible Jazz release is available. Do not skip or remove those fixture tests to make the package command pass.
 
 ## Dependency security
 

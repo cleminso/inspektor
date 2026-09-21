@@ -1,7 +1,7 @@
 import type { RuntimeSourcesConfig } from 'jazz-tools'
 
-const jazzWasmVersion = '96c929d628c7819774409f40543df9a8929e0220550dd67807c19b18a8823cc0'
-const jazzWasmUrl = `https://assets.inspektor.dev/jazz/2.0.0-alpha.55/${jazzWasmVersion}/jazz_wasm_bg.bin`
+const jazzWasmVersion = 'fe9d9506098f30d908789bae82ea59a275229e5e38d40e1445c94a00bbad7947'
+const jazzWasmUrl = `https://assets.inspektor.dev/jazz/2.0.0-alpha.56/${jazzWasmVersion}/jazz_wasm_bg.bin`
 
 let jazzWasmPreparation: Promise<void> | null = null
 

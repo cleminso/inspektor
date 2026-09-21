@@ -6,12 +6,22 @@ import { describe, expect, it } from 'vitest'
 import { GenericQueryBuilder } from '@tables/query/genericQueryBuilder'
 
 const app = s.defineApp({
-  users: s.table({
-    name: s.string(),
-    payload: s.json(),
-    rank: s.int(),
-    signature: s.bytes(),
-  }),
+  users: s.table(
+    {
+      name: s.string(),
+      payload: s.json(),
+      rank: s.int(),
+      signature: s.bytes(),
+    },
+    {},
+  ),
+})
+
+const permissions = s.definePermissions(app, ({ policy }) => {
+  policy.users.allowRead.always()
+  policy.users.allowInsert.always()
+  policy.users.allowUpdate.always()
+  policy.users.allowDelete.always()
 })
 
 describe('GenericQueryBuilder Jazz contract', () => {
@@ -20,6 +30,7 @@ describe('GenericQueryBuilder Jazz contract', () => {
     await deploy({
       adminSecret: server.adminSecret,
       appId: server.appId,
+      permissions,
       schema: app,
       serverUrl: server.url,
     })
@@ -28,6 +39,7 @@ describe('GenericQueryBuilder Jazz contract', () => {
       appId: server.appId,
       driver: { type: 'memory' },
       initial: { backendSecret: server.backendSecret },
+      permissions,
       serverUrl: server.url,
     })
 

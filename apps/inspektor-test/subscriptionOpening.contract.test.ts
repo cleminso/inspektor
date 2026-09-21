@@ -8,9 +8,12 @@ import { deploy, startLocalJazzServer } from "jazz-tools/testing";
 import { describe, expect, it } from "vitest";
 
 const app = s.defineApp({
-  records: s.table({
-    label: s.string(),
-  }),
+  records: s.table(
+    {
+      label: s.string(),
+    },
+    {},
+  ),
 });
 
 const permissions = s.definePermissions(app, ({ policy }) => {
@@ -73,7 +76,7 @@ async function readFirstSubscriptionSnapshot(
   }
 }
 
-describe("alpha.55 subscription openings", () => {
+describe("alpha.56 subscription openings", () => {
   it("opens a populated remote subscription with the authoritative rows", async () => {
     const server = await createFixture(true);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;

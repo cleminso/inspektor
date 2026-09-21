@@ -222,7 +222,7 @@ test('keeps one centered loading view until the first table rows settle', async 
     reportWasmRequested = resolve
   })
   await page.route(
-    (url) => url.pathname.endsWith('.wasm'),
+    (url) => url.pathname.endsWith('.wasm') || url.pathname.endsWith('.bin'),
     async (route) => {
       reportWasmRequested()
       await wasmRelease

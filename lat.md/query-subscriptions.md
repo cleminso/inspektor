@@ -40,8 +40,8 @@ Product structure and interaction decisions belong in [[lat.md/query-interface#L
 
 The investigation used:
 
-- Jazz source tag `v2.0.0-alpha.55`.
-- Jazz Tools package version `2.0.0-alpha.55`.
+- Jazz source tag `v2.0.0-alpha.56`.
+- Jazz Tools package version `2.0.0-alpha.56`.
 - The installed Inspektor `jazz-tools` declarations.
 - The official Jazz Inspektor live-query page.
 - A deployed Jazz Inspektor response containing populated server subscription groups.
