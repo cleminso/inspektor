@@ -1,14 +1,16 @@
 import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
 
+import { getFaviconHref } from './favicon'
+
 const themeColors = {
   dark: '#0a0a0a',
   light: '#fafafa',
 } as const
 
 const faviconHrefs = {
-  dark: '/conn/favicon-dark.svg',
-  light: '/conn/favicon-light.svg',
+  dark: getFaviconHref(import.meta.env.MODE, 'dark'),
+  light: getFaviconHref(import.meta.env.MODE, 'light'),
 } as const
 
 export function ThemeMetadata(): null {

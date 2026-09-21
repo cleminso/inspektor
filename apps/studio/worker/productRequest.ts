@@ -56,7 +56,13 @@ function isStaticProductPath(pathname: string): boolean {
     pathname.startsWith(`${productPath}/brand/`) === true ||
     pathname === `${productPath}/favicon.ico` ||
     pathname === `${productPath}/favicon-light.svg` ||
-    pathname === `${productPath}/favicon-dark.svg`
+    pathname === `${productPath}/favicon-dark.svg` ||
+    pathname === `${productPath}/favicon-dev-light.svg` ||
+    pathname === `${productPath}/favicon-dev-dark.svg` ||
+    pathname === `${productPath}/favicon-preview-light.svg` ||
+    pathname === `${productPath}/favicon-preview-dark.svg` ||
+    pathname === `${productPath}/favicon-dev.ico` ||
+    pathname === `${productPath}/favicon-preview.ico`
   )
 }
 

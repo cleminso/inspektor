@@ -29,6 +29,15 @@ const createStylexPlugin = () => {
   return plugin
 }
 
+const createFaviconMetadataPlugin = (mode: string) => ({
+  name: 'inspektor-favicon-metadata',
+  transformIndexHtml(html: string) {
+    const faviconPrefix =
+      mode === 'development' ? 'favicon-dev' : mode === 'preview' ? 'favicon-preview' : 'favicon'
+    return html.replaceAll('%FAVICON_PREFIX%', faviconPrefix)
+  },
+})
+
 export default defineConfig(({ mode }) => ({
   base: '/conn/',
   resolve: {
@@ -49,6 +58,7 @@ export default defineConfig(({ mode }) => ({
           autoCodeSplitting: true,
         }),
     createStylexPlugin(),
+    createFaviconMetadataPlugin(mode),
     viteReact(),
   ],
   server: {

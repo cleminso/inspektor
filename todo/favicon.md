@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
+- [Environment variants](#environment-variants)
 - [Open product work](#open-product-work)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
 - [Settled interaction decisions](#settled-interaction-decisions)
@@ -16,6 +17,13 @@
 - [x] Add the modular Inspektor I to both existing favicon assets.
 - [x] Use the blue brand background and an off-white foreground.
 - [x] Add a raster favicon fallback for Safari and older WebKit browsers.
+
+## Environment variants
+
+### [21/09/26]
+
+- [x] Derive the variant from Vite's `development`, `preview`, and `production` modes.
+- [x] Scope environment variants to Studio.
 
 ## Open product work
 
@@ -49,3 +57,10 @@
 - [x] Review the favicon at native and enlarged sizes.
 - [x] Confirm both SVG files remain valid and build output preserves them.
 - [x] Confirm the ICO fallback is valid and preserved in build output.
+
+### [21/09/26]
+
+- [x] Confirm dev and preview metadata select their environment-specific assets.
+- [x] Confirm dev and preview SVGs use the accepted OKLCH colors.
+- [x] Confirm dev and preview ICO fallbacks are valid and preserved in build output.
+- [x] Confirm Worker routing accepts every environment-specific favicon path.

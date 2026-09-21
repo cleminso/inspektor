@@ -94,22 +94,28 @@ describe('product Worker routing', () => {
     expect(fetchAsset).toHaveBeenCalledOnce()
   })
 
-  it.each(['/conn/assets', '/conn/brand'])(
-    'does not return the SPA shell for the empty static namespace %s',
-    async (pathname) => {
-      const fetchAsset = vi.fn(async (_request: Request) => new Response(null, { status: 404 }))
+  it.each([
+    '/conn/assets',
+    '/conn/brand',
+    '/conn/favicon-dev.ico',
+    '/conn/favicon-dev-light.svg',
+    '/conn/favicon-dev-dark.svg',
+    '/conn/favicon-preview.ico',
+    '/conn/favicon-preview-light.svg',
+    '/conn/favicon-preview-dark.svg',
+  ])('does not return the SPA shell for the empty static namespace %s', async (pathname) => {
+    const fetchAsset = vi.fn(async (_request: Request) => new Response(null, { status: 404 }))
 
-      const response = await handleProductRequest(
-        new Request(`https://inspektor.dev${pathname}`, {
-          headers: { Accept: 'text/html' },
-        }),
-        { fetchAsset },
-      )
+    const response = await handleProductRequest(
+      new Request(`https://inspektor.dev${pathname}`, {
+        headers: { Accept: 'text/html' },
+      }),
+      { fetchAsset },
+    )
 
-      expect(response.status).toBe(404)
-      expect(fetchAsset).toHaveBeenCalledOnce()
-    },
-  )
+    expect(response.status).toBe(404)
+    expect(fetchAsset).toHaveBeenCalledOnce()
+  })
 
   it('adds product security and immutable asset headers', async () => {
     const response = await handleProductRequest(
