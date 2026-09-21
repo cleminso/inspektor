@@ -78,6 +78,8 @@ export type TableMutationReviewOperation =
     }
 
 export interface TableMutationProjection {
+  hasInvalidInsertionDraft: boolean
+  invalidUpdateRowIds: ReadonlySet<TableRowId>
   ledger: TableMutationLedger
   reviewOperations: readonly TableMutationReviewOperation[]
   stagedFieldsByRowId: Readonly<Record<TableRowId, ReadonlySet<string>>>
@@ -277,10 +279,14 @@ export function selectTableMutationProjection(
   const operations: TableMutationReviewOperation[] = []
   const stagedFieldsByRowId: Record<TableRowId, ReadonlySet<string>> = {}
   const stagedValuesByRowId: Record<TableRowId, Readonly<Record<string, unknown>>> = {}
+  const invalidUpdateRowIds = new Set<TableRowId>()
+  let hasInvalidInsertionDraft = false
   let hasInvalidDraft = false
   for (const operation of state.insertionOperations) {
     const values = buildRowMutationValueProjection(operation.draft, schemaColumns)
-    hasInvalidDraft ||= Object.keys(values.errors).length > 0
+    const hasErrors = Object.keys(values.errors).length > 0
+    hasInvalidInsertionDraft ||= hasErrors
+    hasInvalidDraft ||= hasErrors
     entries.push({
       entryId: operation.operationId,
       fields: values.submissionValues,
@@ -296,7 +302,11 @@ export function selectTableMutationProjection(
   for (const [rowId, draft] of Object.entries(state.draftsByRowId)) {
     const values = buildRowMutationValueProjection(draft, schemaColumns)
     const fieldNames = Object.keys(values.submissionValues).sort()
-    hasInvalidDraft ||= Object.keys(values.errors).length > 0
+    const hasErrors = Object.keys(values.errors).length > 0
+    hasInvalidDraft ||= hasErrors
+    if (hasErrors === true) {
+      invalidUpdateRowIds.add(rowId)
+    }
     if (fieldNames.length === 0) {
       continue
     }
@@ -329,6 +339,8 @@ export function selectTableMutationProjection(
   }
 
   return {
+    hasInvalidInsertionDraft,
+    invalidUpdateRowIds,
     ledger: { entries, hasInvalidDraft },
     reviewOperations: operations,
     stagedFieldsByRowId,

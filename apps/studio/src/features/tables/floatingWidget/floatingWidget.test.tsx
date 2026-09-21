@@ -226,11 +226,7 @@ describe('FieldEditorMutationWidget', () => {
     const onComplete = vi.fn()
     render(
       <TestLedgerProvider schemaColumns={[sessionIdColumn]}>
-        <FieldEditorHarness
-          column={sessionIdColumn}
-          onClose={vi.fn()}
-          onComplete={onComplete}
-        />
+        <FieldEditorHarness column={sessionIdColumn} onClose={vi.fn()} onComplete={onComplete} />
       </TestLedgerProvider>,
     )
     const input = screen.getByRole('textbox', { name: 'SessionId' })
@@ -296,7 +292,13 @@ describe('FieldEditorMutationWidget', () => {
 })
 
 describe('TableMutationWidget', () => {
-  function ReviewHarness({ operationCount = 1 }: { operationCount?: number }): React.ReactElement {
+  function ReviewHarness({
+    invalidDraftFeedback = 'global',
+    operationCount = 1,
+  }: {
+    invalidDraftFeedback?: 'field' | 'global'
+    operationCount?: number
+  }): React.ReactElement {
     const mutations = useTableMutationLedger()
     const controller = useTableMutationEditorController({
       initialRowValues: { id: 'long-row-identity-123456789', name: 'Ada', count: 1 },
@@ -325,6 +327,7 @@ describe('TableMutationWidget', () => {
         </button>
         <TableMutationWidget
           executor={{ deleteRow: vi.fn(), insertRow: vi.fn(), updateRow: vi.fn() }}
+          invalidDraftFeedback={invalidDraftFeedback}
         />
       </>
     )
@@ -421,6 +424,24 @@ describe('TableMutationWidget', () => {
     ).toBe(true)
   })
 
+  it('leaves invalid-draft feedback to an open field editor', () => {
+    render(
+      <InspectorFooterCenterProvider>
+        <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
+          <ReviewHarness invalidDraftFeedback="field" />
+          <InspectorFooterCenterSlot />
+        </TestLedgerProvider>
+      </InspectorFooterCenterProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Stage invalid' }))
+
+    expect(screen.getByRole('button', { name: 'Pending changes' })).toBeTruthy()
+    expect(screen.queryByText('Fix invalid fields before applying changes.')).toBeNull()
+    expect(
+      (screen.getByRole('button', { name: 'Apply changes' }) as HTMLButtonElement).disabled,
+    ).toBe(true)
+  })
+
   it('renders large operation reviews in bounded batches', () => {
     renderReview(102)
 
@@ -448,9 +469,7 @@ describe('TableMutationWidget', () => {
           <button type="button" onClick={() => mutations.stageDeletions(['row-1'])}>
             Stage deletion
           </button>
-          <TableMutationWidget
-            executor={{ deleteRow, insertRow: vi.fn(), updateRow: vi.fn() }}
-          />
+          <TableMutationWidget executor={{ deleteRow, insertRow: vi.fn(), updateRow: vi.fn() }} />
         </>
       )
     }

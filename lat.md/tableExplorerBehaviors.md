@@ -221,6 +221,11 @@ when the schema-derived field interaction supports it.
 Relation and binary fields route to the complete-row pane, and unsupported read-only fields remain read-only in the grid.
 
 Both surfaces consume the same provider-owned per-row draft, parsing, validation, dirty tracking, Apply, and Discard rules.
+The complete-row pane reveals field validation after focus leaves the complete field interaction context, not while focus moves
+between controls within that field. Leaving NULL mode moves focus into the value control or opens the field's picker. While the
+active row's Details representation owns every invalid draft, field errors render below their controls and the mutation widget
+retains Apply blocking without duplicating that feedback. The mutation widget provides the invalid-draft fallback for other rows,
+insertions, and non-field representations.
 
 ## Side-pane behavior
 

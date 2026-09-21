@@ -99,7 +99,7 @@ function RowEditorError({ message }: { message: string }): React.ReactElement {
   )
 }
 
-interface StagedEditRowFormProps {
+interface StagedEditRowPaneProps {
   onRepresentationChange: (representation: RowRepresentation) => void
   representation: RowRepresentation
   rowId: TableRowId
@@ -107,13 +107,13 @@ interface StagedEditRowFormProps {
   schemaColumns: ColumnDescriptor[]
 }
 
-function StagedEditRowForm({
+function StagedEditRowPane({
   onRepresentationChange,
   representation,
   rowId,
   rowValues,
   schemaColumns,
-}: StagedEditRowFormProps): React.ReactElement {
+}: StagedEditRowPaneProps): React.ReactElement {
   const draftController = useTableMutationEditorController({
     initialRowValues: rowValues,
     rowId,
@@ -121,34 +121,10 @@ function StagedEditRowForm({
 
   return (
     <EditRowForm
+      key={rowId}
       draftController={draftController}
       onRepresentationChange={onRepresentationChange}
       representation={representation}
-      rowValues={rowValues}
-      schemaColumns={schemaColumns}
-    />
-  )
-}
-
-interface StagedEditRowPaneProps {
-  rowId: TableRowId
-  rowValues: Record<string, unknown>
-  schemaColumns: ColumnDescriptor[]
-}
-
-function StagedEditRowPane({
-  rowId,
-  rowValues,
-  schemaColumns,
-}: StagedEditRowPaneProps): React.ReactElement {
-  const [representation, setRepresentation] = useState<RowRepresentation>('details')
-
-  return (
-    <StagedEditRowForm
-      key={rowId}
-      onRepresentationChange={setRepresentation}
-      representation={representation}
-      rowId={rowId}
       rowValues={rowValues}
       schemaColumns={schemaColumns}
     />
@@ -187,6 +163,12 @@ function TableViewContent({
   tableKey: string
 }): React.ReactElement {
   const mutations = useTableMutationLedger()
+  const [rowRepresentationState, setRowRepresentationState] = useState<{
+    representation: RowRepresentation
+    tableKey: string
+  }>({ representation: 'details', tableKey })
+  const rowRepresentation =
+    rowRepresentationState.tableKey === tableKey ? rowRepresentationState.representation : 'details'
   const { ledger, rebaseRows, undoDeletions } = mutations
   const stagedDeletionRowIds = useMemo(
     () =>
@@ -204,6 +186,15 @@ function TableViewContent({
     tableKey,
     tableName,
   })
+  const activeRowOwnsInvalidDraftFeedback =
+    rowRepresentation === 'details' &&
+    state.detailPaneMode === 'rows' &&
+    state.rowEditor.activeRowId !== null &&
+    state.rowValues !== null &&
+    mutations.execution.status !== 'applying' &&
+    mutations.hasInvalidInsertionDraft === false &&
+    mutations.invalidUpdateRowIds.size === 1 &&
+    mutations.invalidUpdateRowIds.has(state.rowEditor.activeRowId)
   useConnectionContentReady(state.isInitialLoading === false)
 
   const { openSchemaView } = useTableTabs()
@@ -508,6 +499,10 @@ function TableViewContent({
   )
   const { canOpenRowEditor, closeRowEditor, detailPaneMode, rowEditor } = state
   const { openInsert } = rowEditor
+  const closeRowEditorAndResetRepresentation = useCallback(() => {
+    setRowRepresentationState({ representation: 'details', tableKey })
+    closeRowEditor()
+  }, [closeRowEditor, tableKey])
   const focusPaneReturn = useCallback(() => {
     const focusReturn = paneFocusReturnRef.current
     if (focusReturn === null) {
@@ -567,11 +562,17 @@ function TableViewContent({
     }
     if (detailPaneMode === 'insert') {
       setInsertMoreEnabled(false)
-      closeRowEditor()
+      closeRowEditorAndResetRepresentation()
     } else {
       openInsertPane()
     }
-  }, [canOpenRowEditor, closeRowEditor, detailPaneMode, mutationApplying, openInsertPane])
+  }, [
+    canOpenRowEditor,
+    closeRowEditorAndResetRepresentation,
+    detailPaneMode,
+    mutationApplying,
+    openInsertPane,
+  ])
   useHotkey(
     appHotkeys.insertRow,
     (event) => runAppHotkey(event, toggleInsertPane),
@@ -892,7 +893,7 @@ function TableViewContent({
                 insertMoreEnabled={insertMoreEnabled}
                 mutationDisabled={state.canMutateRows === false || mutationApplying}
                 navigationLabel={state.rowEditor.navigationLabel}
-                onClose={closeRowEditor}
+                onClose={closeRowEditorAndResetRepresentation}
                 onConfirmDelete={(rowIds) => {
                   mutations.stageDeletions(rowIds)
                   state.handleRowsStagedForDeletion(rowIds)
@@ -911,7 +912,7 @@ function TableViewContent({
                     saveDisabled={state.canMutateRows === false || mutationApplying}
                     onClose={() => {
                       setInsertMoreEnabled(false)
-                      closeRowEditor()
+                      closeRowEditorAndResetRepresentation()
                     }}
                     onSave={async (values, options) => {
                       await state.handleInsertSave(values, options)
@@ -923,6 +924,10 @@ function TableViewContent({
                 ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
                   <StagedEditRowPane
                     key={tableKey}
+                    onRepresentationChange={(representation) =>
+                      setRowRepresentationState({ representation, tableKey })
+                    }
+                    representation={rowRepresentation}
                     rowId={state.rowEditor.activeRowId}
                     rowValues={state.rowValues}
                     schemaColumns={schemaColumns}
@@ -952,6 +957,7 @@ function TableViewContent({
       ) : (
         <TableMutationWidget
           executor={state.mutationExecutor}
+          invalidDraftFeedback={activeRowOwnsInvalidDraftFeedback === true ? 'field' : 'global'}
           onAppliedUpdates={state.handleMutationUpdatesApplied}
           onApplySuccess={state.handleMutationApplySuccess}
         />

@@ -442,6 +442,64 @@ describe('EditRowForm row representations', () => {
     expect(input.value).toBe('account-2')
   })
 
+  it('focuses a nullable input after switching from NULL to a value', async () => {
+    const columns = [
+      {
+        name: 'accountId',
+        column_type: { type: 'Uuid' },
+        nullable: true,
+      },
+    ] satisfies ColumnDescriptor[]
+    render(<EditRowForm rowValues={{ id: 'profile-1', accountId: null }} schemaColumns={columns} />)
+    const input = screen.getByLabelText('AccountId')
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Set AccountId to NULL' }))
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(input)
+    })
+  })
+
+  it('shows an invalid nullable value after focus leaves its field', () => {
+    const columns = [
+      {
+        name: 'accountId',
+        column_type: { type: 'Uuid' },
+        nullable: true,
+      },
+    ] satisfies ColumnDescriptor[]
+    render(<EditRowForm rowValues={{ id: 'profile-1', accountId: null }} schemaColumns={columns} />)
+    const input = screen.getByLabelText('AccountId')
+    const rowIdInput = screen.getByLabelText('ID')
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Set AccountId to NULL' }))
+    expect(screen.queryByText('Value must be a UUID.')).toBeNull()
+
+    fireEvent.blur(input, { relatedTarget: rowIdInput })
+
+    const error = screen.getByText('Value must be a UUID.')
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+    expect(input.getAttribute('aria-describedby')).toBe(error.id)
+  })
+
+  it('does not validate while focus moves within a nullable field', () => {
+    const columns = [
+      {
+        name: 'accountId',
+        column_type: { type: 'Uuid' },
+        nullable: true,
+      },
+    ] satisfies ColumnDescriptor[]
+    render(<EditRowForm rowValues={{ id: 'profile-1', accountId: null }} schemaColumns={columns} />)
+    const input = screen.getByLabelText('AccountId')
+    const nullControl = screen.getByRole('checkbox', { name: 'Set AccountId to NULL' })
+
+    fireEvent.click(nullControl)
+    fireEvent.blur(input, { relatedTarget: nullControl })
+
+    expect(screen.queryByText('Value must be a UUID.')).toBeNull()
+  })
+
   it('focuses an editable structured value when its label is clicked', async () => {
     const columns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
@@ -509,6 +567,9 @@ describe('EditRowForm row representations', () => {
 
     const restoredEditor = await screen.findByRole('textbox', { name: 'Settings' })
     expect(restoredEditor.textContent).toContain('"enabled"')
+    await waitFor(() => {
+      expect(document.activeElement).toBe(restoredEditor)
+    })
   })
 
   it('associates a structured field error and focuses the first invalid editor', async () => {

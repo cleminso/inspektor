@@ -52,6 +52,7 @@ interface MutationFieldProps {
   hidden: boolean
   idPrefix?: string
   initialValue: unknown
+  onContextLeave?: () => void
   onExpandedChange: (expanded: boolean) => void
   onInputChange: (input: MutationFieldInput) => void
   readOnlyReason: FieldReadOnlyReason
@@ -158,6 +159,10 @@ function NullInputGroupCheckbox({
   )
 }
 
+function isValuePickerTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest("[role='dialog'], [role='listbox']") !== null
+}
+
 export function MutationField({
   canOmit,
   column,
@@ -169,6 +174,7 @@ export function MutationField({
   hidden,
   idPrefix = 'row-editor',
   initialValue,
+  onContextLeave,
   onExpandedChange,
   onInputChange,
   readOnlyReason,
@@ -292,6 +298,17 @@ export function MutationField({
       hidden={hidden}
       id={`${idPrefix}-field-${column.name}`}
       invalid={hasFieldError}
+      onBlurCapture={(event) => {
+        if (
+          (event.relatedTarget instanceof Node &&
+            event.currentTarget.contains(event.relatedTarget)) ||
+          (valuePickerOpen === true &&
+            (event.relatedTarget === null || isValuePickerTarget(event.relatedTarget)))
+        ) {
+          return
+        }
+        onContextLeave?.()
+      }}
       render={
         isEditableStructuredColumn === true ? (
           <Box

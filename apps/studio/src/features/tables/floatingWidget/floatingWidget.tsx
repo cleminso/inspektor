@@ -224,10 +224,12 @@ function OperationReview({
 
 export function TableMutationWidget({
   executor,
+  invalidDraftFeedback = 'global',
   onAppliedUpdates,
   onApplySuccess,
 }: {
   executor: TableMutationExecutor
+  invalidDraftFeedback?: 'field' | 'global'
   onAppliedUpdates?: (appliedUpdateFields: TableFieldsByRowId) => void
   onApplySuccess?: () => void
 }): React.ReactElement | null {
@@ -244,6 +246,8 @@ export function TableMutationWidget({
   const reviewId = useId()
   const hasPending =
     mutations.ledger.entries.length > 0 || mutations.ledger.hasInvalidDraft === true
+  const showsGlobalInvalidDraftFeedback =
+    mutations.ledger.hasInvalidDraft === true && invalidDraftFeedback === 'global'
 
   if (hasPending === false) {
     return null
@@ -252,7 +256,7 @@ export function TableMutationWidget({
   const label =
     mutations.execution.status === 'applying'
       ? 'Applying changes'
-      : mutations.execution.status === 'failed' || mutations.ledger.hasInvalidDraft === true
+      : mutations.execution.status === 'failed' || showsGlobalInvalidDraftFeedback === true
         ? 'Needs attention'
         : 'Pending changes'
 
@@ -313,7 +317,7 @@ export function TableMutationWidget({
                 >
                   Review pending changes
                 </Button>
-                {mutations.ledger.hasInvalidDraft === true ? (
+                {showsGlobalInvalidDraftFeedback === true ? (
                   <Text color="error">Fix invalid fields before applying changes.</Text>
                 ) : mutations.execution.error === null ? null : (
                   <Text

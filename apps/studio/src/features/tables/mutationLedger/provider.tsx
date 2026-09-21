@@ -343,7 +343,13 @@ export function useTableMutationLedger() {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const setExecution = context.setExecution
-  const { ledger, reviewOperations, stagedFieldsByRowId } = context.projection
+  const {
+    hasInvalidInsertionDraft,
+    invalidUpdateRowIds,
+    ledger,
+    reviewOperations,
+    stagedFieldsByRowId,
+  } = context.projection
   const stagedCount = countUnresolvedMutationState(context.state)
   const acknowledgeAppliedEntries = useCallback(
     (entryIds: readonly TableMutationEntry['entryId'][]) => {
@@ -402,6 +408,8 @@ export function useTableMutationLedger() {
     acknowledgeAppliedEntries,
     discardAll,
     execution: context.execution,
+    hasInvalidInsertionDraft,
+    invalidUpdateRowIds,
     ledger,
     rebaseRows,
     revertField,

@@ -53,10 +53,10 @@ function RowJsonRepresentation({
   })
   const value = useMemo(() => {
     const projection = buildRowMutationValueProjection(draftController.state.draft, schemaColumns)
-    return createRowJsonViewValue(
-      { ...rowValues, ...projection.displayValues },
-      [...schemaColumns, ...TABLE_PROVENANCE_COLUMNS],
-    )
+    return createRowJsonViewValue({ ...rowValues, ...projection.displayValues }, [
+      ...schemaColumns,
+      ...TABLE_PROVENANCE_COLUMNS,
+    ])
   }, [draftController.state.draft, rowValues, schemaColumns])
   const findState: FindBarState =
     searchQuery.length === 0
@@ -223,6 +223,7 @@ export function EditRowForm({
                   schemaColumns={schemaColumns}
                   initialRowValues={rowValues}
                   mode="edit"
+                  onFieldContextLeave={rowEditor.validateField}
                   onFieldExpandedChange={rowEditor.setFieldExpanded}
                   onFieldInputChange={rowEditor.setFieldInput}
                 />

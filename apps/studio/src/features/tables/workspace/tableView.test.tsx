@@ -106,6 +106,10 @@ const stagedFieldsByRowId = vi.hoisted(() => ({
 const stagedValuesByRowId = vi.hoisted(() => ({
   current: {} as Readonly<Record<string, Readonly<Record<string, unknown>>>>,
 }))
+const invalidDraftSources = vi.hoisted(() => ({
+  hasInvalidInsertionDraft: false,
+  invalidUpdateRowIds: new Set<string>(),
+}))
 const mutationExecution = vi.hoisted(() => ({
   current: { error: null as string | null, status: 'idle' as 'applying' | 'failed' | 'idle' },
 }))
@@ -181,6 +185,8 @@ vi.mock('@tables/mutationLedger/provider', () => ({
   },
   useTableMutationLedger: () => ({
     execution: mutationExecution.current,
+    hasInvalidInsertionDraft: invalidDraftSources.hasInvalidInsertionDraft,
+    invalidUpdateRowIds: invalidDraftSources.invalidUpdateRowIds,
     rebaseRows: mutationLedgerRebaseRows,
     stageDeletions,
     stageInsert,
@@ -220,14 +226,17 @@ vi.mock('@tables/grid/tableGridContextMenu', () => ({
 
 vi.mock('@tables/floatingWidget/floatingWidget', () => ({
   TableMutationWidget: ({
+    invalidDraftFeedback,
     onAppliedUpdates,
     onApplySuccess,
   }: {
+    invalidDraftFeedback?: 'field' | 'global'
     onAppliedUpdates?: (fields: Readonly<Record<string, ReadonlySet<string>>>) => void
     onApplySuccess?: () => void
   }) => (
     <button
       type="button"
+      data-invalid-draft-feedback={invalidDraftFeedback}
       onClick={() => {
         onAppliedUpdates?.({ 'row-1': new Set(['name']) })
         onApplySuccess?.()
@@ -302,10 +311,18 @@ vi.mock('@tables/rowEditor/editForm', () => ({
   EditRowForm: (props: Record<string, unknown>) => {
     editRowFormProps.current = props
     return (
-      <label>
-        Edit row fields
-        <input aria-label="Edit row fields" />
-      </label>
+      <>
+        <label>
+          Edit row fields
+          <input aria-label="Edit row fields" />
+        </label>
+        <button
+          type="button"
+          onClick={() => (props.onRepresentationChange as (representation: 'json') => void)('json')}
+        >
+          Show row JSON
+        </button>
+      </>
     )
   },
 }))
@@ -592,6 +609,8 @@ afterEach(() => {
   tableViewState.reorderableColumnIds = []
   stagedFieldsByRowId.current = {}
   stagedValuesByRowId.current = {}
+  invalidDraftSources.hasInvalidInsertionDraft = false
+  invalidDraftSources.invalidUpdateRowIds = new Set()
   mutationExecution.current = { error: null, status: 'idle' }
   gridContextMenuProps.current = null
   dataGridRootProps.current = null
@@ -943,6 +962,52 @@ describe('TableView composition boundary', () => {
 
     expect(screen.queryByRole('textbox', { name: 'Edit row fields' })).toBeNull()
     expect(document.activeElement).toBe(checkbox)
+  })
+
+  it('uses field feedback only while Details owns the active row invalid draft', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+    invalidDraftSources.invalidUpdateRowIds = new Set(['row-1'])
+    renderTableView()
+    const mutationWidget = screen.getByRole('button', { name: 'Complete Apply' })
+
+    expect(mutationWidget.getAttribute('data-invalid-draft-feedback')).toBe('field')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show row JSON' }))
+
+    expect(mutationWidget.getAttribute('data-invalid-draft-feedback')).toBe('global')
+  })
+
+  it('keeps global feedback for an invalid draft owned by another row', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+    invalidDraftSources.invalidUpdateRowIds = new Set(['row-2'])
+    renderTableView()
+
+    expect(
+      screen
+        .getByRole('button', { name: 'Complete Apply' })
+        .getAttribute('data-invalid-draft-feedback'),
+    ).toBe('global')
+  })
+
+  it('keeps global feedback while the active row Details form is unavailable', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowValues = null
+    invalidDraftSources.invalidUpdateRowIds = new Set(['row-1'])
+    const { rerenderTableView } = renderTableView()
+    const mutationWidget = screen.getByRole('button', { name: 'Complete Apply' })
+
+    expect(mutationWidget.getAttribute('data-invalid-draft-feedback')).toBe('global')
+
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+    mutationExecution.current = { error: null, status: 'applying' }
+    rerenderTableView()
+
+    expect(mutationWidget.getAttribute('data-invalid-draft-feedback')).toBe('global')
   })
 
   it('leaves composing and previously handled Escape events to the active pane control', () => {

@@ -59,10 +59,13 @@ describe('table mutation state', () => {
     })
 
     expect(state.draftsByRowId['row-1']?.fieldInputs.age?.text).toBe('invalid')
-    expect(selectTableMutationProjection(state, columns).ledger).toMatchObject({
+    const projection = selectTableMutationProjection(state, columns)
+    expect(projection.ledger).toMatchObject({
       entries: [{ kind: 'update', rowId: 'row-1', fields: { name: 'Grace' } }],
       hasInvalidDraft: true,
     })
+    expect(projection.invalidUpdateRowIds).toEqual(new Set(['row-1']))
+    expect(projection.hasInvalidInsertionDraft).toBe(false)
   })
 
   it('removes a clean draft and lets deletion supersede an update', () => {

@@ -20,11 +20,7 @@ vi.mock('@tanstack/react-router', () => ({
     'aria-label': ariaLabel,
     'data-slot': dataSlot,
   }: React.ComponentProps<'a'> & { 'data-slot'?: string }) => (
-    <a
-      aria-label={ariaLabel}
-      data-slot={dataSlot}
-      href="/relation"
-    >
+    <a aria-label={ariaLabel} data-slot={dataSlot} href="/relation">
       {children}
     </a>
   ),
@@ -261,25 +257,30 @@ describe('MutationField', () => {
   })
 
   it('keeps a nullable Enum select and NULL control in one input group', () => {
+    const onContextLeave = vi.fn()
     function EnumField(): React.ReactElement {
       const [input, setInput] = useState<MutationFieldInput>({ mode: 'null', text: '' })
       return (
-        <MutationField
-          canOmit={false}
-          column={column(
-            'status',
-            { type: 'Enum', variants: ['active', 'archived'] },
-            { nullable: true },
-          )}
-          error={undefined}
-          expanded={false}
-          input={input}
-          hidden={false}
-          initialValue={null}
-          onExpandedChange={vi.fn()}
-          onInputChange={setInput}
-          readOnlyReason={null}
-        />
+        <>
+          <MutationField
+            canOmit={false}
+            column={column(
+              'status',
+              { type: 'Enum', variants: ['active', 'archived'] },
+              { nullable: true },
+            )}
+            error={undefined}
+            expanded={false}
+            input={input}
+            hidden={false}
+            initialValue={null}
+            onContextLeave={onContextLeave}
+            onExpandedChange={vi.fn()}
+            onInputChange={setInput}
+            readOnlyReason={null}
+          />
+          <button type="button">Outside field</button>
+        </>
       )
     }
 
@@ -295,6 +296,9 @@ describe('MutationField', () => {
     fireEvent.click(nullControl)
     expect(select.disabled).toBe(false)
     expect(select.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.blur(select, { relatedTarget: screen.getByRole('button', { name: 'Outside field' }) })
+    expect(onContextLeave).toHaveBeenCalledOnce()
   })
 
   it('presents timestamps with the shared calendar picker', async () => {

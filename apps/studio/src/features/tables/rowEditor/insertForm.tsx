@@ -87,6 +87,7 @@ function InsertRowFormFields({
               schemaColumns={schemaColumns}
               initialRowValues={rowValues}
               mode="insert"
+              onFieldContextLeave={rowEditor.validateField}
               onFieldExpandedChange={rowEditor.setFieldExpanded}
               onFieldInputChange={rowEditor.setFieldInput}
             />

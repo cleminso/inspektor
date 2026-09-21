@@ -12,7 +12,11 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { Box, Field, Input, Text } from '@inspektor/ds'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
-import { getMutationFieldInput, type MutationFieldInput } from '@tables/rowEditor/mutation/draft'
+import {
+  getMutationFieldError,
+  getMutationFieldInput,
+  type MutationFieldInput,
+} from '@tables/rowEditor/mutation/draft'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import type { DetailPaneMode } from '@tables/tableTypes'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
@@ -33,6 +37,7 @@ interface RowEditorFieldsProps {
   initialRowValues: Record<string, unknown>
   mode: DetailPaneMode
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void
+  onFieldContextLeave: (columnName: string) => void
   onFieldInputChange: (columnName: string, input: MutationFieldInput) => void
 }
 
@@ -74,7 +79,19 @@ export function useRowEditorFields({
     }
   }, [])
 
+  const scheduleFieldFocus = (columnName: string) => {
+    if (focusFrameRef.current !== null) {
+      cancelAnimationFrame(focusFrameRef.current)
+    }
+    focusFrameRef.current = requestAnimationFrame(() => {
+      focusFrameRef.current = null
+      focusRowEditorField(columnName)
+    })
+  }
+
   const setFieldInput = (columnName: string, input: MutationFieldInput) => {
+    const previousInput = fieldStates[columnName]
+    const column = schemaColumns.find((candidate) => candidate.name === columnName)
     draftController.actions.setFieldInput(columnName, input)
     if (input.mode === 'null') {
       setExpandedColumnName((currentColumnName) =>
@@ -82,6 +99,26 @@ export function useRowEditorFields({
       )
     }
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
+    if (
+      previousInput?.mode === 'null' &&
+      input.mode === 'value' &&
+      column !== undefined &&
+      column.column_type.type !== 'Boolean' &&
+      column.column_type.type !== 'Enum' &&
+      column.column_type.type !== 'Timestamp'
+    ) {
+      scheduleFieldFocus(columnName)
+    }
+  }
+
+  const validateField = (columnName: string) => {
+    const column = schemaColumns.find((candidate) => candidate.name === columnName)
+    const input = fieldStates[columnName]
+    if (column === undefined || input === undefined) {
+      return
+    }
+    const error = getMutationFieldError(draft, column, input)
+    setErrors((currentErrors) => ({ ...currentErrors, [columnName]: error ?? '' }))
   }
 
   const setFieldExpanded = (columnName: string, expanded: boolean) => {
@@ -107,14 +144,7 @@ export function useRowEditorFields({
         (column) => nextErrors[column.name] !== undefined,
       )
       if (firstInvalidField !== undefined) {
-        if (focusFrameRef.current !== null) {
-          cancelAnimationFrame(focusFrameRef.current)
-        }
-        // Replace an older focus request so repeated submits target the latest validation result.
-        focusFrameRef.current = requestAnimationFrame(() => {
-          focusFrameRef.current = null
-          focusRowEditorField(firstInvalidField.name)
-        })
+        scheduleFieldFocus(firstInvalidField.name)
       }
       return
     }
@@ -144,6 +174,7 @@ export function useRowEditorFields({
     setFieldExpanded,
     setFieldInput,
     submit,
+    validateField,
   }
 }
 
@@ -156,6 +187,7 @@ export function RowEditorFields({
   initialRowValues,
   mode,
   onFieldExpandedChange,
+  onFieldContextLeave,
   onFieldInputChange,
 }: RowEditorFieldsProps): React.ReactElement {
   return (
@@ -219,6 +251,7 @@ export function RowEditorFields({
             hidden={expandedColumnName !== null && isExpanded === false}
             initialValue={initialRowValues[column.name]}
             onExpandedChange={(expanded) => onFieldExpandedChange(column.name, expanded)}
+            onContextLeave={() => onFieldContextLeave(column.name)}
             onInputChange={(input) => onFieldInputChange(column.name, input)}
             canOmit={mode === 'insert' && column.default !== undefined && readOnlyReason === null}
             readOnlyReason={readOnlyReason}
