@@ -60,4 +60,9 @@ export default s.definePermissions(app, ({ policy }) => {
   policy.wideRecords.allowInsert.never();
   policy.wideRecords.allowUpdate.never();
   policy.wideRecords.allowDelete.never();
+
+  policy.uiPerformanceRecords.allowRead.always();
+  policy.uiPerformanceRecords.allowInsert.always();
+  policy.uiPerformanceRecords.allowUpdate.always();
+  policy.uiPerformanceRecords.allowDelete.always();
 });

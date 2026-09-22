@@ -54,6 +54,7 @@ The isolated fixture uses `jazz-tools/testing` to create an in-memory local serv
 | `relationParents` | Relation targets |
 | `relationChildren` | Required, populated optional, and null optional relations |
 | `todos` | Self-relations plus conditional update and delete permissions |
+| `uiPerformanceRecords` | All currently insertable scalar and collection column types for UI performance data |
 | `wideRecords` | Horizontal overflow, long headers, mixed types, and optional-value pairs |
 
 ## Cloud app setup

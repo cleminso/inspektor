@@ -155,6 +155,21 @@ const schema = {
       optionalRelationParent: s.rel("relationParents", "optionalRelationParentId"),
     },
   ),
+  uiPerformanceRecords: s.table(
+    {
+      label: s.string(),
+      booleanValue: s.boolean(),
+      integerValue: s.int(),
+      bigIntValue: s.bigint(),
+      floatValue: s.float(),
+      timestampValue: s.timestamp(),
+      enumValue: s.enum("draft", "active", "archived"),
+      jsonValue: s.json(),
+      stringArrayValue: s.array(s.string()),
+      uuidValue: s.uuid(),
+    },
+    {},
+  ),
 };
 
 type AppSchema = s.Schema<typeof schema>;
