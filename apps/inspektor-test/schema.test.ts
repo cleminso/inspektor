@@ -17,6 +17,7 @@ describe("Inspektor Test schema", () => {
         "relationParents",
         "relationChildren",
         "todos",
+        "uiPerformanceRecords",
         "wideRecords",
       ]),
     );

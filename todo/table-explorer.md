@@ -19,6 +19,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[22/09/26]
+
+### Bounded page rendering
+
+- [x] Render the default 100-row page directly and virtualize larger pages with a bounded mounted row window.
+- [x] Give grid selection checkboxes explicit label relationships so Base UI does not scan hidden-input labels after each commit.
+- [ ] Prevent blank row windows during real-browser scrollbar jumps and rapid scrolling on larger pages.
+
 [15/09/26]
 
 ### Cell and row context actions
@@ -1028,10 +1036,23 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Table query prefetch
 
+[22/09/26]
+
+- [x] Prepare the exact recent or default table query before initial route and tab reconciliation completes.
+- [x] Keep one exact next-page query prepared for the default 100-row page size while retaining remote-authoritative reads and the sentinel row.
+- [x] Use Jazz's public client-attached subscription store for rendered and prepared query ownership without a second row cache.
+- [x] Expose the reconciled table shell and row-level loading state before the first row query settles.
+- [x] Replace shell-first data openings with an authority-ready handoff so the initial grid does not expose `Loading rows`.
+- [x] Keep application-initiated table and pagination navigation on the committed view until the exact destination query fulfills.
+- [x] Accept only one foreground pagination request so rapid input cannot queue intermediate page subscriptions.
+- [x] Prepare filter, sort, page-size, and workspace-history destinations through one workspace coordinator, with replacement before commit and one active browser traversal.
+- [x] Keep direct links and native history behind route-query-keyed connection readiness without remounting the workspace providers.
+- [ ] Measure cache hits, unused prepared queries, transferred rows, and server work before adding table-list or tab-intent prefetch.
+
 [26/08/26]
 
 - [x] Remove table-row prefetch until measured navigation latency and query reuse justify a supported implementation.
-- [ ] Reintroduce prefetch only through a supported Jazz API after destination preparation is identified as the interaction bottleneck.
+- [x] Reintroduce bounded prefetch through Jazz's supported public subscription store after destination preparation was identified as an interaction bottleneck.
 
 [06/08/26]
 

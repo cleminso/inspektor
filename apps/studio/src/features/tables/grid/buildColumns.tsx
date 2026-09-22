@@ -63,7 +63,7 @@ function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   }
 
   if (column.column.references !== undefined) {
-    return { size: 310, minSize: 170 }
+    return { size: 314, minSize: 170 }
   }
 
   switch (column.column.column_type.type) {

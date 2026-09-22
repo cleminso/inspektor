@@ -22,6 +22,7 @@ import {
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
+import { shouldPrepareTableLink } from '@tables/routing/preparedTableLink'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const deferredRenderingThreshold = 50
@@ -113,11 +114,13 @@ export interface TableCheckedChangeOptions {
 interface TableListPaneProps {
   checkedTableNames: ReadonlySet<string>
   isSchemaReady?: boolean
+  pendingTableName?: string | null
   pinnedTableNames: ReadonlySet<string>
   selectedTableName: string | null
   tableSearchByName?: ReadonlyMap<string, TableTabSearch>
   tables: string[]
   onClearSelection: () => void
+  onOpenTable: (tableName: string, search: TableTabSearch) => void
   onOpenTables: (orderedTableNames: readonly string[]) => void
   onPersistTable: (tableName: string) => void
   onPinTables: (tableNames: readonly string[]) => void
@@ -151,11 +154,13 @@ function isTableSelectionInteraction(target: EventTarget | null): boolean {
 export function TableListPane({
   checkedTableNames,
   isSchemaReady = true,
+  pendingTableName = null,
   pinnedTableNames,
   selectedTableName,
   tableSearchByName = emptyTableSearchByName,
   tables,
   onClearSelection,
+  onOpenTable,
   onOpenTables,
   onPersistTable,
   onPinTables,
@@ -300,6 +305,12 @@ export function TableListPane({
                       params={tableParams}
                       search={tableSearchByName.get(tableName) ?? {}}
                       aria-current={isActive === true ? 'page' : undefined}
+                      aria-busy={pendingTableName === tableName ? true : undefined}
+                      onClick={(event) => {
+                        if (shouldPrepareTableLink(event) === false) return
+                        event.preventDefault()
+                        onOpenTable(tableName, tableSearchByName.get(tableName) ?? {})
+                      }}
                       onDoubleClick={() => {
                         onPersistTable(tableName)
                       }}

@@ -33,6 +33,8 @@ import { copyBinaryValue, downloadBinaryValue } from '@tables/rowEditor/values/b
 import type { FieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { isStructuredColumnType } from '@tables/schema/fieldType'
 import { buildRelationTableLink } from '@tables/routing/buildRelationTableLink'
+import { shouldPrepareTableLink } from '@tables/routing/preparedTableLink'
+import { useOptionalTableTabs } from '@tables/workspace/tabsProvider'
 import {
   formatColumnDefault,
   setMutationFieldInputMode,
@@ -182,6 +184,7 @@ export function MutationField({
   structuredEditorLayout = 'fill',
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState()
+  const tableTabs = useOptionalTableTabs()
   const [valuePickerOpen, setValuePickerOpen] = useState(false)
   const label = formatColumnNameLabel(column.name)
   const fieldId = `${idPrefix}-${column.name}`
@@ -190,6 +193,7 @@ export function MutationField({
   const isBinaryColumn = column.column_type.type === 'Bytea'
   const isEnumColumn = column.column_type.type === 'Enum'
   const isStructured = isStructuredColumnType(column.column_type)
+  const referenceTable = column.references ?? null
   const isTimestampColumn = column.column_type.type === 'Timestamp'
   const isReadOnly = readOnlyReason !== null
   const isEditableStructuredColumn = isStructured === true && isReadOnly === false
@@ -584,17 +588,22 @@ export function MutationField({
               />
             ) : null}
             {defaultCheckbox}
-            {relationTarget !== null &&
-            column.references !== undefined &&
-            currentConnectionId !== null ? (
+            {relationTarget !== null && referenceTable !== null && currentConnectionId !== null ? (
               <InputGroup.Link
                 label="Open referenced table"
                 render={
                   <Link
                     {...buildRelationTableLink({
                       connectionId: currentConnectionId,
-                      tableName: column.references,
+                      tableName: referenceTable,
                     })}
+                    aria-busy={tableTabs?.pendingTableName === referenceTable ? true : undefined}
+                    onClick={(event) => {
+                      if (shouldPrepareTableLink(event) === false) return
+                      if (tableTabs === null) return
+                      event.preventDefault()
+                      tableTabs.openTable(referenceTable, {})
+                    }}
                   />
                 }
               >

@@ -27,7 +27,14 @@ export function TableExplorerScreen(): React.ReactElement {
     select: (search) => ({ empty: search.empty, view: search.view }),
   })
   const currentView = routeSearch.view === 'schema' ? 'schema' : 'data'
-  const { openBaseTabs, persistTable, scope, tabs: openTabs } = useTableTabs()
+  const {
+    openBaseTabs,
+    openTable,
+    pendingTableName,
+    persistTable,
+    scope,
+    tabs: openTabs,
+  } = useTableTabs()
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set())
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
     loadPinnedTableNames(scope),
@@ -118,11 +125,13 @@ export function TableExplorerScreen(): React.ReactElement {
           checkedTableNames={checkedTableNames}
           isSchemaReady={isSchemaReady}
           pinnedTableNames={pinnedTableNames}
+          pendingTableName={pendingTableName}
           selectedTableName={currentTableName}
           tableSearchByName={tableSearchByName}
           tables={tables}
           onClearSelection={clearTableSelection}
           onOpenTables={handleOpenTables}
+          onOpenTable={openTable}
           onPersistTable={persistTable}
           onPinTables={(tableNames) => handlePinnedTablesChange(tableNames, true)}
           onReplaceSelection={replaceTableSelection}

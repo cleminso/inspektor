@@ -6,6 +6,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MutationField } from '@tables/rowEditor/mutationField'
 import type { MutationFieldInput } from '@tables/rowEditor/mutation/draft'
 
+const { openTable, tabsState } = vi.hoisted(() => ({
+  openTable: vi.fn(),
+  tabsState: { current: true },
+}))
+
 vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({
     currentBranch: 'main',
@@ -19,14 +24,24 @@ vi.mock('@tanstack/react-router', () => ({
     children,
     'aria-label': ariaLabel,
     'data-slot': dataSlot,
+    ...props
   }: React.ComponentProps<'a'> & { 'data-slot'?: string }) => (
-    <a aria-label={ariaLabel} data-slot={dataSlot} href="/relation">
+    <a {...props} aria-label={ariaLabel} data-slot={dataSlot} href="#relation">
       {children}
     </a>
   ),
 }))
 
-afterEach(cleanup)
+vi.mock('@tables/workspace/tabsProvider', () => ({
+  useOptionalTableTabs: () =>
+    tabsState.current === true ? { openTable, pendingTableName: null } : null,
+}))
+
+afterEach(() => {
+  cleanup()
+  openTable.mockReset()
+  tabsState.current = true
+})
 
 function column(
   name: string,
@@ -84,6 +99,23 @@ describe('MutationField', () => {
     expect(targetLink.getAttribute('data-slot')).toBe('input-group-link')
     expect(input.getAttribute('data-font')).toBe('mono')
     expect(screen.queryByRole('link', { name: 'Show' })).toBeNull()
+    fireEvent.click(targetLink)
+    expect(openTable).toHaveBeenCalledWith('rooms', {})
+  })
+
+  it('preserves native relation navigation outside the table workspace', () => {
+    tabsState.current = false
+    renderMutationField({
+      column: column('roomId', { type: 'Uuid' }, { references: 'rooms' }),
+      input: { mode: 'value', text: 'room-1' },
+      initialValue: 'room-1',
+    })
+
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+    const allowed = screen.getByRole('link', { name: 'Open referenced table' }).dispatchEvent(click)
+
+    expect(allowed).toBe(true)
+    expect(openTable).not.toHaveBeenCalled()
   })
 
   it('shows the concrete schema default with its control inside the input group', () => {

@@ -82,16 +82,16 @@ function mockTableNameOverflow(initialClientWidth: number, initialScrollWidth: n
     unobserve = vi.fn((element: Element) => this.elements.delete(element))
   }
   vi.stubGlobal('ResizeObserver', ResizeObserverMock)
-  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(
-    function (this: HTMLElement) {
-      return this.dataset.slot === 'table-name' ? clientWidth : 0
-    },
-  )
-  vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockImplementation(
-    function (this: HTMLElement) {
-      return this.dataset.slot === 'table-name' ? scrollWidth : 0
-    },
-  )
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.dataset.slot === 'table-name' ? clientWidth : 0
+  })
+  vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.dataset.slot === 'table-name' ? scrollWidth : 0
+  })
   return {
     getTableNameObservers: () =>
       observers.filter((observer) =>
@@ -129,6 +129,7 @@ afterEach(() => {
 describe('TableListPane', () => {
   const defaultActionProps = {
     pinnedTableNames: new Set<string>(),
+    onOpenTable: vi.fn(),
     onOpenTables: vi.fn(),
     onPinTables: vi.fn(),
     onPersistTable: vi.fn(),
@@ -380,7 +381,7 @@ describe('TableListPane', () => {
     expect(remountedObserver).not.toBe(observer)
   })
 
-  it("opens an existing table with that tab's stored filter state", () => {
+  it("prepares an existing table with that tab's stored filter state", () => {
     render(
       <TableListPane
         checkedTableNames={new Set()}
@@ -396,6 +397,11 @@ describe('TableListPane', () => {
     expect(screen.getByRole('button', { name: 'accounts' }).getAttribute('data-search')).toBe(
       JSON.stringify({ filters: 'active-filter', page: 2 }),
     )
+    fireEvent.click(screen.getByRole('button', { name: 'accounts' }))
+    expect(defaultActionProps.onOpenTable).toHaveBeenCalledWith('accounts', {
+      filters: 'active-filter',
+      page: 2,
+    })
   })
 
   it('clears checked tables when clicking outside the table list', () => {
