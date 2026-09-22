@@ -14,6 +14,10 @@
 
 ## Implemented foundation
 
+[22/09/26]
+
+- [x] Keep selected pinned cells opaque without changing the selected-row fill, so horizontally scrolling content cannot show beneath them.
+
 [14/09/26]
 
 - [x] Keep the body-row hover surface continuous across pinned selection and data cells.

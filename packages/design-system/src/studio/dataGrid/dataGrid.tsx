@@ -1729,6 +1729,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         showPinnedRecentlyInserted === true && dataGridStyles.pinnedCellRecentlyInserted,
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
+        pinnedPosition !== false && isSelected === true && dataGridStyles.pinnedCellSelected,
         isSelected === true &&
           rowStatus !== 'stagedDeletion' &&
           isFirstVisibleCell === true &&

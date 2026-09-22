@@ -604,6 +604,16 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
     element.scrollLeft = scrollLeft
   }, cellOverlapScrollLeft)
   await expectPinnedCellOnTop()
+  await expect
+    .poll(() =>
+      labelCell.evaluate((element) => {
+        const backgroundColor = getComputedStyle(element).backgroundColor
+        const hasAlphaChannel =
+          backgroundColor.startsWith('rgba(') || backgroundColor.includes(' / ')
+        return backgroundColor !== 'transparent' && hasAlphaChannel === false
+      }),
+    )
+    .toBe(true)
 
   await viewport.evaluate((element) => {
     element.scrollLeft = 0
@@ -614,14 +624,6 @@ test('pins a column across horizontal scrolling and reloads', async ({ page }) =
     element.scrollLeft = scrollLeft
   }, cellOverlapScrollLeft)
   await expectPinnedCellOnTop()
-  await expect
-    .poll(() =>
-      labelCell.evaluate((element) => {
-        const backgroundColor = getComputedStyle(element).backgroundColor
-        return backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)'
-      }),
-    )
-    .toBe(true)
   await viewport.evaluate((element) => {
     element.scrollLeft = 0
   })

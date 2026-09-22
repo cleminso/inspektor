@@ -293,6 +293,9 @@ export const dataGridStyles = stylex.create({
   pinnedCellSurface: {
     backgroundColor: dataGridVars.rowSurface,
   },
+  pinnedCellSelected: {
+    backgroundColor: dataGridColors.selectedPinnedCellBackground,
+  },
   pinnedCell: {
     position: 'sticky',
     zIndex: 2,

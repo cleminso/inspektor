@@ -36,6 +36,7 @@ export const dataGridColors = stylex.defineVars({
   emphasizedColumnBackground: selectionColors.background,
   emphasizedColumnBorder: selectionColors.border,
   selectedCellBackground: surfaceColors.subtle,
+  selectedPinnedCellBackground: `light-dark(color-mix(in srgb, ${palette.gray950} 6%, ${palette.gray50}), color-mix(in srgb, ${palette.neutral50} 10%, ${palette.neutral950}))`,
   emphasizedCellBackground: selectionColors.background,
   currentCellInnerBorder: 'transparent',
   resizeHandleBackground: 'transparent',
