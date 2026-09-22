@@ -1,6 +1,6 @@
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox'
 import * as stylex from '@stylexjs/stylex'
-import { forwardRef, type ComponentPropsWithRef } from 'react'
+import { forwardRef, useId, type ComponentPropsWithRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { CheckGlyph } from '../icon/iconArtwork'
@@ -58,6 +58,8 @@ export interface CheckboxLabelProps extends Omit<
 
 const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoot(
   {
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     size = 'm',
     disabled = false,
     readOnly = false,
@@ -117,11 +119,16 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
     state.transitionStatus === 'ending' && checkboxStyles.indicatorEnding,
   ])
   const iconStylexProps = stylex.props(checkboxStyles.icon)
+  const accessibleLabelStylexProps = stylex.props(checkboxStyles.visuallyHidden)
+  const generatedLabelId = useId()
+  const usesGeneratedLabel = ariaLabel !== undefined && ariaLabelledBy === undefined
 
   return (
     <BaseCheckbox.Root
       {...props}
       ref={forwardedRef}
+      aria-label={ariaLabel}
+      aria-labelledby={usesGeneratedLabel === true ? generatedLabelId : ariaLabelledBy}
       disabled={disabled}
       readOnly={readOnly}
       required={required}
@@ -150,6 +157,14 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
           </span>
         )}
       />
+      {usesGeneratedLabel === true ? (
+        <span
+          {...accessibleLabelStylexProps}
+          id={generatedLabelId}
+        >
+          {ariaLabel}
+        </span>
+      ) : null}
     </BaseCheckbox.Root>
   )
 })

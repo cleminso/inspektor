@@ -152,6 +152,16 @@ export const checkboxStyles = stylex.create({
   indicatorFocused: {},
   indicatorStarting: {},
   indicatorEnding: {},
+  visuallyHidden: {
+    padding: 0,
+    borderWidth: 0,
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    height: 1,
+    width: 1,
+  },
   icon: {
     display: 'block',
     height: '100%',
