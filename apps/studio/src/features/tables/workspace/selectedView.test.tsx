@@ -6,11 +6,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SelectedTableView } from '@tables/workspace/selectedView'
 
 let mountCount = 0
-const searchState = { view: 'data' as 'data' | 'schema' }
-
-vi.mock('@tables/routing/useTableSearchParams', () => ({
-  useTableExplorerSearchParams: () => searchState,
-}))
 
 vi.mock('@tables/workspace/tableView', () => ({
   TableView: ({ tableName }: { tableName: string }) => {
@@ -26,16 +21,21 @@ vi.mock('@tables/schema/view', () => ({
 afterEach(() => {
   cleanup()
   mountCount = 0
-  searchState.view = 'data'
 })
 
 describe('SelectedTableView', () => {
   it('remounts table-scoped data state when the table changes', () => {
-    const { rerender } = render(<SelectedTableView tableName="accounts" />)
+    const { rerender } = render(<SelectedTableView tableName="accounts" view="data" />)
     expect(screen.getByText('accounts:1')).not.toBeNull()
 
-    rerender(<SelectedTableView tableName="users" />)
+    rerender(<SelectedTableView tableName="users" view="data" />)
 
     expect(screen.getByText('users:2')).not.toBeNull()
+  })
+
+  it('renders the route-owned schema view without subscribing to full table search state', () => {
+    render(<SelectedTableView tableName="accounts" view="schema" />)
+
+    expect(screen.getByText('Schema: accounts')).not.toBeNull()
   })
 })

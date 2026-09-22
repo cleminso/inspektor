@@ -1,11 +1,14 @@
-import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { SchemaView } from '@tables/schema/view'
 import { TableView } from '@tables/workspace/tableView'
 
-export function SelectedTableView({ tableName }: { tableName: string }): React.ReactElement {
-  const searchState = useTableExplorerSearchParams()
-
-  if (searchState.view === 'schema') {
+export function SelectedTableView({
+  tableName,
+  view,
+}: {
+  tableName: string
+  view: 'data' | 'schema'
+}): React.ReactElement {
+  if (view === 'schema') {
     return <SchemaView tableName={tableName} />
   }
 

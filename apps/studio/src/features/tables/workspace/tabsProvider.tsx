@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { AlertDialog, Button } from '@inspektor/ds'
+import { AlertDialog, Button, toasts } from '@inspektor/ds'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import {
@@ -37,13 +37,15 @@ import {
   type TableTabsRouteSearch,
 } from '@tables/workspace/tabs'
 import { appRoutes } from '@app/routing/appRoutes'
-import { toTableTabSearch } from '@tables/routing/tableRowsSearch'
+import { resolveTableRowsSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
+import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { useTableMutationWorkspace } from '@tables/mutationLedger/provider'
 import { createTableScope } from '@tables/workspace/scope'
 
 interface TableTabsContextValue {
   activeTabId: string | null
+  pendingTableName: string | null
   recentViews: readonly TableDataTab[]
   replaceableTabId: string | null
   scope: string
@@ -51,6 +53,7 @@ interface TableTabsContextValue {
   activateTab: (tabId: string) => void
   closeTab: (tabId: string) => void
   openBaseTabs: (orderedTableNames: readonly string[]) => void
+  openTable: (tableName: string, search: TableTabSearch) => void
   openNewView: () => void
   openRecentView: (view: TableDataTab) => void
   openSchemaView: (tableName: string) => void
@@ -77,6 +80,7 @@ interface PendingTabClose {
 
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
   const { currentConnectionId, currentTableName } = useInspectorSessionState()
+  const { cancel: cancelPreparation, pendingTableName, prepare } = useTableNavigationPreparation()
   const navigate = useNavigate({ from: appRoutes.tables })
   const routeSearch = useSearch({ strict: false }) as TableTabsRouteSearch
   const { isSchemaReady, tables: availableTables } = useAvailableTables()
@@ -208,26 +212,55 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       const search = createTableTabRouteSearch(tab)
 
       if (tab.kind === 'newView') {
+        cancelPreparation()
         void navigate({
           to: appRoutes.tables,
-          params: {
-            connectionId: currentConnectionId,
-          },
+          params: { connectionId: currentConnectionId },
+          search,
+        })
+        return
+      }
+      if (tab.search.view === 'schema') {
+        cancelPreparation()
+        void navigate({
+          to: appRoutes.table,
+          params: { connectionId: currentConnectionId, tableName: tab.tableName },
           search,
         })
         return
       }
 
-      void navigate({
-        to: appRoutes.table,
-        params: {
-          connectionId: currentConnectionId,
+      const commitNavigation = () =>
+        navigate({
+          to: appRoutes.table,
+          params: {
+            connectionId: currentConnectionId,
+            tableName: tab.tableName,
+          },
+          search,
+        })
+      void prepare(
+        {
+          policy: 'replace',
+          search: resolveTableRowsSearch(tab.search),
           tableName: tab.tableName,
         },
+        commitNavigation,
+      ).catch(() => toasts.error("Couldn't open table"))
+    },
+    [cancelPreparation, currentConnectionId, navigate, prepare],
+  )
+
+  const openTable = useCallback(
+    (tableName: string, search: TableTabSearch) => {
+      navigateToTab({
+        kind: 'table',
+        id: createBaseTableTabId(tableName),
+        tableName,
         search,
       })
     },
-    [currentConnectionId, navigate],
+    [navigateToTab],
   )
 
   const activateTab = useCallback(
@@ -420,6 +453,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const value = useMemo<TableTabsContextValue>(
     () => ({
       activeTabId,
+      pendingTableName,
       recentViews: state.recentViews,
       replaceableTabId: state.replaceableTabId,
       scope,
@@ -427,6 +461,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       activateTab,
       closeTab,
       openBaseTabs,
+      openTable,
       openNewView,
       openRecentView,
       openSchemaView,
@@ -438,6 +473,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       activateTab,
       closeTab,
       openBaseTabs,
+      openTable,
       openNewView,
       openRecentView,
       openSchemaView,
@@ -445,6 +481,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       persistTable,
       reorderTabs,
       activeTabId,
+      pendingTableName,
       scope,
       state,
     ],
@@ -490,4 +527,8 @@ export function useTableTabs(): TableTabsContextValue {
   }
 
   return context
+}
+
+export function useOptionalTableTabs(): TableTabsContextValue | null {
+  return use(TableTabsContext)
 }

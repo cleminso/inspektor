@@ -186,6 +186,7 @@ function TableViewContent({
     tableKey,
     tableName,
   })
+  useConnectionContentReady(state.isInitialLoading === false)
   const activeRowOwnsInvalidDraftFeedback =
     rowRepresentation === 'details' &&
     state.detailPaneMode === 'rows' &&
@@ -195,8 +196,6 @@ function TableViewContent({
     mutations.hasInvalidInsertionDraft === false &&
     mutations.invalidUpdateRowIds.size === 1 &&
     mutations.invalidUpdateRowIds.has(state.rowEditor.activeRowId)
-  useConnectionContentReady(state.isInitialLoading === false)
-
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
   const insertRowButtonRef = useRef<HTMLButtonElement>(null)
@@ -447,8 +446,14 @@ function TableViewContent({
     state.filters.length === 0
   const { page, setPage } = state
   const hasPreviousPage = state.page > 1
-  const canGoToPreviousPage = state.isInitialLoading === false && hasPreviousPage === true
-  const canGoToNextPage = state.isInitialLoading === false && state.hasNextPage === true
+  const canGoToPreviousPage =
+    state.isInitialLoading === false &&
+    state.isPageNavigationPending === false &&
+    hasPreviousPage === true
+  const canGoToNextPage =
+    state.isInitialLoading === false &&
+    state.isPageNavigationPending === false &&
+    state.hasNextPage === true
   useHotkey(
     appHotkeys.copyCell,
     (event) => {
@@ -728,7 +733,7 @@ function TableViewContent({
                   hasNextPage={state.hasNextPage}
                   hasPreviousPage={hasPreviousPage}
                   loadedRowCount={state.rows.length}
-                  loading={state.isInitialLoading}
+                  loading={state.isInitialLoading || state.isPageNavigationPending}
                   page={state.page}
                   pageSize={state.pageSize}
                   onPageChange={state.setPage}
@@ -811,7 +816,11 @@ function TableViewContent({
                     {composeViewport(
                       <DataGrid.Viewport scrollResetKey={scrollResetKey}>
                         <DataGrid.Table
-                          aria-busy={state.isInitialLoading || state.isRefreshing}
+                          aria-busy={
+                            state.isInitialLoading ||
+                            state.isPageNavigationPending ||
+                            state.isRefreshing
+                          }
                           aria-label={`${tableName} rows`}
                           statusContent={queryStatus}
                         >

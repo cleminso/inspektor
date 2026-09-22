@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
+import { toasts } from '@inspektor/ds'
 import {
   createContext,
   use,
@@ -9,6 +10,9 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+
+import { resolveTableRowsSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
+import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
 
 interface TableNavigationHistoryState {
   entries: readonly TableNavigationHistoryEntry[]
@@ -81,6 +85,18 @@ function isTableWorkspaceHref(href: string, workspacePath: string | null): boole
   }
   const pathname = new URL(href, window.location.origin).pathname
   return pathname === workspacePath || pathname.startsWith(`${workspacePath}/`)
+}
+
+function getTableDestination(
+  href: string,
+): { tableName: string; search: Record<string, string> } | null {
+  const url = new URL(href, window.location.origin)
+  const match = /\/tables\/([^/]+)\/?$/.exec(url.pathname)
+  if (match?.[1] === undefined) return null
+  return {
+    tableName: decodeURIComponent(match[1]),
+    search: Object.fromEntries(url.searchParams),
+  }
 }
 
 export function createTableNavigationHistory(
@@ -161,6 +177,7 @@ export function TableNavigationHistoryProvider({
   children,
 }: TableNavigationHistoryProviderProps): React.ReactElement {
   const router = useRouter()
+  const { prepare } = useTableNavigationPreparation()
   const [history, setHistory] = useState(() =>
     createTableNavigationHistory(
       router.latestLocation.href,
@@ -170,6 +187,7 @@ export function TableNavigationHistoryProvider({
   // Both refs start from the same history snapshot and advance only from committed router events.
   const historyRef = useRef(history)
   const browserIndexRef = useRef(history.entries[history.index]?.browserIndex ?? null)
+  const pendingCommitRef = useRef<(() => void) | null>(null)
   const pendingOffsetRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -195,6 +213,8 @@ export function TableNavigationHistoryProvider({
       }
       browserIndexRef.current = browserIndex
       if (action.type !== 'PUSH' && action.type !== 'REPLACE') {
+        pendingCommitRef.current?.()
+        pendingCommitRef.current = null
         const offset =
           action.type === 'BACK'
             ? -1
@@ -250,7 +270,12 @@ export function TableNavigationHistoryProvider({
   const moveTo = useCallback(
     (index: number) => {
       const currentHistory = historyRef.current
-      if (index < 0 || index >= currentHistory.entries.length || index === currentHistory.index) {
+      if (
+        pendingCommitRef.current !== null ||
+        index < 0 ||
+        index >= currentHistory.entries.length ||
+        index === currentHistory.index
+      ) {
         return
       }
 
@@ -264,10 +289,29 @@ export function TableNavigationHistoryProvider({
           ? targetBrowserIndex - currentBrowserIndex
           : 0
       const offset = browserOffset === 0 ? index - currentHistory.index : browserOffset
-      pendingOffsetRef.current = offset
-      router.history.go(offset)
+      const targetHref = currentHistory.entries[index]?.href
+      if (targetHref === undefined) return
+      const commit = () =>
+        new Promise<void>((resolve) => {
+          pendingCommitRef.current = resolve
+          pendingOffsetRef.current = offset
+          router.history.go(offset)
+        })
+      const destination = getTableDestination(targetHref)
+      if (destination === null) {
+        void commit()
+        return
+      }
+      void prepare(
+        {
+          policy: 'replace',
+          search: resolveTableRowsSearch(toTableTabSearch(destination.search)),
+          tableName: destination.tableName,
+        },
+        commit,
+      ).catch(() => toasts.error("Couldn't open navigation history"))
     },
-    [router],
+    [prepare, router],
   )
   const goBack = useCallback(() => {
     const index = historyRef.current.index

@@ -135,6 +135,23 @@ describe('TableTabsView', () => {
     expect(mocks.reportConnectionContentReady).toHaveBeenCalledWith(true)
   })
 
+  it('leaves data-view readiness to the authoritative rows query', () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" />)
+
+    expect(mocks.reportConnectionContentReady).toHaveBeenCalledWith(false)
+    expect(screen.getByText('Selected table: accounts')).toBeTruthy()
+  })
+
   it('keeps workspace controls visible while schema-dependent content loads', () => {
     mocks.state.activeTabId = 'new-view'
     mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]

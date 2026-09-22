@@ -13,7 +13,7 @@ import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { TableCommands } from '@tables/workspace/tableCommands'
 
 export function TableHotkeys(): React.ReactElement {
-  const { activeTabId, closeTab, openNewView, tabs } = useTableTabs()
+  const { activeTabId, closeTab, openNewView, openTable, tabs } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
   const canCloseActiveTab =
@@ -80,5 +80,10 @@ export function TableHotkeys(): React.ReactElement {
   )
   useAppCommands(commands)
 
-  return <TableCommands tabs={tabs} />
+  return (
+    <TableCommands
+      tabs={tabs}
+      onOpenTable={openTable}
+    />
+  )
 }

@@ -71,6 +71,7 @@ export function TableTabsView({
     activateTab,
     closeTab,
     openNewView,
+    pendingTableName,
     persistTab,
     reorderTabs,
     replaceableTabId,
@@ -199,6 +200,7 @@ export function TableTabsView({
               return (
                 <WorkspaceTabs.Tab
                   key={tab.id}
+                  aria-busy={pendingTableName === tab.tableName ? true : undefined}
                   value={tab.id}
                   prefix={
                     tab.search.view === 'schema' ? (
@@ -302,7 +304,10 @@ export function TableTabsView({
         ) : tableName !== null && isTableIdentityReady === false ? null : activeTab?.kind ===
             'table' && tableName !== null ? (
           <WorkspaceTabs.Panel value={activeTab.id}>
-            <SelectedTableView tableName={tableName} />
+            <SelectedTableView
+              tableName={tableName}
+              view={view}
+            />
           </WorkspaceTabs.Panel>
         ) : activeTab?.kind === 'newView' ? (
           <WorkspaceTabs.Panel value={NEW_VIEW_TAB_ID}>

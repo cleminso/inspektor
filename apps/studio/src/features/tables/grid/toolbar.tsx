@@ -73,6 +73,7 @@ export function TablePagination({
   return (
     <Box
       alignItems="center"
+      aria-busy={loading === true}
       gap="xs"
     >
       <Text
@@ -82,6 +83,7 @@ export function TablePagination({
         {rowStatus}
       </Text>
       <Select.Root
+        disabled={loading === true}
         items={pageSizeItems}
         value={pageSize}
         onValueChange={(value) => {

@@ -9,11 +9,13 @@ import { useTableViewState as useTableViewStateImpl } from '@tables/workspace/us
 
 const insertRow = vi.fn()
 const setPage = vi.fn()
-const { focusRowEditorField, moveColumnInOrderMock, useTableRowByIdMock } = vi.hoisted(() => ({
-  focusRowEditorField: vi.fn(),
-  moveColumnInOrderMock: vi.fn(),
-  useTableRowByIdMock: vi.fn(),
-}))
+const { focusRowEditorField, moveColumnInOrderMock, prepareNavigationMock, useTableRowByIdMock } =
+  vi.hoisted(() => ({
+    focusRowEditorField: vi.fn(),
+    moveColumnInOrderMock: vi.fn(),
+    prepareNavigationMock: vi.fn(),
+    useTableRowByIdMock: vi.fn(),
+  }))
 const columnOrderState = {
   columnOrder: ['id', 'name'],
   columnVisibility: { id: true, name: true },
@@ -125,6 +127,13 @@ vi.mock('@tables/query/useTableRows', () => ({
   },
 }))
 
+vi.mock('@tables/routing/tableNavigationPreparation', () => ({
+  useTableNavigationPreparation: () => ({
+    pendingTableName: null,
+    prepare: prepareNavigationMock,
+  }),
+}))
+
 vi.mock('@tables/query/useTableRowById', () => ({
   useTableRowById: useTableRowByIdMock,
 }))
@@ -133,6 +142,7 @@ beforeEach(() => {
   insertRow.mockReset()
   focusRowEditorField.mockClear()
   setPage.mockReset()
+  searchState.setPageSize.mockReset()
   searchState.setFilters.mockReset()
   moveColumnInOrderMock.mockReset()
   columnOrderState.setColumnOrder.mockReset()
@@ -158,6 +168,11 @@ beforeEach(() => {
   }
   runtimeState.client = null
   runtimeState.schema = null
+  prepareNavigationMock.mockReset()
+  prepareNavigationMock.mockImplementation(async (_options, commit) => {
+    await commit()
+    return 'committed'
+  })
 })
 
 afterEach(() => {
@@ -210,6 +225,36 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('keeps filter updates rejected when preparation fails', async () => {
+    const error = new Error('query failed')
+    prepareNavigationMock.mockRejectedValue(error)
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    let receivedError: unknown
+
+    await act(async () => {
+      try {
+        await result.current.setFilters([
+          { id: 'filter-1', column: 'id', operator: 'eq', value: 'row-2' },
+        ])
+      } catch (caughtError) {
+        receivedError = caughtError
+      }
+    })
+
+    expect(receivedError).toBe(error)
+    expect(searchState.setFilters).not.toHaveBeenCalled()
+  })
+
+  it('silently drops a filter update superseded by a newer intent', async () => {
+    prepareNavigationMock.mockResolvedValue('superseded')
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    await expect(
+      result.current.setFilters([{ id: 'filter-1', column: 'id', operator: 'eq', value: 'row-2' }]),
+    ).resolves.toBeUndefined()
+    expect(searchState.setFilters).not.toHaveBeenCalled()
+  })
+
   it('keeps pinned data columns reorderable and moves them within the pinned order', async () => {
     columnOrderState.pinnedColumnIds = ['id', 'name']
     columnOrderState.setPinnedColumnIds.mockImplementation((updater) => {

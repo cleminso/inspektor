@@ -5,6 +5,12 @@ import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 import { TableCommands } from '@tables/workspace/tableCommands'
 
 const navigate = vi.hoisted(() => vi.fn())
+const prepareNavigation = vi.hoisted(() =>
+  vi.fn(async (_options: unknown, commit: () => Promise<void> | void) => {
+    await commit()
+    return 'committed'
+  }),
+)
 const availableTables = vi.hoisted(() => ({
   isSchemaReady: true,
   tables: ['accounts', 'profiles'],
@@ -26,9 +32,14 @@ vi.mock('@tables/schema/useAvailableTables', () => ({
   useAvailableTables: () => availableTables,
 }))
 
+vi.mock('@tables/routing/tableNavigationPreparation', () => ({
+  useTableNavigationPreparation: () => ({ prepare: prepareNavigation }),
+}))
+
 beforeEach(() => {
   availableTables.isSchemaReady = true
   availableTables.tables = ['accounts', 'profiles']
+  prepareNavigation.mockClear()
 })
 
 afterEach(() => {
@@ -37,6 +48,24 @@ afterEach(() => {
 })
 
 describe('TableCommands', () => {
+  it('delegates table-route preparation when the workspace owns navigation', async () => {
+    const onOpenTable = vi.fn()
+    render(
+      <AppHotkeysProvider>
+        <TableCommands onOpenTable={onOpenTable} tabs={[]} />
+      </AppHotkeysProvider>,
+    )
+
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+    const input = await screen.findByRole('combobox', { name: 'Search commands' })
+    fireEvent.change(input, { target: { value: 'profiles' } })
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    fireEvent.keyDown(input, { key: 'Enter' })
+
+    expect(onOpenTable).toHaveBeenCalledWith('profiles', {})
+    expect(navigate).not.toHaveBeenCalled()
+  })
+
   it('registers tables without active workspace tabs', async () => {
     render(
       <AppHotkeysProvider>
@@ -80,6 +109,20 @@ describe('TableCommands', () => {
         params: { connectionId: 'connection-1', tableName: 'accounts' },
         search: { filters: 'active', page: 2, pageSize: 500 },
       }),
+    )
+    expect(prepareNavigation).toHaveBeenCalledWith(
+      {
+        policy: 'replace',
+        search: {
+          filters: [],
+          page: 2,
+          pageSize: 500,
+          sortColumn: 'id',
+          sortDirection: 'asc',
+        },
+        tableName: 'accounts',
+      },
+      expect.any(Function),
     )
   })
 

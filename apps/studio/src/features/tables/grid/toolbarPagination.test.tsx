@@ -105,7 +105,7 @@ describe('TablePagination', () => {
   })
 
   it('keeps the settled range and page visible while a new page size loads', () => {
-    const { rerender } = render(
+    const { container, rerender } = render(
       <TablePagination
         hasNextPage
         hasPreviousPage={false}
@@ -132,6 +132,9 @@ describe('TablePagination', () => {
 
     expect(screen.getByText('1–100 of 101+')).toBeTruthy()
     expect(screen.getByText('Page 1')).toBeTruthy()
-    expect(screen.getByRole('combobox', { name: 'Rows per page' }).textContent).toContain('500')
+    const pageSize = screen.getByRole('combobox', { name: 'Rows per page' })
+    expect(pageSize.textContent).toContain('500')
+    expect(pageSize.hasAttribute('disabled')).toBe(true)
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
   })
 })

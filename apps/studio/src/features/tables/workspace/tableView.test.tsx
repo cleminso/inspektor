@@ -29,6 +29,7 @@ const tableViewState = vi.hoisted(() => ({
   hasCellSelection: false,
   hasNextPage: false,
   isInitialLoading: false,
+  isPageNavigationPending: false,
   isRefreshing: false,
   mutationExecutor: {
     deleteRow: vi.fn(),
@@ -115,6 +116,7 @@ const mutationExecution = vi.hoisted(() => ({
 }))
 const gridContextMenuProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const dataGridRootProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
+const dataGridContentProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
@@ -130,7 +132,7 @@ const editRowFormProps = vi.hoisted(() => ({ current: null as Record<string, unk
 const fieldEditorProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
-const useConnectionContentReady = vi.hoisted(() => vi.fn())
+const reportConnectionContentReady = vi.hoisted(() => vi.fn())
 const schemaColumns = vi.hoisted(
   (): Array<{
     name: string
@@ -160,7 +162,9 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeSchema: () => null,
 }))
 
-vi.mock('@app/runtime/connectionContentBoundary', () => ({ useConnectionContentReady }))
+vi.mock('@app/runtime/connectionContentBoundary', () => ({
+  useConnectionContentReady: reportConnectionContentReady,
+}))
 
 vi.mock('@tables/schema/tableSchema', () => ({
   getTableColumns: () => schemaColumns,
@@ -415,9 +419,16 @@ vi.mock('@inspektor/ds', () => {
       {children}
     </div>
   )
-  const DataGridContent = ({ emptyContent }: { emptyContent: ReactNode }) => (
-    <div>{tableViewState.rows.length === 0 ? emptyContent : null}</div>
-  )
+  const DataGridContent = ({
+    emptyContent,
+    rowRendering,
+  }: {
+    emptyContent: ReactNode
+    rowRendering?: 'all' | 'virtual'
+  }) => {
+    dataGridContentProps.current = { rowRendering }
+    return <div>{tableViewState.rows.length === 0 ? emptyContent : null}</div>
+  }
   const DataGridRootPropsCapture = ({
     columnDragPreview,
     reorderableColumnIds,
@@ -614,6 +625,7 @@ afterEach(() => {
   mutationExecution.current = { error: null, status: 'idle' }
   gridContextMenuProps.current = null
   dataGridRootProps.current = null
+  dataGridContentProps.current = null
   useTableViewStateOptions.current = null
   mutationLedgerProviderProps.current = null
   mutationEditorOptions.current = null
@@ -639,7 +651,7 @@ afterEach(() => {
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
-  useConnectionContentReady.mockReset()
+  reportConnectionContentReady.mockReset()
   schemaColumns.splice(1)
   if (initialClipboardDescriptor === undefined) {
     Reflect.deleteProperty(navigator, 'clipboard')
@@ -914,6 +926,24 @@ describe('TableView cell actions', () => {
 })
 
 describe('TableView composition boundary', () => {
+  it('virtualizes larger bounded pages', () => {
+    renderTableView()
+
+    expect(dataGridContentProps.current?.rowRendering).toBe('virtual')
+  })
+
+  it('keeps connection content hidden until the first rows query settles', () => {
+    tableViewState.isInitialLoading = true
+    const { rerenderTableView } = renderTableView()
+
+    expect(reportConnectionContentReady).toHaveBeenLastCalledWith(false)
+
+    tableViewState.isInitialLoading = false
+    rerenderTableView()
+
+    expect(reportConnectionContentReady).toHaveBeenLastCalledWith(true)
+  })
+
   it('configures column reordering only after the first rows query settles', () => {
     tableViewState.isInitialLoading = true
     tableViewState.reorderableColumnIds = ['id', 'name']
@@ -929,18 +959,6 @@ describe('TableView composition boundary', () => {
 
     expect(dataGridRootProps.current?.reorderableColumnIds).toEqual(['id', 'name'])
     expect(dataGridRootProps.current?.columnDragPreview).toBeTypeOf('function')
-  })
-
-  it('reports when the first rows query settles', () => {
-    tableViewState.isInitialLoading = true
-    const { rerenderTableView } = renderTableView()
-
-    expect(useConnectionContentReady).toHaveBeenLastCalledWith(false)
-
-    tableViewState.isInitialLoading = false
-    rerenderTableView()
-
-    expect(useConnectionContentReady).toHaveBeenLastCalledWith(true)
   })
 
   it('tracks the active row checkbox when it mounts after the pane opens', async () => {

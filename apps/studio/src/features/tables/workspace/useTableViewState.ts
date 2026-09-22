@@ -15,7 +15,7 @@ import {
   useState,
 } from 'react'
 
-import type { DataGridCellTarget, DataGridFocusRequest } from '@inspektor/ds'
+import { toasts, type DataGridCellTarget, type DataGridFocusRequest } from '@inspektor/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -23,18 +23,22 @@ import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProv
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
 import { useTablePreferences } from '@tables/grid/useTablePreferences'
 import { useTableGrid } from '@tables/grid/useTableGrid'
+import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { useTableMutationExecutor } from '@tables/rowEditor/mutation/useTableMutation'
 import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
+import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
 import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
 import type {
   DynamicTableRow,
   TableFieldsByRowId,
   TableRowId,
   TableValuesByRowId,
+  TableRowsSearchState,
+  TablePageSize,
 } from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
 import {
@@ -92,17 +96,103 @@ export function useTableViewState({
 }: UseTableViewStateOptions) {
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
+  const { pendingTableName, prepare } = useTableNavigationPreparation()
   const searchState = useTableExplorerSearchParams()
   const sortColumn =
     wasmSchema === null
       ? searchState.sortColumn
       : resolveTableSortColumn(schemaColumns, searchState.sortColumn)
   const sortDirection = sortColumn === searchState.sortColumn ? searchState.sortDirection : 'asc'
+  const isPageNavigationPending = pendingTableName !== null
+  const runPreparedPageNavigation = useCallback(
+    async (
+      destination: TableRowsSearchState,
+      commit: () => Promise<void>,
+      options: {
+        errorMessage: string
+        policy: 'ignore' | 'replace'
+        requireCommit?: boolean
+      },
+    ): Promise<void> => {
+      let result: Awaited<ReturnType<typeof prepare>>
+      try {
+        result = await prepare({ policy: options.policy, search: destination, tableName }, commit)
+      } catch (error) {
+        toasts.error(options.errorMessage)
+        if (options.requireCommit === true) throw error
+        return
+      }
+      if (options.requireCommit === true && result === 'unavailable') {
+        throw new Error('Filters were not applied.')
+      }
+    },
+    [prepare, tableName],
+  )
+  const setPage = useCallback(
+    async (page: number) =>
+      runPreparedPageNavigation(
+        {
+          filters: searchState.filters,
+          page,
+          pageSize: searchState.pageSize,
+          sortColumn,
+          sortDirection,
+        },
+        () => searchState.setPage(page),
+        { errorMessage: "Couldn't load page", policy: 'ignore' },
+      ),
+    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
+  )
+  const setPageSize = useCallback(
+    async (pageSize: TablePageSize) =>
+      runPreparedPageNavigation(
+        {
+          filters: searchState.filters,
+          page: 1,
+          pageSize,
+          sortColumn,
+          sortDirection,
+        },
+        () => searchState.setPageSize(pageSize),
+        { errorMessage: "Couldn't change page size", policy: 'replace' },
+      ),
+    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
+  )
+  const setFilters = useCallback(
+    async (filters: TableFilterClause[]) =>
+      runPreparedPageNavigation(
+        {
+          filters,
+          page: 1,
+          pageSize: searchState.pageSize,
+          sortColumn,
+          sortDirection,
+        },
+        () => searchState.setFilters(filters),
+        { errorMessage: "Couldn't apply filters", policy: 'replace', requireCommit: true },
+      ),
+    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
+  )
+  const setSorting = useCallback(
+    async (nextSortColumn: string, nextSortDirection: 'asc' | 'desc') =>
+      runPreparedPageNavigation(
+        {
+          filters: searchState.filters,
+          page: 1,
+          pageSize: searchState.pageSize,
+          sortColumn: nextSortColumn,
+          sortDirection: nextSortDirection,
+        },
+        () => searchState.setSorting(nextSortColumn, nextSortDirection),
+        { errorMessage: "Couldn't change sorting", policy: 'replace' },
+      ),
+    [runPreparedPageNavigation, searchState],
+  )
   // Sort values schedule canonicalization; router command identity is not part of that condition.
   const setCanonicalSorting = useEffectEvent(searchState.setSorting)
   const query = useTableRows({
     client,
-    onPageOutOfRange: () => searchState.setPage(1),
+    onPageOutOfRange: () => setPage(1),
     onRowsAdded: handleRowsAdded,
     onRowsUpdated: handleRowsUpdated,
     search: {
@@ -269,14 +359,25 @@ export function useTableViewState({
   })
 
   // Filters, sorting, connection, branch, schema, and table define one selection scope.
-  const selectionScopeKey = JSON.stringify({
-    filters: searchState.filters,
-    page: searchState.page,
-    pageSize: searchState.pageSize,
-    sortColumn,
-    sortDirection,
-    tableKey,
-  })
+  const selectionScopeKey = useMemo(
+    () =>
+      JSON.stringify({
+        filters: searchState.filters,
+        page: searchState.page,
+        pageSize: searchState.pageSize,
+        sortColumn,
+        sortDirection,
+        tableKey,
+      }),
+    [
+      searchState.filters,
+      searchState.page,
+      searchState.pageSize,
+      sortColumn,
+      sortDirection,
+      tableKey,
+    ],
+  )
   const selectionScopeRef = useRef(selectionScopeKey)
   const effectiveSelectedRowIds = useMemo(() => {
     if (activeRowId === null) {
@@ -424,7 +525,7 @@ export function useTableViewState({
   }, [navigablePageRowIds, openRows, query.isInitialLoading, searchState.page])
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
-    void searchState.setSorting(columnId, direction)
+    void setSorting(columnId, direction)
   }
 
   const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
@@ -569,7 +670,7 @@ export function useTableViewState({
     if (options.keepOpen === true) {
       return
     }
-    void searchState.setPage(1)
+    void setPage(1)
     closeDetailPane()
   }
 
@@ -602,8 +703,20 @@ export function useTableViewState({
   }
 
   const goToPageEdge = (page: number, edge: PendingPageRowNavigation['edge']) => {
-    pendingPageRowNavigationRef.current = { edge, page }
-    void searchState.setPage(page)
+    void runPreparedPageNavigation(
+      {
+        filters: searchState.filters,
+        page,
+        pageSize: searchState.pageSize,
+        sortColumn,
+        sortDirection,
+      },
+      () => {
+        pendingPageRowNavigationRef.current = { edge, page }
+        return searchState.setPage(page)
+      },
+      { errorMessage: "Couldn't load page", policy: 'ignore' },
+    )
   }
 
   const goToPreviousRow = () => {
@@ -701,12 +814,13 @@ export function useTableViewState({
     hasNextPage: query.hasNextPage,
     hasCellSelection: cellSelection.length > 0,
     isInitialLoading: query.isInitialLoading,
+    isPageNavigationPending,
     isRefreshing: query.isRefreshing,
     scrollResetKey: selectionScopeKey,
-    setPage: searchState.setPage,
-    setPageSize: searchState.setPageSize,
+    setPage,
+    setPageSize,
     filters: searchState.filters,
-    setFilters: searchState.setFilters,
+    setFilters,
     tableColumns: query.columns,
     rowValues,
     rowEditorQueryError: activeRowQueryStatus === 'rejected' ? activeRowQuery.error : null,

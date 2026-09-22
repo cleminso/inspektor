@@ -11,6 +11,10 @@ import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
 import { createTableScope } from '@tables/workspace/scope'
 
 const navigate = vi.hoisted(() => vi.fn())
+const { cancelPreparationMock, prepareNavigationMock } = vi.hoisted(() => ({
+  cancelPreparationMock: vi.fn(),
+  prepareNavigationMock: vi.fn(),
+}))
 const routeSearch = vi.hoisted(() => ({
   current: {
     empty: undefined as string | undefined,
@@ -40,6 +44,14 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => sessionState,
 }))
 
+vi.mock('@tables/routing/tableNavigationPreparation', () => ({
+  useTableNavigationPreparation: () => ({
+    cancel: cancelPreparationMock,
+    pendingTableName: null,
+    prepare: prepareNavigationMock,
+  }),
+}))
+
 vi.mock('@tables/schema/useAvailableTables', () => ({
   useAvailableTables: () => schemaState,
 }))
@@ -53,6 +65,12 @@ beforeEach(() => {
   sessionState.currentTableName = 'accounts'
   schemaState.isSchemaReady = true
   schemaState.tables = ['accounts', 'profiles']
+  cancelPreparationMock.mockReset()
+  prepareNavigationMock.mockReset()
+  prepareNavigationMock.mockImplementation(async (_options, commit) => {
+    await commit()
+    return 'committed'
+  })
   const values = new Map<string, string>()
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
@@ -91,6 +109,7 @@ function TabActions(): React.ReactElement {
     closeTab,
     openBaseTabs,
     openNewView,
+    openTable,
     openSchemaView,
     persistTable,
     replaceableTabId,
@@ -115,6 +134,9 @@ function TabActions(): React.ReactElement {
       <button type="button" onClick={openNewView}>
         Open New view
       </button>
+      <button type="button" onClick={() => openTable('profiles', {})}>
+        Open profiles
+      </button>
       <button type="button" onClick={() => openSchemaView('accounts')}>
         Open accounts schema
       </button>
@@ -138,6 +160,34 @@ function Harness(): React.ReactElement {
 }
 
 describe('TableTabsProvider', () => {
+  it('delegates data-table navigation to the workspace preparation owner', async () => {
+    render(<Harness />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open profiles' }))
+
+    expect(prepareNavigationMock).toHaveBeenCalledWith(
+      {
+        policy: 'replace',
+        search: {
+          filters: [],
+          page: 1,
+          pageSize: 100,
+          sortColumn: 'id',
+          sortDirection: 'asc',
+        },
+        tableName: 'profiles',
+      },
+      expect.any(Function),
+    )
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({
+        to: '/conn/$connectionId/tables/$tableName',
+        params: { connectionId: 'connection', tableName: 'profiles' },
+        search: {},
+      }),
+    )
+  })
+
   it('opens a missing routed table as replaceable and persists it through bulk open', async () => {
     render(<Harness />)
 

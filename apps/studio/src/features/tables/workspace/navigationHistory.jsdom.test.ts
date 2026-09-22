@@ -18,14 +18,25 @@ const router = vi.hoisted(() => ({
     subscribe: vi.fn((_subscriber: unknown) => () => {}),
   },
 }))
+const prepareTableNavigation = vi.hoisted(() =>
+  vi.fn(async (_options: unknown, commit: () => Promise<void> | void) => {
+    await commit()
+    return 'committed'
+  }),
+)
 
 vi.mock('@tanstack/react-router', () => ({ useRouter: () => router }))
+
+vi.mock('@tables/routing/tableNavigationPreparation', () => ({
+  useTableNavigationPreparation: () => ({ prepare: prepareTableNavigation }),
+}))
 
 afterEach(() => {
   cleanup()
   router.history.go.mockReset()
   router.history.push.mockReset()
   router.history.subscribe.mockClear()
+  prepareTableNavigation.mockClear()
   router.history.location.href = '/conn/1/tables/accounts'
   router.history.location.state = { __TSR_index: 0 }
   router.latestLocation.href = '/conn/1/tables/accounts'
@@ -196,8 +207,24 @@ describe('table navigation history', () => {
     const backButton = screen.getByRole('button', { name: 'Back' }) as HTMLButtonElement
     expect(backButton.disabled).toBe(false)
     fireEvent.click(backButton)
+    fireEvent.click(backButton)
 
+    expect(prepareTableNavigation).toHaveBeenCalledWith(
+      {
+        policy: 'replace',
+        search: {
+          filters: [],
+          page: 1,
+          pageSize: 100,
+          sortColumn: 'id',
+          sortDirection: 'asc',
+        },
+        tableName: 'accounts',
+      },
+      expect.any(Function),
+    )
     expect(router.history.go).toHaveBeenCalledWith(-1)
+    expect(router.history.go).toHaveBeenCalledOnce()
     expect(router.history.push).not.toHaveBeenCalled()
 
     act(() => {
