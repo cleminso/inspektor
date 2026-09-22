@@ -11,6 +11,10 @@ import type { JazzClient } from 'jazz-tools/client'
 import { RowChangeKind } from 'jazz-tools/shared'
 
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import {
+  isRecoverableJazzTransportError,
+  TABLE_QUERY_FAILURE_MESSAGE,
+} from '@tables/query/jazzQueryError'
 import { prefetchJazzQuery } from '@tables/query/prefetchJazzQuery'
 import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
@@ -39,6 +43,7 @@ const PROVENANCE_COLUMNS = TABLE_PROVENANCE_COLUMNS.map((descriptor): TableColum
 interface UseTableRowsOptions {
   client: JazzClient | null
   onPageOutOfRange: () => void
+  onQueryStateChange?: (observation: TableRowsQueryObservation) => void
   onRowsAdded?: (rowIds: readonly string[]) => void
   onRowsUpdated?: (
     updates: readonly { current: DynamicTableRow; previous: DynamicTableRow }[],
@@ -55,9 +60,21 @@ interface UseTableRowsResult {
   error: string | null
   hasNextPage: boolean
   isInitialLoading: boolean
+  isRecoverableTransportFailure: boolean
   isRefreshing: boolean
   rows: DynamicTableRow[]
 }
+
+type TableRowsQueryObservation =
+  | {
+      client: JazzClient
+      status: 'fulfilled'
+    }
+  | {
+      client: JazzClient
+      recoverableTransportFailure: boolean
+      status: 'rejected'
+    }
 
 interface ResolvedRowsState {
   dataScopeKey: string
@@ -86,6 +103,7 @@ function wasCreatedDuringObservation(row: DynamicTableRow, observationStartedAt:
 export function useTableRows({
   client,
   onPageOutOfRange,
+  onQueryStateChange,
   onRowsAdded,
   onRowsUpdated,
   search,
@@ -192,6 +210,25 @@ export function useTableRows({
   }, [pageSize, queryState.data])
   const fulfilledRows = fulfilledPage?.rows
   const fulfilledHasNextPage = fulfilledPage?.hasNextPage ?? false
+  const isRecoverableTransportFailure =
+    queryState.status === 'rejected' && isRecoverableJazzTransportError(queryState.error)
+  const reportQueryState = useEffectEvent((observation: TableRowsQueryObservation) => {
+    onQueryStateChange?.(observation)
+  })
+  useEffect(() => {
+    if (client === null) {
+      return
+    }
+    if (queryState.status === 'fulfilled') {
+      reportQueryState({ client, status: 'fulfilled' })
+    } else if (queryState.status === 'rejected') {
+      reportQueryState({
+        client,
+        recoverableTransportFailure: isRecoverableTransportFailure,
+        status: 'rejected',
+      })
+    }
+  }, [client, isRecoverableTransportFailure, queryKey, queryState.status])
   useEffect(() => {
     if (
       client === null ||
@@ -282,15 +319,11 @@ export function useTableRows({
 
   return {
     columns,
-    error:
-      queryState.status === 'rejected'
-        ? queryState.error instanceof Error
-          ? queryState.error.message
-          : String(queryState.error)
-        : null,
+    error: queryState.status === 'rejected' ? TABLE_QUERY_FAILURE_MESSAGE : null,
     rows: visibleRows,
     hasNextPage,
     isInitialLoading,
+    isRecoverableTransportFailure,
     isRefreshing,
   }
 }

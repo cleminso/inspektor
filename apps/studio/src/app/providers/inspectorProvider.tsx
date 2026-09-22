@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react'
@@ -33,8 +34,34 @@ interface InspectorRuntimeContextValue {
   runtime: InspectorRuntimeStore
 }
 
+type RuntimeQueryRecoveryObservation =
+  | {
+      client: JazzClient
+      status: 'fulfilled'
+    }
+  | {
+      client: JazzClient
+      recoverableTransportFailure: boolean
+      status: 'rejected'
+    }
+
+interface RuntimeQueryRecovery {
+  observe: (observation: RuntimeQueryRecoveryObservation) => void
+  status: 'exhausted' | 'idle' | 'recovering'
+}
+
+type RuntimeQueryRecoveryState =
+  | { scopeKey: string; status: 'idle' }
+  | {
+      failedClient: JazzClient
+      scopeKey: string
+      status: 'recovering'
+    }
+  | { scopeKey: string; status: 'exhausted' }
+
 const InspectorContext = createContext<InspectorContextValue | null>(null)
 const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | null>(null)
+const RuntimeQueryRecoveryContext = createContext<RuntimeQueryRecovery | null>(null)
 const connectionIdentityTokens = new WeakMap<object, number>()
 const RUNTIME_RECONNECT_HIDDEN_MS = 5 * 60 * 1000
 let nextConnectionIdentityToken = 0
@@ -208,7 +235,7 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
 // @lat: [[runtimeConnectionStartup#Connection startup phases]]
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext()
-  const [retryGeneration, retryRuntime] = useReducer((generation: number) => generation + 1, 0)
+  const [retryGeneration, replaceRuntime] = useReducer((generation: number) => generation + 1, 0)
   const initialSchemaCatalogue =
     initialRuntimeTarget?.connectionId === session.currentConnectionId
       ? initialRuntimeTarget.schemaCatalogue
@@ -221,12 +248,76 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
     initialSchemaCatalogue,
     retryGeneration,
   })
-  const runtimeContext = useMemo(() => ({ retry: retryRuntime, runtime }), [retryRuntime, runtime])
-  useRuntimeResumeRetry(runtime, retryRuntime)
   const clientIdentity =
     session.activeConnection === null
-      ? null
+      ? 'none'
       : `${session.activeConnection.id}:${getConnectionIdentityToken(session.activeConnection)}`
+  const recoveryScopeKey = `${clientIdentity}:${session.currentBranch ?? 'none'}:${session.currentSchemaHash ?? 'none'}`
+  const [queryRecoveryState, setQueryRecoveryState] = useState<RuntimeQueryRecoveryState>({
+    scopeKey: recoveryScopeKey,
+    status: 'idle',
+  })
+  const queryRecoveryStateRef = useRef(queryRecoveryState)
+  const publishQueryRecoveryState = useCallback((state: RuntimeQueryRecoveryState) => {
+    queryRecoveryStateRef.current = state
+    setQueryRecoveryState(state)
+  }, [])
+  const retryRuntime = useCallback(() => {
+    publishQueryRecoveryState({ scopeKey: recoveryScopeKey, status: 'idle' })
+    replaceRuntime()
+  }, [publishQueryRecoveryState, recoveryScopeKey])
+  const observeQueryRecovery = useCallback(
+    (observation: RuntimeQueryRecoveryObservation) => {
+      const storedState = queryRecoveryStateRef.current
+      const state =
+        storedState.scopeKey === recoveryScopeKey
+          ? storedState
+          : ({ scopeKey: recoveryScopeKey, status: 'idle' } as const)
+
+      if (state.status === 'idle') {
+        if (
+          observation.status !== 'rejected' ||
+          observation.recoverableTransportFailure === false ||
+          runtime.$client.get() !== observation.client
+        ) {
+          return
+        }
+        publishQueryRecoveryState({
+          failedClient: observation.client,
+          scopeKey: recoveryScopeKey,
+          status: 'recovering',
+        })
+        replaceRuntime()
+        return
+      }
+
+      if (state.status === 'recovering' && observation.client === state.failedClient) {
+        return
+      }
+      if (runtime.$client.get() !== observation.client) {
+        return
+      }
+      if (observation.status === 'fulfilled') {
+        publishQueryRecoveryState({ scopeKey: recoveryScopeKey, status: 'idle' })
+        return
+      }
+      if (state.status === 'recovering') {
+        publishQueryRecoveryState({
+          scopeKey: recoveryScopeKey,
+          status: 'exhausted',
+        })
+      }
+    },
+    [publishQueryRecoveryState, recoveryScopeKey, runtime],
+  )
+  const queryRecoveryStatus =
+    queryRecoveryState.scopeKey === recoveryScopeKey ? queryRecoveryState.status : 'idle'
+  const queryRecovery = useMemo<RuntimeQueryRecovery>(
+    () => ({ observe: observeQueryRecovery, status: queryRecoveryStatus }),
+    [observeQueryRecovery, queryRecoveryStatus],
+  )
+  const runtimeContext = useMemo(() => ({ retry: retryRuntime, runtime }), [retryRuntime, runtime])
+  useRuntimeResumeRetry(runtime, retryRuntime)
   const switchBranch = useCallback(
     (branch: string) =>
       session.switchBranch(
@@ -245,16 +336,18 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
   )
 
   return (
-    <InspectorRuntimeContext.Provider value={runtimeContext}>
-      {session.activeConnection === null ? null : (
-        <RuntimeAdminClient
-          key={`${clientIdentity ?? 'unknown'}:${retryGeneration}`}
-          connection={session.activeConnection}
-          runtime={runtime}
-        />
-      )}
-      <InspectorContext.Provider value={value}>{children}</InspectorContext.Provider>
-    </InspectorRuntimeContext.Provider>
+    <RuntimeQueryRecoveryContext.Provider value={queryRecovery}>
+      <InspectorRuntimeContext.Provider value={runtimeContext}>
+        {session.activeConnection === null ? null : (
+          <RuntimeAdminClient
+            key={`${clientIdentity}:${retryGeneration}`}
+            connection={session.activeConnection}
+            runtime={runtime}
+          />
+        )}
+        <InspectorContext.Provider value={value}>{children}</InspectorContext.Provider>
+      </InspectorRuntimeContext.Provider>
+    </RuntimeQueryRecoveryContext.Provider>
   )
 }
 
@@ -312,4 +405,13 @@ export function useRuntimeRetry(): () => void {
   }
 
   return context.retry
+}
+
+export function useRuntimeQueryRecovery(): RuntimeQueryRecovery {
+  const context = useContext(RuntimeQueryRecoveryContext)
+  if (context === null) {
+    throw new Error('useRuntimeQueryRecovery must be used within InspectorProvider')
+  }
+
+  return context
 }

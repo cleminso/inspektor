@@ -108,6 +108,12 @@ Change route defaults in `tableRowsSearch.ts`, query construction in `tableRowsQ
 
 The rendered table acquires one canonical Jazz cache entry and releases it through React cleanup.
 
+The runtime provider owns bounded recovery from the verified Jazz message-credit transport failure. The rendered table-rows query reports its
+settlement against the client that produced it. A recognized terminal rejection replaces the runtime and admin client once while the
+workspace remains mounted. The grid presents `Reconnecting…` until the active row query fulfills through the replacement client. A
+replacement rejection exhausts the automatic attempt and presents generic query-failure copy; internal Jazz error text is never shown.
+Successful replacement settlement rearms recovery for a separate incident.
+
 Initial-route preparation, foreground navigation, and one default-size next-page lookahead may temporarily own exact canonical entries through the same public Jazz subscription store.
 
 The rendered table owns its subscription through `useSyncExternalStore`. React calls the returned cleanup when the active query entry
@@ -143,6 +149,9 @@ The grid distinguishes initial loading, compatible refresh, resolved rows, empty
 | Fulfilled with rows    | Not applicable           | Resolved rows                   | Available          |
 | Fulfilled without rows | Not applicable           | Filtered or table-empty message | Available          |
 | Rejected               | No compatible result     | Error message                   | Available          |
+| Recovering transport   | Not applicable           | Spinner and `Reconnecting…`     | Available          |
+
+Query errors use product-owned copy rather than rendering unknown Jazz error messages.
 
 The loading body uses the design-system spinner and visible status text. It communicates pending work without implying a result count
 or record shape.
@@ -206,5 +215,7 @@ These constraints preserve subscription cleanup, semantic table structure, and f
 - Shut down an admin client that resolves after failure, replacement, or unmount.
 - Do not reconcile Jazz one-shot snapshots with maintained subscription results without an upstream ordering boundary.
 - Release every rendered subscription through the cleanup function returned by Jazz.
+- Keep terminal transport recovery bounded to one runtime replacement per active query incident.
+- Do not broaden automatic recovery beyond explicitly verified Jazz transport errors without a typed upstream error contract or new evidence.
 - Preserve one semantic table, one `colgroup`, one header, and one body for loading and resolved rows.
 - Keep virtual rendering opt-in for consumers whose measured row counts require it.

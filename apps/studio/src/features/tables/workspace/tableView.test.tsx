@@ -30,6 +30,7 @@ const tableViewState = vi.hoisted(() => ({
   hasNextPage: false,
   isInitialLoading: false,
   isPageNavigationPending: false,
+  isReconnecting: false,
   isRefreshing: false,
   mutationExecutor: {
     deleteRow: vi.fn(),
@@ -421,12 +422,16 @@ vi.mock('@inspektor/ds', () => {
   )
   const DataGridContent = ({
     emptyContent,
+    loading,
+    loadingContent,
     rowRendering,
   }: {
     emptyContent: ReactNode
+    loading?: boolean
+    loadingContent?: ReactNode
     rowRendering?: 'all' | 'virtual'
   }) => {
-    dataGridContentProps.current = { rowRendering }
+    dataGridContentProps.current = { loading, loadingContent, rowRendering }
     return <div>{tableViewState.rows.length === 0 ? emptyContent : null}</div>
   }
   const DataGridRootPropsCapture = ({
@@ -600,6 +605,7 @@ afterEach(() => {
   tableViewState.canOpenRowEditor = true
   tableViewState.filters = [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }]
   tableViewState.isInitialLoading = false
+  tableViewState.isReconnecting = false
   tableViewState.isRefreshing = false
   tableViewState.hasCellSelection = false
   tableViewState.hasNextPage = false
@@ -1355,8 +1361,8 @@ describe('TableView query status', () => {
     ).toBeNull()
   })
 
-  it('presents query failures as alerts with corrective reload guidance', () => {
-    tableViewState.error = 'Network request failed'
+  it('presents product-owned query failure copy', () => {
+    tableViewState.error = 'Something went wrong while loading this table.'
     tableViewState.filters = []
     tableViewState.rows = []
 
@@ -1364,8 +1370,27 @@ describe('TableView query status', () => {
 
     const alert = screen.getByRole('alert')
     expect(alert.textContent).toContain("Couldn't load rows")
-    expect(alert.textContent).toContain('Network request failed')
-    expect(alert.textContent).toContain('Check the connection, then reload the page to try again.')
+    expect(alert.textContent).toContain('Something went wrong while loading this table.')
+    expect(alert.textContent).toContain('Reload the page to try again.')
+  })
+
+  it('presents runtime recreation as reconnecting instead of a query failure', () => {
+    tableViewState.error = null
+    tableViewState.isInitialLoading = true
+    tableViewState.isReconnecting = true
+    tableViewState.rows = []
+
+    renderTableView()
+
+    expect(dataGridContentProps.current).toMatchObject({
+      loading: true,
+      loadingContent: 'Reconnecting…',
+    })
+    expect(screen.getByText('Reconnecting')).toBeTruthy()
+    expect(screen.queryByText("Couldn't load rows")).toBeNull()
+    expect(screen.getByRole('table', { name: 'accounts rows' }).getAttribute('aria-busy')).toBe(
+      'true',
+    )
   })
 })
 

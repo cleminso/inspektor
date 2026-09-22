@@ -425,9 +425,37 @@ describe('useTableRows', () => {
       }),
     )
 
-    expect(result.current.error).toBe('Unable to load rows')
+    expect(result.current.error).toBe('Something went wrong while loading this table.')
     expect(result.current.isInitialLoading).toBe(false)
+    expect(result.current.isRecoverableTransportFailure).toBe(false)
     expect(result.current.rows).toEqual([])
+  })
+
+  it('reports a Jazz credit failure for runtime recovery without exposing its message', async () => {
+    const onQueryStateChange = vi.fn()
+    queryError = new Error('message credit exceeds outstanding balance')
+
+    const { result } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        onQueryStateChange,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+
+    expect(result.current.error).toBe('Something went wrong while loading this table.')
+    expect(result.current.isRecoverableTransportFailure).toBe(true)
+    await waitFor(() =>
+      expect(onQueryStateChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          client: runtimeClient,
+          recoverableTransportFailure: true,
+          status: 'rejected',
+        }),
+      ),
+    )
   })
 
   it('does not preserve resolved rows when a sort refresh fails', () => {
@@ -450,7 +478,7 @@ describe('useTableRows', () => {
     queryError = new Error('Unable to sort rows')
     rerender()
 
-    expect(result.current.error).toBe('Unable to sort rows')
+    expect(result.current.error).toBe('Something went wrong while loading this table.')
     expect(result.current.rows).toEqual([])
     expect(result.current.isRefreshing).toBe(false)
   })

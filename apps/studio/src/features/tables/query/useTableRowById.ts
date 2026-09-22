@@ -2,6 +2,7 @@ import type { WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
 
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { TABLE_QUERY_FAILURE_MESSAGE } from '@tables/query/jazzQueryError'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import { TABLE_PROVENANCE_COLUMN_NAMES } from '@tables/tableProvenance'
 import type { DynamicTableRow, TableRowId } from '@tables/tableTypes'
@@ -44,8 +45,7 @@ export function useTableRowById({
   if (queryState.status === 'rejected') {
     return {
       status: 'rejected',
-      error:
-        queryState.error instanceof Error ? queryState.error.message : String(queryState.error),
+      error: TABLE_QUERY_FAILURE_MESSAGE,
       row: null,
     }
   }

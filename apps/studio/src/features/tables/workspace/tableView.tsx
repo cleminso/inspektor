@@ -598,20 +598,22 @@ function TableViewContent({
   )
   useAppCommands(commands)
   const queryStatus =
-    state.error !== null
-      ? ''
-      : state.isRefreshing === true
-        ? 'Refreshing rows'
-        : [
-            refreshAnnouncement,
-            filteredEmpty
-              ? 'No rows match these filters'
-              : unfilteredEmpty
-                ? 'This table is empty'
-                : '',
-          ]
-            .filter(Boolean)
-            .join('. ')
+    state.isReconnecting === true
+      ? 'Reconnecting'
+      : state.error !== null
+        ? ''
+        : state.isRefreshing === true
+          ? 'Refreshing rows'
+          : [
+              refreshAnnouncement,
+              filteredEmpty
+                ? 'No rows match these filters'
+                : unfilteredEmpty
+                  ? 'This table is empty'
+                  : '',
+            ]
+              .filter(Boolean)
+              .join('. ')
 
   useEffect(() => {
     if (state.isInitialLoading === true || state.error !== null) {
@@ -826,7 +828,9 @@ function TableViewContent({
                         >
                           <DataGrid.Content
                             loading={state.isInitialLoading}
-                            loadingContent="Loading rows"
+                            loadingContent={
+                              state.isReconnecting === true ? 'Reconnecting…' : 'Loading rows'
+                            }
                             rowRendering="virtual"
                             emptyContent={
                               state.error === null ? (
@@ -870,9 +874,7 @@ function TableViewContent({
                                     Couldn't load rows
                                   </Text>
                                   <Text color="muted">{state.error}</Text>
-                                  <Text color="muted">
-                                    Check the connection, then reload the page to try again.
-                                  </Text>
+                                  <Text color="muted">Reload the page to try again.</Text>
                                 </Box>
                               )
                             }

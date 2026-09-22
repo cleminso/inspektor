@@ -21,6 +21,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [22/09/26]
 
+### Query transport recovery
+
+- [x] Recreate the Jazz runtime once when the active row query receives the verified message-credit transport failure.
+- [x] Keep the workspace mounted and present `Reconnecting…` until the replacement query settles.
+- [x] Replace raw Jazz query errors with product-owned failure copy.
+- [x] Stop automatic recreation when the replacement query also rejects.
+
 ### Bounded page rendering
 
 - [x] Render the default 100-row page directly and virtualize larger pages with a bounded mounted row window.

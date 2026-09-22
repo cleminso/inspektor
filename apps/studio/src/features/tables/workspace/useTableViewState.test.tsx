@@ -66,6 +66,10 @@ const runtimeState = vi.hoisted(() => ({
   client: null as object | null,
   schema: null as Record<string, unknown> | null,
 }))
+const queryRecoveryState = vi.hoisted(() => ({
+  observe: vi.fn(),
+  status: 'idle' as 'exhausted' | 'idle' | 'recovering',
+}))
 const schemaColumns = [tableColumns[1]!.column!]
 
 function useTableViewState(
@@ -83,6 +87,7 @@ function useTableViewState(
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeClient: () => runtimeState.client,
+  useRuntimeQueryRecovery: () => queryRecoveryState,
   useRuntimeSchema: () => runtimeState.schema,
 }))
 
@@ -121,6 +126,7 @@ vi.mock('@tables/query/useTableRows', () => ({
       error: null,
       hasNextPage: queryHasNextPage,
       isInitialLoading: queryIsInitialLoading,
+      isRecoverableTransportFailure: false,
       isRefreshing: false,
       rows: queryRows,
     }
@@ -168,6 +174,8 @@ beforeEach(() => {
   }
   runtimeState.client = null
   runtimeState.schema = null
+  queryRecoveryState.observe.mockReset()
+  queryRecoveryState.status = 'idle'
   prepareNavigationMock.mockReset()
   prepareNavigationMock.mockImplementation(async (_options, commit) => {
     await commit()

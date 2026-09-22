@@ -101,11 +101,18 @@ describe('useTableRowById', () => {
     )
   })
 
-  it('preserves a rejected fallback query as an explicit error state', () => {
-    queryError.value = new Error('Unable to load row')
+  it.each([new Error('message credit exceeds outstanding balance'), 'internal server detail'])(
+    'presents a rejected fallback query without exposing %p',
+    (error) => {
+      queryError.value = error
 
-    const { result } = renderRow('row-1')
+      const { result } = renderRow('row-1')
 
-    expect(result.current).toEqual({ status: 'rejected', error: 'Unable to load row', row: null })
-  })
+      expect(result.current).toEqual({
+        status: 'rejected',
+        error: 'Something went wrong while loading this table.',
+        row: null,
+      })
+    },
+  )
 })

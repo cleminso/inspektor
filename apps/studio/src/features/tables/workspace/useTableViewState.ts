@@ -19,7 +19,11 @@ import { toasts, type DataGridCellTarget, type DataGridFocusRequest } from '@ins
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import {
+  useRuntimeClient,
+  useRuntimeQueryRecovery,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
 import { useTablePreferences } from '@tables/grid/useTablePreferences'
 import { useTableGrid } from '@tables/grid/useTableGrid'
@@ -95,6 +99,7 @@ export function useTableViewState({
   tableName,
 }: UseTableViewStateOptions) {
   const client = useRuntimeClient()
+  const queryRecovery = useRuntimeQueryRecovery()
   const wasmSchema = useRuntimeSchema()
   const { pendingTableName, prepare } = useTableNavigationPreparation()
   const searchState = useTableExplorerSearchParams()
@@ -193,6 +198,7 @@ export function useTableViewState({
   const query = useTableRows({
     client,
     onPageOutOfRange: () => setPage(1),
+    onQueryStateChange: queryRecovery.observe,
     onRowsAdded: handleRowsAdded,
     onRowsUpdated: handleRowsUpdated,
     search: {
@@ -207,6 +213,9 @@ export function useTableViewState({
     tableName,
     wasmSchema,
   })
+  const isReconnecting =
+    queryRecovery.status === 'recovering' ||
+    (queryRecovery.status === 'idle' && query.isRecoverableTransportFailure === true)
   const settledRowsRef = useRef(query.rows)
   useLayoutEffect(() => {
     if (retainDisabledRows === false) {
@@ -805,7 +814,7 @@ export function useTableViewState({
     recentlyAppliedCells,
     recentlyInsertedRowIds,
     detailPaneMode,
-    error: query.error,
+    error: isReconnecting === true ? null : query.error,
     table,
     rows,
     mutationExecutor: mutations,
@@ -813,8 +822,9 @@ export function useTableViewState({
     pageSize: searchState.pageSize,
     hasNextPage: query.hasNextPage,
     hasCellSelection: cellSelection.length > 0,
-    isInitialLoading: query.isInitialLoading,
+    isInitialLoading: query.isInitialLoading || isReconnecting,
     isPageNavigationPending,
+    isReconnecting,
     isRefreshing: query.isRefreshing,
     scrollResetKey: selectionScopeKey,
     setPage,

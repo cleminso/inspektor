@@ -1,9 +1,19 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import { atom } from 'nanostores'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   InspectorProvider,
+  useRuntimeClient,
+  useRuntimeQueryRecovery,
   useRuntimeRetry,
   useRuntimeSchema,
 } from '@app/providers/inspectorProvider'
@@ -384,6 +394,54 @@ describe('InspectorProvider runtime projections', () => {
 
     await waitFor(() => expect(runtime.publishClientError).toHaveBeenCalledWith(reconnectError))
     expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }))
+  })
+
+  it('recreates the runtime once for a terminal query transport failure', async () => {
+    const failedClient = client()
+    const replacementClient = client()
+    const nextClient = client()
+    session.activeConnection = connection()
+    adminClientMocks.create
+      .mockResolvedValueOnce(failedClient)
+      .mockResolvedValueOnce(replacementClient)
+      .mockResolvedValueOnce(nextClient)
+
+    const { result } = renderHook(
+      () => ({ client: useRuntimeClient(), recovery: useRuntimeQueryRecovery() }),
+      { wrapper: InspectorProvider },
+    )
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(failedClient))
+    const observeQuery = (status: 'fulfilled' | 'rejected') => {
+      const currentClient = result.current.client
+      if (currentClient === null) throw new Error('Expected a published runtime client')
+
+      act(() => {
+        result.current.recovery.observe(
+          status === 'fulfilled'
+            ? { client: currentClient, status }
+            : { client: currentClient, recoverableTransportFailure: true, status },
+        )
+      })
+    }
+
+    observeQuery('rejected')
+    observeQuery('rejected')
+
+    expect(result.current.recovery.status).toBe('recovering')
+    expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }))
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(replacementClient))
+
+    observeQuery('rejected')
+
+    expect(result.current.recovery.status).toBe('exhausted')
+    expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }))
+
+    observeQuery('fulfilled')
+    expect(result.current.recovery.status).toBe('idle')
+
+    observeQuery('rejected')
+    expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 2 }))
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(nextClient))
   })
 
   it('ignores a resume reconnection failure after the provider unmounts', async () => {
