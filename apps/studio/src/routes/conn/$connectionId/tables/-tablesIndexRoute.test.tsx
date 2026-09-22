@@ -1,8 +1,10 @@
 // The `-` prefix keeps this test module out of TanStack Router's generated route tree.
 import { cleanup, render, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const navigate = vi.hoisted(() => vi.fn())
+const navigate = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+const cancelPreparation = vi.hoisted(() => vi.fn())
+const prepareNavigation = vi.hoisted(() => vi.fn())
 const params = vi.hoisted(() => ({ connectionId: 'connection-1' }))
 const routeState = vi.hoisted(() => ({
   isSchemaReady: true,
@@ -11,7 +13,10 @@ const routeState = vi.hoisted(() => ({
       kind: 'table' as const,
       id: 'table:profiles',
       tableName: 'profiles',
-      search: { filters: 'active', page: 2 },
+      search: {
+        filters: '[{"id":"filter-1","column":"name","operator":"contains","value":"Ada"}]',
+        page: 2,
+      },
     },
   ],
   search: {} as { empty?: string },
@@ -33,23 +38,41 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
   useTableTabs: () => routeState,
 }))
 
+vi.mock('@tables/routing/tableNavigationPreparation', () => ({
+  useTableNavigationPreparation: () => ({
+    cancel: cancelPreparation,
+    prepare: prepareNavigation,
+  }),
+}))
+
 const { TablesIndexRoute } = await import('./-tablesIndexRoute')
 
-afterEach(() => {
-  cleanup()
+beforeEach(() => {
   navigate.mockReset()
+  navigate.mockResolvedValue(undefined)
+  cancelPreparation.mockReset()
+  prepareNavigation.mockReset()
+  prepareNavigation.mockImplementation(async (_options, commit) => {
+    await commit()
+    return 'committed'
+  })
   routeState.isSchemaReady = true
   routeState.recentViews = [
     {
       kind: 'table',
       id: 'table:profiles',
       tableName: 'profiles',
-      search: { filters: 'active', page: 2 },
+      search: {
+        filters: '[{"id":"filter-1","column":"name","operator":"contains","value":"Ada"}]',
+        page: 2,
+      },
     },
   ]
   routeState.search = {}
   routeState.tables = ['accounts', 'profiles']
 })
+
+afterEach(cleanup)
 
 describe('tables index route', () => {
   it('selects the initial table only after schema readiness', async () => {
@@ -66,8 +89,28 @@ describe('tables index route', () => {
         to: '/conn/$connectionId/tables/$tableName',
         params: { connectionId: 'connection-1', tableName: 'profiles' },
         replace: true,
-        search: { filters: 'active', page: 2 },
+        search: {
+          filters: '[{"id":"filter-1","column":"name","operator":"contains","value":"Ada"}]',
+          page: 2,
+        },
       }),
+    )
+    expect(prepareNavigation).toHaveBeenCalledWith(
+      {
+        policy: 'replace',
+        search: {
+          filters: [{ id: 'filter-1', column: 'name', operator: 'contains', value: 'Ada' }],
+          page: 2,
+          pageSize: 100,
+          sortColumn: 'id',
+          sortDirection: 'asc',
+        },
+        tableName: 'profiles',
+      },
+      expect.any(Function),
+    )
+    expect(prepareNavigation.mock.invocationCallOrder[0]).toBeLessThan(
+      navigate.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
     )
 
     navigate.mockReset()

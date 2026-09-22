@@ -14,6 +14,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
 import { canonicalizeTableRouteSearch } from '@tables/routing/tableRowsSearch'
+import { TableNavigationPreparationProvider } from '@tables/routing/tableNavigationPreparation'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
 
@@ -25,6 +26,8 @@ vi.mock('@app/providers/inspectorProvider', () => ({
       currentTableName: params.tableName ?? null,
     }
   },
+  useRuntimeClient: () => null,
+  useRuntimeSchema: () => null,
 }))
 
 vi.mock('@tables/schema/useAvailableTables', () => ({
@@ -36,11 +39,13 @@ afterEach(cleanup)
 function Providers(): React.ReactElement {
   return (
     <RuntimeScopeExitGuardProvider>
-      <TableMutationLedgerWorkspaceProvider>
-        <TableTabsProvider scope="test-scope">
-          <Outlet />
-        </TableTabsProvider>
-      </TableMutationLedgerWorkspaceProvider>
+      <TableNavigationPreparationProvider identity="test-route" scope="test-scope">
+        <TableMutationLedgerWorkspaceProvider>
+          <TableTabsProvider scope="test-scope">
+            <Outlet />
+          </TableTabsProvider>
+        </TableMutationLedgerWorkspaceProvider>
+      </TableNavigationPreparationProvider>
     </RuntimeScopeExitGuardProvider>
   )
 }

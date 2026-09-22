@@ -14,9 +14,12 @@ function Content({ ready }: { ready: boolean }): React.ReactElement {
   return <div>Workspace</div>
 }
 
-function boundary(ready: boolean): React.ReactElement {
+function boundary(ready: boolean, readinessKey?: string): React.ReactElement {
   return (
-    <ConnectionContentBoundary fallback={<div role="status">Loading</div>}>
+    <ConnectionContentBoundary
+      fallback={<div role="status">Loading</div>}
+      readinessKey={readinessKey}
+    >
       <Content ready={ready} />
     </ConnectionContentBoundary>
   )
@@ -47,5 +50,15 @@ describe('ConnectionContentBoundary', () => {
     rerender(boundary(false))
 
     expect(screen.queryByRole('status')).toBeNull()
+  })
+
+  it('hides a new route identity until that exact content reports ready', () => {
+    const { rerender } = render(boundary(true, 'accounts:1'))
+    expect(screen.queryByRole('status')).toBeNull()
+
+    rerender(boundary(false, 'accounts:2'))
+
+    expect(screen.getByRole('status').textContent).toBe('Loading')
+    expect(screen.getByText('Workspace').parentElement?.getAttribute('aria-hidden')).toBe('true')
   })
 })

@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute, useSearch } from '@tanstack/react-router'
 
 import { formatStudioDocumentTitle } from '@shared/documentTitle'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
@@ -9,7 +9,7 @@ import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHist
 import { createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
 import { TableExplorerScreen } from '@tables/view'
-import { canonicalizeTableRouteSearch } from '@tables/routing/tableRowsSearch'
+import { canonicalizeTableRouteSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
 
 import { ConnectionRouteLoading } from '../-connectionRouteStatus'
 
@@ -29,17 +29,25 @@ export const Route = createFileRoute('/conn/$connectionId/tables')({
  * layer consumes runtime projections; it does not resolve or initialize the connection.
  */
 function TablesWorkspaceLayout(): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+  const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
+    useInspectorSessionState()
+  const routeSearch = useSearch({ strict: false })
   const workspaceScope = createTableWorkspaceScope({
     branch: currentBranch,
     connectionId: currentConnectionId,
     schemaHash: currentSchemaHash,
   })
+  const readinessKey = JSON.stringify([
+    currentTableName,
+    routeSearch.empty,
+    toTableTabSearch(routeSearch),
+  ])
 
   return (
     <ConnectionContentBoundary
       key={workspaceScope}
       fallback={<ConnectionRouteLoading />}
+      readinessKey={readinessKey}
     >
       <TableMutationLedgerWorkspaceProvider>
         <TableNavigationHistoryProvider>

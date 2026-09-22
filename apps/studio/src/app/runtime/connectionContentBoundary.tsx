@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useLayoutEffect, useState } from 'react'
 
 import { Box } from '@inspektor/ds'
 
@@ -9,16 +9,18 @@ const ConnectionContentReadyContext = createContext<(() => void) | null>(null)
 interface ConnectionContentBoundaryProps {
   children: React.ReactNode
   fallback: React.ReactNode
+  readinessKey?: string
 }
 
 export function ConnectionContentBoundary({
   children,
   fallback,
+  readinessKey = 'connection-content',
 }: ConnectionContentBoundaryProps): React.ReactElement {
-  const [contentReady, setContentReady] = useState(false)
+  const [readyKey, setReadyKey] = useState<string | null>(null)
   const runtimeError = useRuntimeError()
-  const reportReady = useCallback(() => setContentReady(true), [])
-  const contentVisible = contentReady === true || runtimeError !== null
+  const reportReady = useCallback(() => setReadyKey(readinessKey), [readinessKey])
+  const contentVisible = readyKey === readinessKey || runtimeError !== null
 
   return (
     <ConnectionContentReadyContext.Provider value={reportReady}>
@@ -39,7 +41,7 @@ export function ConnectionContentBoundary({
 export function useConnectionContentReady(ready: boolean): void {
   const reportReady = useContext(ConnectionContentReadyContext)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ready === true) reportReady?.()
   }, [ready, reportReady])
 }

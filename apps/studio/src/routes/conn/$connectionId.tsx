@@ -17,6 +17,8 @@ import { getConnectionById, readStoredConnections } from '@app/connections/conne
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
+import { TableNavigationPreparationProvider } from '@tables/routing/tableNavigationPreparation'
+import { createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableCommands } from '@tables/workspace/tableCommands'
 
 import { ConnectionRouteError, ConnectionRouteLoading } from './-connectionRouteStatus'
@@ -90,8 +92,14 @@ function ConnectionNotFoundRoute(): React.ReactElement {
 
 function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()
-  const isLiveQueriesRoute = useRouterState({
-    select: (state) => state.location.pathname.endsWith('/live-queries'),
+  const location = useRouterState({
+    select: (state) => state.location,
+  })
+  const isLiveQueriesRoute = location.pathname.endsWith('/live-queries')
+  const workspaceScope = createTableWorkspaceScope({
+    branch: target.branch,
+    connectionId: target.connectionId,
+    schemaHash: target.schemaHash,
   })
 
   return (
@@ -99,10 +107,15 @@ function InspectorRuntimeRoute(): React.ReactElement {
       target={target}
       fallback={<ConnectionRouteLoading />}
     >
-      <InspectorLayout pageTitle={isLiveQueriesRoute === true ? 'Live queries' : 'Tables'}>
-        {isLiveQueriesRoute === true ? <TableCommands /> : null}
-        <Outlet />
-      </InspectorLayout>
+      <TableNavigationPreparationProvider
+        identity={location.href}
+        scope={workspaceScope}
+      >
+        <InspectorLayout pageTitle={isLiveQueriesRoute === true ? 'Live queries' : 'Tables'}>
+          {isLiveQueriesRoute === true ? <TableCommands /> : null}
+          <Outlet />
+        </InspectorLayout>
+      </TableNavigationPreparationProvider>
     </InspectorRuntimeBoundary>
   )
 }
