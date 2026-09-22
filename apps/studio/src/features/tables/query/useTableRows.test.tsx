@@ -8,7 +8,9 @@ import { useTableRows } from '@tables/query/useTableRows'
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import type { DynamicTableRow } from '@tables/tableTypes'
 
-const { useJazzQueryStateMock } = vi.hoisted(() => ({
+const { prefetchJazzQueryMock, releasePrefetchMock, useJazzQueryStateMock } = vi.hoisted(() => ({
+  prefetchJazzQueryMock: vi.fn(),
+  releasePrefetchMock: vi.fn(),
   useJazzQueryStateMock: vi.fn(),
 }))
 
@@ -58,6 +60,10 @@ vi.mock('@tables/query/useJazzQueryState', () => ({
   useJazzQueryState: useJazzQueryStateMock,
 }))
 
+vi.mock('@tables/query/prefetchJazzQuery', () => ({
+  prefetchJazzQuery: prefetchJazzQueryMock,
+}))
+
 function useTestTableRows(
   options: Omit<
     Parameters<typeof useTableRows>[0],
@@ -103,6 +109,12 @@ beforeEach(() => {
     },
   }
   useJazzQueryStateMock.mockReset()
+  prefetchJazzQueryMock.mockClear()
+  releasePrefetchMock.mockReset()
+  prefetchJazzQueryMock.mockReturnValue({
+    promise: Promise.resolve([]),
+    release: releasePrefetchMock,
+  })
   useJazzQueryStateMock.mockImplementation(() =>
     queryError === null
       ? queryRows === undefined
@@ -117,6 +129,72 @@ afterEach(() => {
 })
 
 describe('useTableRows', () => {
+  it('prefetches one exact next page after the default page settles', () => {
+    queryRows = Array.from({ length: 101 }, (_, index) => ({ id: `row-${index}` }))
+
+    const { unmount } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+
+    expect(prefetchJazzQueryMock).toHaveBeenCalledOnce()
+    const prefetchCall = prefetchJazzQueryMock.mock.lastCall as unknown as [
+      JazzClient,
+      { limitValue: number; offsetValue: number },
+      unknown,
+    ]
+    expect(prefetchCall[0]).toBe(runtimeClient)
+    expect(prefetchCall[1]).toMatchObject({
+      limitValue: 101,
+      offsetValue: 100,
+    })
+    expect(prefetchCall[2]).toBe(INSPEKTOR_QUERY_OPTIONS)
+
+    unmount()
+    expect(releasePrefetchMock).toHaveBeenCalledOnce()
+  })
+
+  it('does not automatically prefetch large pages or a final page', () => {
+    queryRows = [{ id: 'row-1' }]
+    const { rerender } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+
+    expect(prefetchJazzQueryMock).not.toHaveBeenCalled()
+
+    pageSize = 500
+    queryRows = Array.from({ length: 501 }, (_, index) => ({ id: `row-${index}` }))
+    rerender()
+
+    expect(prefetchJazzQueryMock).not.toHaveBeenCalled()
+  })
+
+  it('releases and reacquires lookahead ownership when the runtime scope changes', () => {
+    queryRows = Array.from({ length: 101 }, (_, index) => ({ id: `row-${index}` }))
+    const { rerender } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey,
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    scopeKey = 'schema-2'
+    rerender()
+
+    expect(releasePrefetchMock).toHaveBeenCalledOnce()
+    expect(prefetchJazzQueryMock).toHaveBeenCalledTimes(2)
+  })
+
   it('projects schema and provenance columns into table columns', () => {
     schemaColumns = [{ name: 'name', column_type: { type: 'Text' }, nullable: false }]
 
@@ -523,7 +601,10 @@ describe('useTableRows', () => {
       (row, index) => ({ id: row.id, index, item: row, kind: RowChangeKind.Added }) as const,
     )
 
-    onDelta({ all: [insertedRow, equalBoundaryRow, invalidDateRow, missingDateRow], delta: changes })
+    onDelta({
+      all: [insertedRow, equalBoundaryRow, invalidDateRow, missingDateRow],
+      delta: changes,
+    })
     onDelta({ all: [insertedRow], delta: [changes[0]!] })
 
     expect(onRowsAdded).toHaveBeenCalledOnce()

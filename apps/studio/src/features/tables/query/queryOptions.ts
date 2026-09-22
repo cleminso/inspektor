@@ -1,4 +1,4 @@
 import type { QueryOptions } from 'jazz-tools'
 
-/** Waits for the serving authority before presenting populated or empty table results. */
+/** Requests a remote-tier opening; the canonical Jazz entry defines fulfillment readiness. */
 export const INSPEKTOR_QUERY_OPTIONS = { tier: 'remote' } as const satisfies QueryOptions

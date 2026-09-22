@@ -11,10 +11,8 @@ import type { JazzClient } from 'jazz-tools/client'
 import { RowChangeKind } from 'jazz-tools/shared'
 
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
-import {
-  buildTableRowsQuery,
-  isTableColumnSortable,
-} from '@tables/query/tableRowsQuery'
+import { prefetchJazzQuery } from '@tables/query/prefetchJazzQuery'
+import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import { TABLE_PROVENANCE_COLUMNS } from '@tables/tableProvenance'
 import type { DynamicTableRow, TableColumnMeta, TableRowsSearchState } from '@tables/tableTypes'
@@ -172,9 +170,7 @@ export function useTableRows({
         onRowsUpdated?.(updatedRows)
       }
       if (delta.all !== undefined) {
-        liveRowsByIdRef.current = new Map(
-          delta.all.slice(0, pageSize).map((row) => [row.id, row]),
-        )
+        liveRowsByIdRef.current = new Map(delta.all.slice(0, pageSize).map((row) => [row.id, row]))
       } else {
         const nextRowsById = new Map(liveRowsByIdRef.current)
         for (const change of delta.delta) {
@@ -196,6 +192,41 @@ export function useTableRows({
   }, [pageSize, queryState.data])
   const fulfilledRows = fulfilledPage?.rows
   const fulfilledHasNextPage = fulfilledPage?.hasNextPage ?? false
+  useEffect(() => {
+    if (
+      client === null ||
+      wasmSchema === null ||
+      queryState.status !== 'fulfilled' ||
+      fulfilledHasNextPage === false ||
+      pageSize !== 100
+    ) {
+      return
+    }
+
+    const nextPageQuery = buildTableRowsQuery({
+      filters,
+      page: page + 1,
+      pageSize,
+      schema: wasmSchema,
+      sortColumn,
+      sortDirection,
+      tableName,
+    })
+    const preparation = prefetchJazzQuery(client, nextPageQuery, INSPEKTOR_QUERY_OPTIONS)
+    return preparation.release
+  }, [
+    client,
+    filters,
+    fulfilledHasNextPage,
+    page,
+    pageSize,
+    queryState.status,
+    scopeKey,
+    sortColumn,
+    sortDirection,
+    tableName,
+    wasmSchema,
+  ])
   useLayoutEffect(() => {
     liveRowsByIdRef.current = new Map((fulfilledRows ?? []).map((row) => [row.id, row]))
   }, [fulfilledRows, queryKey])

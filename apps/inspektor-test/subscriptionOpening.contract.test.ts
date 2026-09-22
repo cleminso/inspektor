@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { schema as s } from "jazz-tools";
+import { schema as s, type QueryBuilder } from "jazz-tools";
 import { createInspectorAdminClient } from "jazz-tools/_dev/inspector-client";
 import { deploy, startLocalJazzServer } from "jazz-tools/testing";
 import { describe, expect, it } from "vitest";
@@ -23,7 +23,7 @@ const permissions = s.definePermissions(app, ({ policy }) => {
   policy.records.allowDelete.always();
 });
 
-async function createFixture(seedRecord: boolean) {
+async function createFixture(labels: readonly string[]) {
   const server = await startLocalJazzServer({ inMemory: true });
   try {
     await deploy({
@@ -34,14 +34,17 @@ async function createFixture(seedRecord: boolean) {
       serverUrl: server.url,
     });
 
-    if (seedRecord === true) {
+    if (labels.length > 0) {
       const seedClient = await createInspectorAdminClient({
         adminSecret: server.adminSecret,
         appId: server.appId,
         serverUrl: server.url,
       });
       try {
-        await seedClient.db.insert(app.records, { label: "Remote record" }).wait({ tier: "edge" });
+        for (const [index, label] of labels.entries()) {
+          const id = `10000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`;
+          await seedClient.db.insert(app.records, { label }, { id }).wait({ tier: "global" });
+        }
       } finally {
         await seedClient.shutdown();
       }
@@ -57,11 +60,12 @@ async function createFixture(seedRecord: boolean) {
 async function readFirstSubscriptionSnapshot(
   client: Awaited<ReturnType<typeof createInspectorAdminClient>>,
   tier: "local-first" | "remote",
+  query: QueryBuilder<s.RowOf<typeof app.records>> = app.records,
 ) {
   let unsubscribe: () => void = () => undefined;
   const firstSnapshot = new Promise<s.RowOf<typeof app.records>[]>((resolve, reject) => {
     unsubscribe = client.db.subscribe(
-      app.records,
+      query,
       {
         onUpdate: resolve,
         onError: reject,
@@ -78,7 +82,7 @@ async function readFirstSubscriptionSnapshot(
 
 describe("alpha.56 subscription openings", () => {
   it("opens a populated remote subscription with the authoritative rows", async () => {
-    const server = await createFixture(true);
+    const server = await createFixture(["Remote record"]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
 
     try {
@@ -96,8 +100,30 @@ describe("alpha.56 subscription openings", () => {
     }
   });
 
+  it.fails("opens a sorted page only after the authoritative rows are available", async () => {
+    const server = await createFixture(["Charlie", "Alpha", "Bravo"]);
+    let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
+
+    try {
+      client = await createInspectorAdminClient({
+        adminSecret: server.adminSecret,
+        appId: server.appId,
+        serverUrl: server.url,
+      });
+      const query = app.records.orderBy("label", "asc").orderBy("id", "asc").limit(2).offset(1);
+
+      await expect(readFirstSubscriptionSnapshot(client, "remote", query)).resolves.toEqual([
+        expect.objectContaining({ label: "Bravo" }),
+        expect.objectContaining({ label: "Charlie" }),
+      ]);
+    } finally {
+      await client?.shutdown();
+      await server.stop();
+    }
+  });
+
   it("confirms an authoritative empty remote subscription", async () => {
-    const server = await createFixture(false);
+    const server = await createFixture([]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
     let unsubscribe: () => void = () => undefined;
 
@@ -147,7 +173,7 @@ describe("alpha.56 subscription openings", () => {
   });
 
   it("preserves the immediate local opening for a fresh memory client", async () => {
-    const server = await createFixture(true);
+    const server = await createFixture(["Remote record"]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
 
     try {
@@ -164,7 +190,7 @@ describe("alpha.56 subscription openings", () => {
   });
 
   it("maintains remote updates through final-row deletion and client replacement", async () => {
-    const server = await createFixture(false);
+    const server = await createFixture([]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
     let writer: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
     let unsubscribe: () => void = () => undefined;

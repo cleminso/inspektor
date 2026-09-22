@@ -1,7 +1,7 @@
 import type { QueryBuilder, QueryOptions } from 'jazz-tools'
 import { getSubscriptionStore, type JazzClient } from 'jazz-tools/client'
 import type { SubscriptionDelta } from 'jazz-tools/shared'
-import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 
 /** Stable state projection exposed by one Jazz subscription-store cache entry. */
 export type JazzQueryState<T> =
@@ -32,7 +32,10 @@ export function useJazzQueryState<T extends { id: string }>(
   // Use Jazz's attached subscription store instead of relying on client internals.
   const store = client === null ? null : getSubscriptionStore(client)
   // Computing a key is render-safe; registering the query is deferred to subscription setup.
-  const key = store !== null && query !== undefined ? store.computeKey(query, options) : null
+  const key = useMemo(
+    () => (store !== null && query !== undefined ? store.computeKey(query, options) : null),
+    [options, query, store],
+  )
   const inputsRef = useRef({ query, options, onDelta })
   // Subscription callbacks must use committed inputs without changing subscription identity.
   useLayoutEffect(() => {
