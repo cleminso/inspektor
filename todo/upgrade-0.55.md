@@ -5,7 +5,6 @@
 - [Summary](#summary)
 - [Release behavior](#release-behavior)
 - [Implemented adoption](#implemented-adoption)
-- [Known blocker](#known-blocker)
 - [Remaining finalization](#remaining-finalization)
 - [Validation](#validation)
 - [References](#references)
@@ -32,24 +31,13 @@ current schema, package, and Inspektor Test documentation.
 - [x] Recheck the admin-client, subscription-store, query-option, and shutdown APIs used by Inspektor.
 - [x] Update current-state Jazz lifecycle documentation.
 
-## Known blocker
-
-Jazz alpha.55 rejects native writes to top-level `s.json()` fixture columns. This is tracked upstream in
-[Jazz issue #1865](https://github.com/garden-co/jazz/issues/1865). Keep the fixture and its coverage intact
-rather than changing JSON fields or skipping assertions.
-
-This blocks:
-
-- the complete `inspektor-test` suite
-- Playwright acceptance, whose setup seeds the same fixture
-
-The blocker is resolved when a compatible Jazz build accepts the existing deterministic JSON writes.
+The nullable JSON blocker and its upstream tracking are recorded in
+[the alpha.57 upgrade note](./upgrade-0.57.md).
 
 ## Remaining finalization
 
-- [ ] Upgrade to a Jazz build that fixes native top-level `s.json()` writes.
-- [ ] Run the complete Inspektor Test suite and Playwright acceptance after that fix.
-- [x] Run the final repository validation and diff review, recording the upstream JSON blocker.
+- [ ] Upgrade to a Jazz build that fixes the nullable JSON blocker recorded in the [alpha.57 upgrade note](./upgrade-0.57.md).
+- [x] Run the final repository validation and diff review.
 
 ## Validation
 
@@ -62,12 +50,11 @@ The blocker is resolved when a compatible Jazz build accepts the existing determ
 - [x] Verify the hosted WASM digest, MIME type, immutable caching, and compressed delivery.
 - [x] Run the production dependency audit.
 - [x] Run `lat check`.
-- [ ] Run the complete Inspektor Test suite after the JSON blocker is resolved.
-- [ ] Run Playwright acceptance after the JSON blocker is resolved.
 
 ## References
 
 - [Jazz alpha.54 migration](./upgrade-0.54.md)
+- [Jazz alpha.57 JSON blocker](./upgrade-0.57.md)
 - [Table row query lifecycle](../lat.md/tableRowsQueryLifecycle.md#authority-settled-openings)
 - [Jazz live-query and subscription telemetry](../lat.md/query-subscriptions.md)
 - [Inspektor Test](../apps/inspektor-test/README.md)
