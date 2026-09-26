@@ -11,8 +11,8 @@
 
 ## Summary
 
-This document records the historical alpha.55 adoption. The workspace now resolves Jazz
-`2.0.0-alpha.56`; its explicit relationship migration and current validation are recorded in the
+This document records the historical alpha.55 adoption. The workspace resolves Jazz
+`2.0.0-alpha.57`; its explicit relationship migration and current validation are recorded in the
 current schema, package, and Inspektor Test documentation.
 
 ## Release behavior

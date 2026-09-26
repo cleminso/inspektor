@@ -22,7 +22,7 @@ interface UseTableMutationExecutorOptions {
  * exposes mutation commands. For example, an update `{ name: "Grace" }` reaches Jazz as a
  * one-column patch; this hook never reconstructs the rest of the row.
  *
- * Each write waits for edge durability so the mutation ledger advances only after server
+ * Each write waits for global durability so the mutation ledger advances only after server
  * acceptance. Branch-aware mutations remain incomplete because this executor supplies no
  * operation-scoped head or base options.
  */
@@ -54,16 +54,16 @@ export function useTableMutationExecutor({
       const runtime = getRuntime()
       const insertedRow = await runtime.client.db
         .insert(runtime.tableProxy, values)
-        .wait({ tier: 'edge' })
+        .wait({ tier: 'global' })
       return insertedRow.id
     },
     updateRow: async (rowId: string, values: Record<string, unknown>) => {
       const runtime = getRuntime()
-      await runtime.client.db.update(runtime.tableProxy, rowId, values).wait({ tier: 'edge' })
+      await runtime.client.db.update(runtime.tableProxy, rowId, values).wait({ tier: 'global' })
     },
     deleteRow: async (rowId: string) => {
       const runtime = getRuntime()
-      await runtime.client.db.delete(runtime.tableProxy, rowId).wait({ tier: 'edge' })
+      await runtime.client.db.delete(runtime.tableProxy, rowId).wait({ tier: 'global' })
     },
   }
 }

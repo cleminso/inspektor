@@ -80,7 +80,7 @@ async function readFirstSubscriptionSnapshot(
   }
 }
 
-describe("alpha.56 subscription openings", () => {
+describe("alpha.57 subscription openings", () => {
   it("opens a populated remote subscription with the authoritative rows", async () => {
     const server = await createFixture(["Remote record"]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;
@@ -150,7 +150,7 @@ describe("alpha.56 subscription openings", () => {
                 }
                 void activeClient.db
                   .insert(app.records, { label: "Inserted after empty opening" })
-                  .wait({ tier: "edge" })
+                  .wait({ tier: "global" })
                   .catch(reject);
                 return;
               }
@@ -210,7 +210,7 @@ describe("alpha.56 subscription openings", () => {
       writer = mutationClient;
       const inserted = await mutationClient.db
         .insert(app.records, { label: "Initial label" })
-        .wait({ tier: "edge" });
+        .wait({ tier: "global" });
 
       const finalSnapshot = new Promise<s.RowOf<typeof app.records>[]>((resolve, reject) => {
         let phase: "opening" | "updated" | "deleted" = "opening";
@@ -228,7 +228,7 @@ describe("alpha.56 subscription openings", () => {
                 phase = "updated";
                 void mutationClient.db
                   .update(app.records, inserted.id, { label: "Updated label" })
-                  .wait({ tier: "edge" })
+                  .wait({ tier: "global" })
                   .catch(reject);
                 return;
               }
@@ -243,7 +243,7 @@ describe("alpha.56 subscription openings", () => {
                 phase = "deleted";
                 void mutationClient.db
                   .delete(app.records, inserted.id)
-                  .wait({ tier: "edge" })
+                  .wait({ tier: "global" })
                   .catch(reject);
                 return;
               }
@@ -262,7 +262,7 @@ describe("alpha.56 subscription openings", () => {
       client = undefined;
       await mutationClient.db
         .insert(app.records, { label: "Replacement opening" })
-        .wait({ tier: "edge" });
+        .wait({ tier: "global" });
 
       const replacementClient = await createInspectorAdminClient({
         adminSecret: server.adminSecret,
@@ -334,7 +334,7 @@ describe("alpha.56 subscription openings", () => {
                   });
                   await writer.db
                     .insert(app.records, { label: "After reconnect" })
-                    .wait({ tier: "edge" });
+                    .wait({ tier: "global" });
                 })();
                 void restart.catch(reject);
                 return;

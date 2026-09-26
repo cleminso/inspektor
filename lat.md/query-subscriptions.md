@@ -40,9 +40,8 @@ Product structure and interaction decisions belong in [[lat.md/query-interface#L
 
 The investigation used:
 
-- Jazz source tag `v2.0.0-alpha.56`.
-- Jazz Tools package version `2.0.0-alpha.56`.
-- The installed Inspektor `jazz-tools` declarations.
+- Jazz source tag `v2.0.0-alpha.56` for the original telemetry investigation.
+- The installed Inspektor `jazz-tools` alpha.57 declarations for current read-tier options.
 - The official Jazz Inspektor live-query page.
 - A deployed Jazz Inspektor response containing populated server subscription groups.
 
@@ -160,7 +159,7 @@ Application-facing `QueryOptions` includes:
 
 | Option   | Values                                                                          | Meaning              |
 | -------- | ------------------------------------------------------------------------------- | -------------------- |
-| `tier`   | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Read policy          |
+| `tier`   | `ReadTier.LocalFirst`, `Remote`, `LocalFirstUnlessEmpty`, or legacy durability names | Read policy          |
 | `branch` | scalar or qualified branch                                                      | Branch head          |
 | `base`   | live branch or branch/snapshot pair                                             | Optional branch base |
 
@@ -194,7 +193,7 @@ The execution flow is:
 
 Relevant protocol messages include `RegisterShape`, `Subscribe`, `SubscribeRejected`, `ViewUpdate`, and `Unsubscribe`.
 
-Reconnect behavior includes replaying desired subscriptions and sending known-state declarations. `ReadTier.RemoteIfPossible` uses local fallback after an explicit disconnect; an ordinary transport failure is not equivalent to that fallback.
+Reconnect behavior includes replaying desired subscriptions and sending known-state declarations. `ReadTier.LocalFirstUnlessEmpty` serves non-empty local results immediately; an empty local opening waits for the first remote answer only while a server is reachable or connecting. It falls back to local results when offline or disconnected, and offset queries prefer the server's page when available. Inspektor keeps `ReadTier.Remote` for table reads rather than adopting this different opening policy.
 
 Sources:
 

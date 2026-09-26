@@ -13,6 +13,7 @@ This note records upstream findings, Inspektor policy differences, and the share
 - [Patterns not to copy](#patterns-not-to-copy)
 - [Verified field representation contracts](#verified-field-representation-contracts)
 - [Mutation state table](#mutation-state-table)
+- [Installed optional JSON boundary](#installed-optional-json-boundary)
 - [Nested Row fields](#nested-row-fields)
 - [Deliberate Inspektor policy differences](#deliberate-inspektor-policy-differences)
 - [Structured draft formatting](#structured-draft-formatting)
@@ -123,6 +124,14 @@ Jazz evidence:
 
 Omission is operation-dependent: it requests the stored default during insert and means unchanged during update. Unavailable source data is presentation state, not another spelling of omission.
 
+### Installed optional JSON boundary
+
+Installed Jazz alpha.57 rejects populated and SQL-NULL writes to optional JSON columns. The direct isolated contract keeps the intended mutation semantics distinct from this runtime defect.
+
+Required JSON and omitted optional JSON writes succeed, but populated object writes and explicit SQL-NULL writes to `s.json().optional()` fail with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The independent `apps/inspektor-test/optionalJson.contract.test.ts` exercises these shapes against a fresh in-memory Jazz server; three tests assert that exact failure for populated insert, explicit-null insert, and update from omitted to null. They do not claim to isolate clearing a populated value because creating that prerequisite value fails in this release.
+
+The canonical fixture retains both populated and null optional JSON cases. The root suite runs the focused contract but excludes the complete fixture; a root pass does not establish end-to-end optional JSON or Playwright acceptance. When an optional write succeeds instead of producing the known error, validate it as a positive round trip, then run the complete fixture and browser acceptance. The upstream issue is [#2733](https://github.com/garden-co/jazz/issues/2733); its proposed fix is [PR #3007](https://github.com/garden-co/jazz/pull/3007).
+
 ### Nested Row fields
 
 Jazz's TypeScript `Row` converter processes declared object fields in descriptor order.
@@ -176,6 +185,7 @@ Playwright E2E covers the real inline editor, local staging and Discard, Save, a
 Inspektor follows this acceptance split:
 
 - Pure tests cover state transitions, parsing, nested Row validation, omission, NULL, dirty equality, and payload construction.
+- Isolated Jazz contracts cover optional JSON required/omitted controls and the exact protocol error for unsupported optional writes without involving Inspektor's fixture seeder.
 - Component tests cover control composition, validation timing, focus, keyboard behavior, and local draft preservation.
 - Playwright E2E covers production-only boundaries: route activation, the real deferred structured editor, local staging or discard, and a representative persisted mutation observed after reload.
 - Playwright E2E does not repeat every column type when focused tests exercise the same mutation contract. Add a type-specific E2E case only when that type crosses a distinct browser, deferred-module, focus, or runtime serialization boundary.

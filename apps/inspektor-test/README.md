@@ -80,7 +80,7 @@ The command prints readiness text followed by one JSON object containing the con
 
 Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, repeatable seeding, and server disposal.
 
-Permission tests use `createPolicyTestApp(app, permissions, expect)` from `jazz-tools/testing` and must call `testApp.shutdown()` in teardown. Use `testApp.as(session)` for identity-scoped reads and writes. `expectDenied()` waits for authority rejection when a write can be staged; use a synchronous throw assertion when the loaded policy rejects before staging. `expectAllowed()` only verifies local staging and rolls the write back. Await a write at the `edge` tier when a test needs to prove authority acceptance.
+Permission tests use `createPolicyTestApp(app, permissions, expect)` from `jazz-tools/testing` and must call `testApp.shutdown()` in teardown. Use `testApp.as(session)` for identity-scoped reads and writes. `expectDenied()` waits for authority rejection when a write can be staged; use a synchronous throw assertion when the loaded policy rejects before staging. `expectAllowed()` only verifies local staging and rolls the write back. Await a write at the `global` tier when a test needs to prove authority acceptance.
 
 Inspektor browser acceptance tests run with `pnpm test:e2e`. Playwright owns a built application, a direct loopback server, and an ephemeral Inspektor Test fixture; it never uses the shared cloud connection.
 
@@ -94,10 +94,11 @@ Inspektor browser acceptance tests run with `pnpm test:e2e`. Playwright owns a b
 | `pnpm inspektor-test:seed` | Seed deterministic cloud rows by inserting missing rows and updating existing rows |
 | `pnpm inspektor-test:fixture` | Start an isolated local app |
 | `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission contracts, repeatable seeding, and fixture disposal |
+| `pnpm --filter inspektor-test test:root` | Run the passing schema, data, permission, and isolated Jazz optional-JSON contracts without the blocked full fixture |
 | `pnpm test:e2e` | Run standalone Playwright E2E against built applications and isolated fixtures |
 | `pnpm test:e2e:install` | Install the Playwright Chromium browser |
 
-The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.56` still rejects native writes to top-level `s.json()` columns; this is tracked upstream in [Jazz issue #1865](https://github.com/garden-co/jazz/issues/1865). The complete fixture suite and Playwright acceptance remain blocked until a compatible Jazz release is available. Do not skip or remove those fixture tests to make the package command pass.
+The root `pnpm test` command runs schema, deterministic-data, permissions, and `optionalJson.contract.test.ts` against an isolated Jazz server. The direct contract confirms that required JSON and omitted optional JSON work, and asserts the specific Jazz `2.0.0-alpha.57` protocol error for populated optional JSON inserts, explicit SQL-NULL inserts, and updates from omitted optional JSON to SQL NULL. The complete `inspectorTestFixture.test.ts` suite is excluded from the root command, not removed: seeding still fails with that error. Fixture-dependent Playwright acceptance remains blocked. Track [Jazz issue #2733](https://github.com/garden-co/jazz/issues/2733) and [PR #3007](https://github.com/garden-co/jazz/pull/3007); do not remove the canonical fixture tests or optional JSON cases to make the package command pass. When a direct write succeeds instead of producing the known error, revalidate the complete fixture and browser suites.
 
 ## Dependency security
 

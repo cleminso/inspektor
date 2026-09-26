@@ -40,11 +40,11 @@ describe('useTableMutationExecutor', () => {
     })
 
     expect(insert).toHaveBeenCalledWith(tableProxy, { name: 'Ada' })
-    expect(wait).toHaveBeenCalledWith({ tier: 'edge' })
+    expect(wait).toHaveBeenCalledWith({ tier: 'global' })
     expect(insertedRowId).toBe('row-1')
   })
 
-  it('waits for edge acknowledgement when updating and deleting', async () => {
+  it('waits for global acknowledgement when updating and deleting', async () => {
     const { result } = renderHook(() =>
       useTableMutationExecutor({
         client: runtimeClient as never,
@@ -59,8 +59,8 @@ describe('useTableMutationExecutor', () => {
     })
 
     expect(update).toHaveBeenCalledWith(tableProxy, 'row-1', { name: 'Grace' })
-    expect(updateWait).toHaveBeenCalledWith({ tier: 'edge' })
+    expect(updateWait).toHaveBeenCalledWith({ tier: 'global' })
     expect(deleteRow).toHaveBeenCalledWith(tableProxy, 'row-2')
-    expect(deleteWait).toHaveBeenCalledWith({ tier: 'edge' })
+    expect(deleteWait).toHaveBeenCalledWith({ tier: 'global' })
   })
 })

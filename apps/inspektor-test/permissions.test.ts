@@ -46,11 +46,11 @@ describe("Inspektor Test permissions", () => {
         label: "Public record",
         enabled: true,
       })
-      .wait({ tier: "edge" });
+      .wait({ tier: "global" });
 
     await alice
       .update(app.publicEditableRecords, inserted.id, { enabled: false })
-      .wait({ tier: "edge" });
+      .wait({ tier: "global" });
     await expect(
       alice.all(app.publicEditableRecords.where({ id: inserted.id })),
     ).resolves.toEqual([
@@ -59,7 +59,7 @@ describe("Inspektor Test permissions", () => {
         enabled: false,
       }),
     ]);
-    await alice.delete(app.publicEditableRecords, inserted.id).wait({ tier: "edge" });
+    await alice.delete(app.publicEditableRecords, inserted.id).wait({ tier: "global" });
   });
 
   it("allows reads and rejects mutations for public read-only records", async () => {
@@ -96,7 +96,7 @@ describe("Inspektor Test permissions", () => {
         label: "Alice's record",
         notes: null,
       })
-      .wait({ tier: "edge" });
+      .wait({ tier: "global" });
 
     await expect(
       alice.all(app.creatorManagedRecords.where({ id: inserted.id })),
@@ -106,12 +106,12 @@ describe("Inspektor Test permissions", () => {
     ).resolves.toEqual([]);
     await alice
       .update(app.creatorManagedRecords, inserted.id, { label: "Alice's update" })
-      .wait({ tier: "edge" });
+      .wait({ tier: "global" });
     expect(() =>
       bob.update(app.creatorManagedRecords, inserted.id, { label: "Bob's update" }),
     ).toThrow(/read policy denied UPDATE on table creatorManagedRecords/);
     await bob.expectDenied((db) => db.delete(app.creatorManagedRecords, inserted.id));
-    await alice.delete(app.creatorManagedRecords, inserted.id).wait({ tier: "edge" });
+    await alice.delete(app.creatorManagedRecords, inserted.id).wait({ tier: "global" });
   });
 
   it("enforces old and new row conditions for todo updates and deletes", async () => {
@@ -138,7 +138,7 @@ describe("Inspektor Test permissions", () => {
 
     await alice
       .update(app.todos, incompleteTodo.id, { title: "Allowed update" })
-      .wait({ tier: "edge" });
+      .wait({ tier: "global" });
     await alice.expectDenied((db) =>
       db.update(app.todos, incompleteTodo.id, { done: true }),
     );
@@ -146,6 +146,6 @@ describe("Inspektor Test permissions", () => {
       db.update(app.todos, completedTodo.id, { title: "Denied update" }),
     );
     await alice.expectDenied((db) => db.delete(app.todos, completedTodo.id));
-    await alice.delete(app.todos, incompleteTodo.id).wait({ tier: "edge" });
+    await alice.delete(app.todos, incompleteTodo.id).wait({ tier: "global" });
   });
 });

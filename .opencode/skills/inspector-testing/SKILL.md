@@ -52,7 +52,7 @@ Read `apps/inspektor-test/README.md` before changing its schema, permissions, se
 - Do not deploy, initialize, or seed the cloud app unless the task explicitly includes changing shared fixture state.
 - Keep seeded rows deterministic and replaceable by stable ID.
 - Use `createPolicyTestApp(app, permissions, expect)` from `jazz-tools/testing` for focused schema-permission tests. Use `createInspectorTestFixture()` for schema publication, deterministic seeding, serialization, integration, and browser-boundary tests.
-- Shut down every policy test app in teardown. `expectDenied()` waits for serving-authority rejection when a write can be staged; use a synchronous throw assertion when the loaded policy rejects before staging. `expectAllowed()` only checks local staging and rolls the write back. Await the write at the `edge` tier when positive authority acceptance is part of the contract.
+- Shut down every policy test app in teardown. `expectDenied()` waits for serving-authority rejection when a write can be staged; use a synchronous throw assertion when the loaded policy rejects before staging. `expectAllowed()` only checks local staging and rolls the write back. Await the write at the `global` tier when positive authority acceptance is part of the contract.
 
 ## Browser verification
 
@@ -91,5 +91,5 @@ Reserve persistent browser profiles and saved cloud connections for explicit sha
 - Inspektor Test typecheck: `pnpm --filter inspektor-test typecheck`
 - Inspektor Test cloud validation without publishing: `pnpm inspektor-test:validate`
 - The commands above are safe local validation. `pnpm inspektor-test:deploy`, `pnpm inspektor-test:initialize`, and `pnpm inspektor-test:seed` mutate shared cloud state and require explicit task scope.
-- Root `pnpm test` runs Inspektor Test schema, deterministic-data, and permission coverage but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.56` rejects top-level JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
+- Root `pnpm test` runs Inspektor Test schema, deterministic-data, permission, and focused optional-JSON contracts (including assertions for the known protocol error), but excludes `inspectorTestFixture.test.ts` while Jazz `2.0.0-alpha.57` rejects populated and explicit-null optional JSON fixture writes. Do not treat a root pass as evidence that the complete fixture suite passes, and do not skip or remove the fixture tests.
 - Run the affected package's complete suite after the focused command passes when the execution scope requires it.

@@ -354,12 +354,12 @@ server query activity.
 
 Because of this, the inspektor can work with arbitrary app schemas without importing generated types from the target app.
 
-The inspektor is close to an **admin client talking to the sync system** rather than a purely local debug tool. It's for that the default durability/mutation tier is `edge`
+The inspektor is close to an **admin client talking to the sync system** rather than a purely local debug tool. Row mutations wait for `global` durability so the serving authority accepts them before the ledger advances.
 
 To me, Jazz's in-app overlay and standalone Inspektor answer different problems.
 
 - The overlay joins the host application's local store and identity, which makes it useful for local and unsynced application state.
-- THe standalone Inspektor keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting Live queries.
+- The standalone Inspektor keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting Live queries.
 
 Standalone Inspektor behavior is my product priority here.
 
@@ -585,7 +585,7 @@ navigation. Invalid local input does not start preparation.
 
 Other accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved profile has an available credential and before schema-catalogue discovery. This covers unlocked saved actions, direct URLs, refreshes, and history navigation while avoiding work for unknown or locked profiles.
 
-`jazzWasmPreparation.ts` owns one application-wide promise. Development uses Jazz's bundled WASM resolution. Production calls Jazz's public `loadWasmModule()` API with the exact alpha.56 artifact stored under a content-addressed `assets.inspektor.dev` URL. Repeated accepted actions and React remounts share the same attempt. A failed attempt is cleared so retry can fetch it again. `RuntimeAdminClient` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version and publishing remote asset failures through the existing runtime error boundary.
+`jazzWasmPreparation.ts` owns one application-wide promise. Development uses Jazz's bundled WASM resolution. Production calls Jazz's public `loadWasmModule()` API with the exact alpha.57 artifact stored under a content-addressed `assets.inspektor.dev` URL. Repeated accepted actions and React remounts share the same attempt. A failed attempt is cleared so retry can fetch it again. `RuntimeAdminClient` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version and publishing remote asset failures through the existing runtime error boundary.
 
 The R2 object is public runtime code, not application data or a credential. Its path includes the package version and SHA-256 digest, and its object metadata enables immutable browser caching. Production deployment excludes only Vite's oversized `jazz_wasm_bg-*.wasm` fallback through `public/.assetsignore`; development retains the bundled fallback. The remote bytes must remain exactly paired with the installed `jazz-wasm` package.
 
@@ -1395,7 +1395,7 @@ An out-of-scope `Live`/`Paused` presentation can freeze an Inspektor-owned visib
 subscription continues receiving changes. The paused state can report pending inserted, updated, and deleted rows, then
 reconcile and highlight changes when returning to `Live`. Jazz `Db.disconnect()` and `Db.reconnect()` are not used for this
 feature because they control remote synchronization for the whole database connection rather than one visible table, do not
-freeze local subscription updates, and can leave edge-durability mutations pending.
+freeze local subscription updates, and can leave global-durability mutations pending.
 
 #### Export and advanced copy
 

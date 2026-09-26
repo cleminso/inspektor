@@ -336,7 +336,7 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 
 ### Mutation and transition boundaries
 
-- [x] Send generic inserts, sparse updates, and deletes through `useTableMutations` and Jazz's edge-acknowledged mutation API.
+- [x] Send generic inserts, sparse updates, and deletes through `useTableMutationExecutor` and wait for Jazz's global durability acknowledgement.
 - [x] Protect one active dirty draft through clean, dirty, and saving lifecycle states.
 - [x] Support Save and continue, Discard and continue, Keep editing, and explicit form Cancel.
 - [x] Guard row-target, query-scope, pane, relation, and route transitions without putting field state in the guard.

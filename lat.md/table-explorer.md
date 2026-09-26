@@ -342,17 +342,17 @@ v1 direction:
 
 ## Mutation and insert
 
-Regarde performs mutations through the Jazz runtime `Db` API.
+Inspektor performs mutations through the Jazz runtime `Db` API.
 
-It creates a structural `TableProxy` for the selected table, then calls write methods from `useDb()`.
+It creates a structural `TableProxy` for the selected table, then calls write methods on the runtime client.
 
-Current Regarde flow:
+Current Inspektor flow:
 
-1. `useTableMutations(tableName)` reads `db` from `useDb()`.
+1. `useTableMutationExecutor` reads `db` from the active runtime client.
 2. It creates a table proxy from the selected table and `runtime.wasmSchema`.
-3. Insert calls `db.insert(tableProxy, values).wait({ tier: "edge" })`.
-4. Update calls `db.update(tableProxy, rowId, values).wait({ tier: "edge" })`.
-5. Delete calls `db.delete(tableProxy, rowId).wait({ tier: "edge" })`.
+3. Insert calls `db.insert(tableProxy, values).wait({ tier: "global" })`.
+4. Update calls `db.update(tableProxy, rowId, values).wait({ tier: "global" })`.
+5. Delete calls `db.delete(tableProxy, rowId).wait({ tier: "global" })`.
 
 Relevant Inspektor files:
 

@@ -122,7 +122,7 @@ Prepared ownership remains active through navigation completion and is released 
 
 ## Remote opening contract
 
-The isolated Jazz contract shows alpha.56 suppressing the immediate local-first empty opening for a
+The isolated Jazz contract shows alpha.57 suppressing the immediate local-first empty opening for a
 single-row remote subscription.
 
 The sorted, limited, and offset contract remains an expected failure: remote replay can fulfill on an

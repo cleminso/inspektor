@@ -34,7 +34,7 @@
     "@oxlint/plugins": "1.79.0",
     "@stylexjs/eslint-plugin": "^0.19.1",
     "oxfmt": "^0.68.0",
-    "oxlint": "^1.83.0"
+    "oxlint": "^1.85.0"
   },
   "engines": {
     "node": "^22.18.0 || ^24.11.0 || >=26.0.0"

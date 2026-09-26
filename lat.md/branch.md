@@ -1,6 +1,6 @@
 # Jazz branch behavior
 
-Jazz alpha.56 defines branches through schema columns and selects branch views per query or mutation.
+Jazz alpha.57 defines branches through schema columns and selects branch views per query or mutation.
 
 ## Table of contents
 
