@@ -11,6 +11,7 @@
     "build:preview": "vite build --mode preview && tsc -p tsconfig.app.json --noEmit",
     "preview": "pnpm build:preview && wrangler dev",
     "deploy:worker": "pnpm build && wrangler deploy",
+    "check:worker": "pnpm build && wrangler deploy --dry-run --outdir .wrangler-dist",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",

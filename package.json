@@ -28,7 +28,7 @@
     "test": "pnpm -r --filter='!inspektor-test' --workspace-concurrency=1 --if-present test && pnpm --filter inspektor-test test:root && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
     "test:e2e": "pnpm --filter inspektor test:e2e && pnpm --filter inspektor.website test:e2e",
     "test:e2e:install": "pnpm --filter inspektor test:e2e:install",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm --filter inspektor check:worker && pnpm --filter inspektor.website check:worker"
   },
   "devDependencies": {
     "@oxlint/plugins": "1.79.0",

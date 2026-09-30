@@ -8,6 +8,7 @@
     "build": "vite build && pnpm typecheck",
     "preview": "pnpm build && wrangler dev",
     "deploy:worker": "pnpm build && wrangler deploy",
+    "check:worker": "pnpm build && wrangler deploy --dry-run --outdir .wrangler-dist",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",

@@ -34,7 +34,7 @@ This checklist records production asset-delivery requirements that cannot be val
 
 [07/09/26]
 
-- [ ] Define privacy-safe production error and availability observability without collecting connection credentials, inspected data, or Jazz server responses.
+- [ ] Define privacy-safe production error and availability observability without collecting connection credentials, inspected data, or Jazz server responses. Cloudflare platform logs and sampled traces are enabled, but this policy still needs to govern application-level diagnostics.
 
 ## Work outside the foundation scope
 

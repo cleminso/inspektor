@@ -95,7 +95,7 @@ Inspektor v1:
 - does not replace Jazz's in-app Inspektor overlay. The standalone Inspektor focuses on remote admin exploration, while the overlay focuses on an application's local identity, local store, and active development context. Their user experiences may share foundations without becoming the same product surface.
 - does not generate or import app-specific query builders, table views, or custom admin screens
 - remains schema-driven and generic.
-- does not implement traces, logs, metrics collection, or a dedicated telemetry query endpoint. Those belong to a later telemetry-focused version.
+- does not implement application traces, logs, metrics collection, or a dedicated telemetry query endpoint. Cloudflare Workers platform logs and sampled traces are enabled for deployment diagnostics, but they are not an Inspektor or Jazz telemetry surface.
 
 ## Architecture diagram
 
@@ -1793,7 +1793,7 @@ Not v1:
 - row bookmarks
 - snapshot history
 - query playground
-- traces, logs, and metrics
+- application traces, logs, and metrics
 
 ### Bootstrap runtime
 
