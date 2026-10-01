@@ -80,7 +80,7 @@ async function readFirstSubscriptionSnapshot(
   }
 }
 
-describe("alpha.57 subscription openings", () => {
+describe("subscription openings", () => {
   it("opens a populated remote subscription with the authoritative rows", async () => {
     const server = await createFixture(["Remote record"]);
     let client: Awaited<ReturnType<typeof createInspectorAdminClient>> | undefined;

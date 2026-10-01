@@ -12,7 +12,7 @@
 ## Summary
 
 This document records the historical alpha.55 adoption. The workspace resolves Jazz
-`2.0.0-alpha.57`; its explicit relationship migration and current validation are recorded in the
+`2.0.0-alpha.57` for that upgrade; its explicit relationship migration and current validation are recorded in the
 current schema, package, and Inspektor Test documentation.
 
 ## Release behavior
@@ -36,7 +36,8 @@ The nullable JSON blocker and its upstream tracking are recorded in
 
 ## Remaining finalization
 
-- [ ] Upgrade to a Jazz build that fixes the nullable JSON blocker recorded in the [alpha.57 upgrade note](./upgrade-0.57.md).
+- [ ] [superseded] Upgrade to a Jazz build that fixes the nullable JSON blocker.
+  - Continued in [Jazz alpha.58](./update-0.58.md#remaining-blockers); alpha.58 fixes populated writes, but explicit SQL-NULL writes remain blocked by Jazz issue #2733.
 - [x] Run the final repository validation and diff review.
 
 ## Validation

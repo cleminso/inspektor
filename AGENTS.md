@@ -36,10 +36,12 @@ Before editing files for a substantial task that changes TanStack behavior or di
 - Treat Lat as navigation, not proof. Verify implementation claims against source, tests, manifests, generated output, or runtime behavior as applicable. Report conflicts.
 - When a change alters documented behavior, architecture, tests, or accepted decisions, update the relevant current-state Lat sections and run `lat check`.
 - Keep long-lived component checklists in `todo/`, bounded lifecycle plans in `specs/<camelCase>/plan.md`, optional plan detail beside them, and supporting evidence in `research/`. Spec folders without `plan.md` are legacy accepted specifications, not lifecycle plans. Do not use `lat.md/` as a changelog or task ledger.
+- Load the `todo` skill before creating or modifying `todo/` checklists. Add only durable, owned, actionable work; use plain prose for exclusions and link cross-cutting blockers to one canonical owner.
 
 ## Skill routing
 
 - Load `inspektor-workflow` before planning, implementing, validating, debugging, optimizing performance, reviewing, or preparing repository changes for commit.
+- Load `todo` when creating, editing, reviewing, or querying `todo/` checklists or recording implementation discoveries.
 - Load `typescript-discipline` when changing TypeScript configuration, domain or state models, reusable or public types, boundary parsing, or code that relies on assertions or custom narrowing.
 - Load `product-design` for user-visible product or design decisions and UI implementation checklists.
 - Load `create-inspector-component` when adding or changing `@inspektor/ds` components, public component APIs, Base UI wrappers, or StyleX component behavior.

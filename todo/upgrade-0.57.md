@@ -40,7 +40,7 @@ Omitting those fields avoided the unsupported native write while preserving the 
 - [x] Replace deprecated `edge` write waits with `global` in Studio and the isolated contracts.
 - [x] Verify remote subscription contracts against alpha.57; the sorted, limited, offset opening remains an expected failure.
 - [x] Add a focused isolated Jazz contract to root tests with required/omitted controls and exact protocol-error assertions for populated and SQL-NULL optional JSON writes.
-- [ ] Run the complete fixture successfully and unblock fixture-dependent Playwright acceptance when Jazz supports the optional JSON writes.
+- [ ] [superseded] Run the complete fixture successfully and unblock fixture-dependent Playwright acceptance when Jazz supports the optional JSON writes. Continued in [Jazz alpha.58](./update-0.58.md#remaining-blockers).
 
 ## Upstream tracking
 

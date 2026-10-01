@@ -33,8 +33,8 @@ describe('Jazz WASM preparation', () => {
 
     const runtimeSources = {
       wasmUrl:
-        'https://assets.inspektor.dev/jazz/2.0.0-alpha.57/32c4b5643a71e61b7b8fec342c93d237676f734a6f8a1e7dd8a691d107deb707/jazz_wasm_bg.bin',
-      wasmVersion: '32c4b5643a71e61b7b8fec342c93d237676f734a6f8a1e7dd8a691d107deb707',
+        'https://assets.inspektor.dev/jazz/2.0.0-alpha.58/63ed04d114b101758617814fddc47141e08286645cbbf879051ed9d883081ff2/jazz_wasm_bg.bin',
+      wasmVersion: '63ed04d114b101758617814fddc47141e08286645cbbf879051ed9d883081ff2',
     }
     await prepareJazzWasm()
 

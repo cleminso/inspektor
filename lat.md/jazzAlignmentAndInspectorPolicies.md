@@ -126,11 +126,11 @@ Omission is operation-dependent: it requests the stored default during insert an
 
 ### Installed optional JSON boundary
 
-Installed Jazz alpha.57 rejects populated and SQL-NULL writes to optional JSON columns. The direct isolated contract keeps the intended mutation semantics distinct from this runtime defect.
+Installed Jazz alpha.58 accepts populated optional JSON but rejects SQL-NULL writes. The direct isolated contract distinguishes the supported round-trip from this remaining runtime defect.
 
-Required JSON and omitted optional JSON writes succeed, but populated object writes and explicit SQL-NULL writes to `s.json().optional()` fail with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The independent `apps/inspektor-test/optionalJson.contract.test.ts` exercises these shapes against a fresh in-memory Jazz server; three tests assert that exact failure for populated insert, explicit-null insert, and update from omitted to null. They do not claim to isolate clearing a populated value because creating that prerequisite value fails in this release.
+Required JSON, omitted optional JSON, and populated object writes to `s.json().optional()` round-trip. Explicit SQL-NULL inserts and updates from omitted or populated values to null fail with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The independent `apps/inspektor-test/optionalJson.contract.test.ts` exercises these shapes against a fresh in-memory Jazz server.
 
-The canonical fixture retains both populated and null optional JSON cases. The root suite runs the focused contract but excludes the complete fixture; a root pass does not establish end-to-end optional JSON or Playwright acceptance. When an optional write succeeds instead of producing the known error, validate it as a positive round trip, then run the complete fixture and browser acceptance. The upstream issue is [#2733](https://github.com/garden-co/jazz/issues/2733); its proposed fix is [PR #3007](https://github.com/garden-co/jazz/pull/3007).
+The canonical fixture retains both populated and null optional JSON cases. The root suite runs the focused contract but excludes the complete fixture; a root pass does not establish end-to-end optional JSON or Playwright acceptance. When explicit-null writes succeed in a released Jazz build, run the complete fixture and browser acceptance. The upstream issue is [#2733](https://github.com/garden-co/jazz/issues/2733); its proposed fix is [PR #3007](https://github.com/garden-co/jazz/pull/3007).
 
 ### Nested Row fields
 

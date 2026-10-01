@@ -105,17 +105,19 @@ describe("Jazz optional JSON write contract", () => {
     ]);
   });
 
-  it("identifies the protocol rejection for a populated optional JSON value", async () => {
+  it("round-trips a populated optional JSON value", async () => {
     const db = getDb();
-    await expect(async () => {
-      await db
-        .insert(app.documents, {
-          name: "Populated",
-          requiredJson: {},
-          optionalJson: { present: true },
-        })
-        .wait({ tier: "global" });
-    }).rejects.toMatchObject({ message: optionalJsonProtocolError });
+    const row = await db
+      .insert(app.documents, {
+        name: "Populated",
+        requiredJson: {},
+        optionalJson: { present: true },
+      })
+      .wait({ tier: "global" });
+
+    await expect(db.all(app.documents.where({ id: row.id }), { tier: "global" })).resolves.toEqual([
+      expect.objectContaining({ optionalJson: { present: true } }),
+    ]);
   });
 
   it("identifies the protocol rejection for explicit SQL null", async () => {
@@ -134,6 +136,24 @@ describe("Jazz optional JSON write contract", () => {
       .wait({ tier: "global" });
     await expect(db.all(app.documents.where({ id: row.id }), { tier: "global" })).resolves.toEqual([
       expect.objectContaining({ optionalJson: null }),
+    ]);
+    await expect(async () => {
+      await db.update(app.documents, row.id, { optionalJson: null }).wait({ tier: "global" });
+    }).rejects.toMatchObject({ message: optionalJsonProtocolError });
+  });
+
+  it("identifies the protocol rejection for clearing populated optional JSON", async () => {
+    const db = getDb();
+    const row = await db
+      .insert(app.documents, {
+        name: "Cleared",
+        requiredJson: {},
+        optionalJson: { present: true },
+      })
+      .wait({ tier: "global" });
+
+    await expect(db.all(app.documents.where({ id: row.id }), { tier: "global" })).resolves.toEqual([
+      expect.objectContaining({ optionalJson: { present: true } }),
     ]);
     await expect(async () => {
       await db.update(app.documents, row.id, { optionalJson: null }).wait({ tier: "global" });

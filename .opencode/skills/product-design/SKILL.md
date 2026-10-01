@@ -62,7 +62,7 @@ Do not promote one implementation into guidance without evidence that it represe
 
 ## Implementation checklists
 
-Use one `todo/{elementName}.md` file per UI element. Each checklist contains a table of contents and these sections:
+Use one `todo/{elementName}.md` file per UI element. Load the `todo` skill before creating or modifying a checklist. Each checklist contains a table of contents and these sections:
 
 - Implemented foundation
 - Open product work
@@ -76,9 +76,12 @@ For each implementation:
 1. Create or update the relevant checklist.
 2. Add a `[DD/MM/YY]` block above older blocks in the affected section; never rewrite an existing block's date.
 3. Mark completed work with `[x]`.
-4. Record newly discovered open work, exclusions, or design decisions instead of implementing them without approval.
-5. Do not implement items marked as open or out of scope unless the user explicitly requests them.
-6. Route ideas for another UI element to that element's checklist.
+4. Record open work only when it has a concrete owner, verified need, clear completion condition, and durable value beyond the current session.
+5. Mark new unchecked items `[ready]`, `[blocked]`, or `[deferred]`; blocked items name their dependency and deferred items name their trigger.
+6. Record exclusions as plain prose, not unchecked tasks.
+7. Link cross-cutting blockers to their canonical owner instead of copying them.
+8. Do not implement items marked as open or out of scope unless the user explicitly requests them.
+9. Route ideas for another UI element to that element's checklist, or leave them unrecorded if they do not meet the admission criteria.
 
 ## Validation
 
