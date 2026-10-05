@@ -126,7 +126,7 @@ Omission is operation-dependent: it requests the stored default during insert an
 
 ### Installed optional JSON boundary
 
-Installed Jazz alpha.58 accepts populated optional JSON but rejects SQL-NULL writes. The direct isolated contract distinguishes the supported round-trip from this remaining runtime defect.
+Installed Jazz alpha.59 accepts populated optional JSON but rejects SQL-NULL writes. The direct isolated contract distinguishes the supported round-trip from this remaining runtime defect.
 
 Required JSON, omitted optional JSON, and populated object writes to `s.json().optional()` round-trip. Explicit SQL-NULL inserts and updates from omitted or populated values to null fail with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The independent `apps/inspektor-test/optionalJson.contract.test.ts` exercises these shapes against a fresh in-memory Jazz server.
 

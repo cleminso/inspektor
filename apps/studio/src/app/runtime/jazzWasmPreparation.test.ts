@@ -1,3 +1,8 @@
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const loadWasmModule = vi.hoisted(() => vi.fn())
@@ -33,14 +38,26 @@ describe('Jazz WASM preparation', () => {
 
     const runtimeSources = {
       wasmUrl:
-        'https://assets.inspektor.dev/jazz/2.0.0-alpha.58/63ed04d114b101758617814fddc47141e08286645cbbf879051ed9d883081ff2/jazz_wasm_bg.bin',
-      wasmVersion: '63ed04d114b101758617814fddc47141e08286645cbbf879051ed9d883081ff2',
+        'https://assets.inspektor.dev/jazz/2.0.0-alpha.59/49d0af280091fa462720a5739431cb516ab4d7cc8ca943faa0279ebcd008f056/jazz_wasm_bg.bin',
+      wasmVersion: '49d0af280091fa462720a5739431cb516ab4d7cc8ca943faa0279ebcd008f056',
     }
     await prepareJazzWasm()
 
     expect(loadWasmModule).toHaveBeenCalledExactlyOnceWith(runtimeSources)
     expect(getJazzWasmRuntimeSources(true)).toEqual(runtimeSources)
     expect(getJazzWasmRuntimeSources(false)).toBeUndefined()
+  })
+
+  it('pins the production artifact to the installed Jazz WASM bytes', async () => {
+    const require = createRequire(import.meta.url)
+    const jazzRequire = createRequire(require.resolve('jazz-tools/package.json'))
+    const wasmPackageDirectory = dirname(jazzRequire.resolve('jazz-wasm/package.json'))
+    const wasmBytes = readFileSync(join(wasmPackageDirectory, 'pkg/jazz_wasm_bg.wasm'))
+    const { getJazzWasmRuntimeSources } = await import('./jazzWasmPreparation')
+
+    expect(getJazzWasmRuntimeSources(true)?.wasmVersion).toBe(
+      createHash('sha256').update(wasmBytes).digest('hex'),
+    )
   })
 
   it('exposes a failed attempt and allows retry', async () => {
