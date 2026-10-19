@@ -1,5 +1,6 @@
 // The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cloneElement, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createSchemaCatalogueLoadError } from '@app/connections/connectionValidation'
@@ -33,6 +34,20 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
     }
   },
   Outlet: () => null,
+  Link: ({
+    children,
+    params,
+    to,
+  }: {
+    children: ReactNode
+    params?: { connectionId: string }
+    to: string
+  }) => (
+    <a href={params === undefined ? to : to.replace('$connectionId', params.connectionId)}>
+      {children}
+    </a>
+  ),
+  useParams: () => ({ connectionId: 'connection-1' }),
   useRouterState: ({ select }: { select: (state: unknown) => unknown }) =>
     select({ location: { pathname: '/conn/connection-1/live-queries' } }),
 }))
@@ -98,6 +113,8 @@ vi.mock('@inspektor/ds', () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
+  ButtonLink: ({ children, render }: { children: ReactNode; render: ReactElement }) =>
+    cloneElement(render, {}, children),
   CopyButton: ({ label }: { label: string }) => <button>{label}</button>,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }))
@@ -311,6 +328,14 @@ describe('connection route', () => {
     render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
 
     expect(screen.getByText('Jazz server connection failed')).toBeTruthy()
+    expect(screen.getByText(/browser allows this site to access the local network/u)).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Edit connection' }).getAttribute('href')).toBe(
+      '/conn/edit/connection-1',
+    )
+    expect(screen.getByRole('link', { name: 'Back to connections' }).getAttribute('href')).toBe(
+      '/conn',
+    )
+    expect(screen.getByRole('button', { name: 'Reconnect' })).toBeTruthy()
     expect(connectionRecovery.reload).not.toHaveBeenCalled()
   })
 
@@ -342,6 +367,7 @@ describe('connection route', () => {
 
     fireEvent(window, new Event('online'))
 
+    expect(screen.queryByText(/browser allows this site to access the local network/u)).toBeNull()
     expect(connectionRecovery.begin).not.toHaveBeenCalled()
     expect(connectionRecovery.reload).not.toHaveBeenCalled()
   })

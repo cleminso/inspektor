@@ -1,7 +1,7 @@
 // The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { useEffect, useState } from 'react'
-import type { ErrorComponentProps } from '@tanstack/react-router'
-import { Accordion, Box, Button, CopyButton, Text } from '@inspektor/ds'
+import { Link, useParams, type ErrorComponentProps } from '@tanstack/react-router'
+import { Accordion, Box, Button, ButtonLink, CopyButton, Text } from '@inspektor/ds'
 import { useTheme } from 'next-themes'
 
 import {
@@ -13,6 +13,7 @@ import {
   beginAutomaticConnectionRecovery,
   reloadConnectionPage,
 } from '@app/connections/connectionRecovery'
+import { appRoutes } from '@app/routing/appRoutes'
 
 export function ConnectionRouteLoading(): React.ReactElement {
   const { resolvedTheme } = useTheme()
@@ -56,6 +57,7 @@ function canRecoverConnectionAutomatically(error: unknown): boolean {
 }
 
 export function ConnectionRouteError({ error }: ErrorComponentProps): React.ReactElement {
+  const { connectionId } = useParams({ from: appRoutes.connection })
   const diagnostics = getSchemaCatalogueDiagnostics(error)
   const connectionError =
     diagnostics === null
@@ -149,15 +151,50 @@ export function ConnectionRouteError({ error }: ErrorComponentProps): React.Reac
           >
             {connectionError.description}
           </Text>
+          {retryWhenOnline === true ? (
+            <Text
+              color="muted"
+              align="center"
+            >
+              If this server runs on your device or local network, check that your browser allows
+              this site to access the local network, then reconnect.
+            </Text>
+          ) : null}
         </Box>
-        <Button
-          type="button"
-          size="s"
-          variant="secondary"
-          onClick={reconnect}
+        <Box
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="center"
+          gap="s"
         >
-          Reconnect
-        </Button>
+          <ButtonLink
+            size="s"
+            variant="primary"
+            render={
+              <Link
+                to={appRoutes.editConnection}
+                params={{ connectionId }}
+              />
+            }
+          >
+            Edit connection
+          </ButtonLink>
+          <Button
+            type="button"
+            size="s"
+            variant="secondary"
+            onClick={reconnect}
+          >
+            Reconnect
+          </Button>
+          <ButtonLink
+            size="s"
+            variant="ghost"
+            render={<Link to={appRoutes.connections} />}
+          >
+            Back to connections
+          </ButtonLink>
+        </Box>
         {diagnostics === null ? null : (
           <Box
             width="full"

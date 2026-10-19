@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[19/10/26]
+
+- [x] Let terminal saved-connection errors exit directly to the failed profile's edit route or the saved connection list without remounting the failed runtime.
+
 [07/09/26]
 
 - [x] Keep failed saved-connection discovery in the route boundary instead of mounting an unverified remembered schema.

@@ -550,9 +550,11 @@ subscriptions can retain stale fulfilled state after transport failure. When a p
 hidden, `InspectorProvider` calls the public `db.reconnect()` once for that hidden episode. This replaces the transport while
 preserving the in-memory client, subscriptions, local writes, and mounted workspace. A reconnect rejection enters the existing
 runtime error retry path, which recreates the scoped client rather than reloading the document.
-If automatic recovery is unavailable or has already run, a viewport-centered route error offers an explicit `Reconnect` action. The error
-includes collapsed, copyable diagnostics limited to the request stage, server origin, response status, attempt count, and browser
-network state; credentials, app IDs, URL paths, and raw upstream details remain hidden.
+If automatic recovery is unavailable or has already run, a viewport-centered route error offers actions to edit the failed
+connection, reconnect it, or return to the saved connection list. Network failures conditionally remind developers to check
+the browser's local-network permission when the server runs on their device or local network. The error includes collapsed,
+copyable diagnostics limited to the request stage, server origin, response status, attempt count, and browser network state;
+credentials, app IDs, URL paths, and raw upstream details remain hidden.
 
 UI representation:
 

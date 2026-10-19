@@ -11,6 +11,13 @@
 
 ## Implemented foundation
 
+[19/10/26]
+
+### Terminal saved-connection recovery
+
+- [x] Keep reconnect available while adding direct routes to edit the failed connection or return to the saved connection list.
+- [x] Explain the browser local-network permission check conditionally for terminal network failures without claiming that every opaque failure is a permission denial.
+
 [15/09/26]
 
 - [x] Size the connection switcher popup to its widest content instead of the medium fixed width.
