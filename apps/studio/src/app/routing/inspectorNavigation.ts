@@ -135,7 +135,7 @@ export async function fetchConnectionSchemaCatalogue(
   return buildSchemaCatalogue(response, latestSchemaHash)
 }
 
-async function fetchConnectionSchemaCatalogueForRoute(
+export async function fetchConnectionSchemaCatalogueWithRetry(
   connection: ConnectionCredentials,
   signal?: AbortSignal,
 ): Promise<readonly SchemaCatalogueRecord[]> {
@@ -151,10 +151,7 @@ async function fetchConnectionSchemaCatalogueForRoute(
       signal?.throwIfAborted()
       const retryDelay = schemaCatalogueRetryDelays[attempts - 1]
       if (retryDelay === undefined || isTransientSchemaFetchError(error) === false) {
-        throw createSchemaCatalogueLoadError(error, {
-          attempts,
-          serverUrl: connection.serverUrl,
-        })
+        throw createSchemaCatalogueLoadError(error)
       }
       await waitForRetry(retryDelay, signal)
     }
@@ -288,7 +285,7 @@ export async function resolveStoredRuntimeTarget({
   ) {
     return handoff.target
   }
-  const schemaCatalogue = await fetchConnectionSchemaCatalogueForRoute(connection, signal)
+  const schemaCatalogue = await fetchConnectionSchemaCatalogueWithRetry(connection, signal)
 
   const schemaHash = resolveDefaultSchemaHash(schemaCatalogue, schemaHashOverride)
   return schemaHash === null ? null : { connectionId, branch, schemaHash, schemaCatalogue }

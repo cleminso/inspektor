@@ -46,7 +46,7 @@ function TablesWorkspaceLayout(): React.ReactElement {
   return (
     <ConnectionContentBoundary
       key={workspaceScope}
-      fallback={<ConnectionRouteLoading />}
+      fallback={<ConnectionRouteLoading message="Loading workspace…" />}
       readinessKey={readinessKey}
     >
       <TableMutationLedgerWorkspaceProvider>

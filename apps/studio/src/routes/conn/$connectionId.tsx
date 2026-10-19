@@ -12,7 +12,9 @@ import {
   resolveStoredRuntimeTarget,
 } from '@app/routing/inspectorNavigation'
 import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
+import { SchemaCatalogueLoadError } from '@app/connections/connectionValidation'
 import { getCredentialSafeRelativeUrl } from '@app/routing/credentialSafeUrl'
+import { appRoutes } from '@app/routing/appRoutes'
 import { getConnectionById, readStoredConnections } from '@app/connections/connections'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
@@ -57,12 +59,32 @@ export const Route = createFileRoute('/conn/$connectionId')({
     if (profile === null) redirectToConnections()
     if (resolveRuntimeConnection(profile) === null) redirectToEditConnection(params.connectionId)
     void prepareJazzWasm()
-    const target = await resolveStoredRuntimeTarget({
-      connectionId: params.connectionId,
-      schemaHashOverride: deps.schemaHash,
-      signal: abortController.signal,
-      store,
-    })
+    let target: Awaited<ReturnType<typeof resolveStoredRuntimeTarget>>
+    try {
+      target = await resolveStoredRuntimeTarget({
+        connectionId: params.connectionId,
+        schemaHashOverride: deps.schemaHash,
+        signal: abortController.signal,
+        store,
+      })
+    } catch (error) {
+      if (error instanceof SchemaCatalogueLoadError) {
+        throw redirect({
+          to: appRoutes.editConnection,
+          params: { connectionId: params.connectionId },
+          search: {
+            recovery: error.reason,
+            returnTo: getCredentialSafeRelativeUrl({
+              pathname: location.pathname,
+              search: location.searchStr,
+              hash: location.hash,
+            }),
+          },
+          replace: true,
+        })
+      }
+      throw error
+    }
     if (target === null) redirectToConnections()
     if (deps.schemaHash !== undefined && deps.schemaHash !== target.schemaHash) {
       const search = new URLSearchParams(location.searchStr)
@@ -79,7 +101,7 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
     return target
   },
-  pendingComponent: ConnectionRouteLoading,
+  pendingComponent: ConnectionRoutePending,
   errorComponent: ConnectionRouteError,
   notFoundComponent: ConnectionNotFoundRoute,
   component: InspectorRuntimeRoute,
@@ -88,6 +110,10 @@ export const Route = createFileRoute('/conn/$connectionId')({
 function ConnectionNotFoundRoute(): React.ReactElement {
   const { connectionId } = Route.useParams()
   return <ConnectionNotFound connectionId={connectionId} />
+}
+
+function ConnectionRoutePending(): React.ReactElement {
+  return <ConnectionRouteLoading message="Checking connection…" />
 }
 
 function InspectorRuntimeRoute(): React.ReactElement {
@@ -105,7 +131,7 @@ function InspectorRuntimeRoute(): React.ReactElement {
   return (
     <InspectorRuntimeBoundary
       target={target}
-      fallback={<ConnectionRouteLoading />}
+      fallback={<ConnectionRouteLoading message="Loading connection…" />}
     >
       <TableNavigationPreparationProvider
         identity={location.href}

@@ -8,6 +8,7 @@ import type { CredentialRetention } from '@app/connections/connections'
 import type { ConnectionFormValues } from './connectionFormTypes'
 
 interface ConnectionFormProps {
+  cancelLabel?: string
   error: ConnectionError | null
   formValues: ConnectionFormValues
   isSubmitting: boolean
@@ -18,9 +19,12 @@ interface ConnectionFormProps {
     value: string,
   ) => void
   onCredentialRetentionChange: (credentialRetention: CredentialRetention) => void
+  submitLabel?: string
+  submittingLabel?: string | null
 }
 
 export function ConnectionForm({
+  cancelLabel = 'Cancel',
   error,
   formValues,
   isSubmitting,
@@ -28,6 +32,8 @@ export function ConnectionForm({
   onSubmit,
   onFieldValueChange,
   onCredentialRetentionChange,
+  submitLabel = 'Save connection',
+  submittingLabel = 'Checking connection…',
 }: ConnectionFormProps): React.ReactElement {
   const serverUrlRef = useRef<HTMLInputElement>(null)
   const appIdRef = useRef<HTMLInputElement>(null)
@@ -131,8 +137,8 @@ export function ConnectionForm({
           >
             <Text variant="label">Store admin secret in sessionStorage</Text>
             <Text color="muted">
-              By default, secret is kept in memory, so the connection is lost on refresh.
-              This option uses sessionStorage so connection survives refresh in this tab.
+              By default, secret is kept in memory, so the connection is lost on refresh. This
+              option uses sessionStorage so connection survives refresh in this tab.
             </Text>
           </Box>
           <Checkbox
@@ -155,7 +161,15 @@ export function ConnectionForm({
           }}
         />
       </Fieldset.Root>
-      {error !== null && error.field === undefined ? (
+      {isSubmitting === true && submittingLabel !== null ? (
+        <Text
+          color="muted"
+          role="status"
+          aria-live="polite"
+        >
+          {submittingLabel}
+        </Text>
+      ) : error !== null && error.field === undefined ? (
         <Box
           flexDirection="column"
           gap="xs"
@@ -183,7 +197,7 @@ export function ConnectionForm({
             disabled={isSubmitting === true}
             loading={isSubmitting === true}
           >
-            Save connection
+            {submitLabel}
           </Button>
         </Box>
         <Box flex={1}>
@@ -195,7 +209,7 @@ export function ConnectionForm({
             onClick={onCancel}
             disabled={isSubmitting === true}
           >
-            Cancel
+            {cancelLabel}
           </Button>
         </Box>
       </Box>

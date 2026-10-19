@@ -259,7 +259,6 @@ describe('resolveStoredRuntimeTarget', () => {
         store: createStore('schema-1'),
       }),
     ).rejects.toMatchObject({
-      attempts: 1,
       reason: 'unknown',
     } satisfies Partial<SchemaCatalogueLoadError>)
     expect(fetchSchemaHashes).toHaveBeenCalledOnce()
@@ -294,9 +293,7 @@ describe('resolveStoredRuntimeTarget', () => {
       store: createStore('schema-1'),
     })
     const expectation = expect(target).rejects.toMatchObject({
-      attempts: 3,
       reason: 'network',
-      status: null,
     } satisfies Partial<SchemaCatalogueLoadError>)
     await vi.runAllTimersAsync()
 

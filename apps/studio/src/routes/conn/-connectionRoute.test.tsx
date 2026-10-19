@@ -87,12 +87,6 @@ vi.mock('@app/shell/layout', () => ({
 }))
 
 vi.mock('@inspektor/ds', () => ({
-  Accordion: Object.assign(({ children }: { children: React.ReactNode }) => <div>{children}</div>, {
-    Header: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-    Item: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    Panel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    Trigger: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
-  }),
   Box: ({
     'aria-atomic': ariaAtomic,
     'aria-label': ariaLabel,
@@ -115,12 +109,11 @@ vi.mock('@inspektor/ds', () => ({
   ),
   ButtonLink: ({ children, render }: { children: ReactNode; render: ReactElement }) =>
     cloneElement(render, {}, children),
-  CopyButton: ({ label }: { label: string }) => <button>{label}</button>,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }))
 
 await import('./$connectionId')
-const { ConnectionRouteError } = await import('./-connectionRouteStatus')
+const { ConnectionRouteError, ConnectionRouteLoading } = await import('./-connectionRouteStatus')
 
 afterEach(() => {
   cleanup()
@@ -136,6 +129,20 @@ afterEach(() => {
 })
 
 describe('connection route', () => {
+  it('announces route loading context visibly', () => {
+    render(<ConnectionRouteLoading message="Checking connection…" />)
+
+    expect(screen.getByRole('status').textContent).toBe('Checking connection…')
+  })
+
+  it('uses connection-checking copy for the route pending state', () => {
+    const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
+
+    render(<PendingComponent />)
+
+    expect(screen.getByRole('status').textContent).toBe('Checking connection…')
+  })
+
   it('loads the runtime target through the stored connection resolver', async () => {
     const target = {
       branch: 'main',
@@ -188,6 +195,46 @@ describe('connection route', () => {
     expect(redirectToEditConnection).toHaveBeenCalledWith('connection-1')
     expect(resolveStoredRuntimeTarget).not.toHaveBeenCalled()
     expect(prepareJazzWasm).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['authorization', new Error('Schema hashes fetch failed: 401 Unauthorized')],
+    ['not-found', new Error('Schema hashes fetch failed: 404 Not Found')],
+    ['network', new TypeError('Failed to fetch')],
+    ['server', new Error('Schema hashes fetch failed: 500 Internal Server Error')],
+    ['invalid-url', new TypeError('Invalid URL')],
+    ['unknown', new Error('Unexpected schema response')],
+  ] as const)('redirects %s startup failures to recovery editing', async (recovery, cause) => {
+    resolveStoredRuntimeTarget.mockRejectedValueOnce(createSchemaCatalogueLoadError(cause))
+    const loader = routeOptions.current?.loader as (options: {
+      abortController: AbortController
+      deps: { schemaHash: string | undefined }
+      location: { hash: string; pathname: string; searchStr: string }
+      params: { connectionId: string }
+    }) => Promise<unknown>
+
+    await expect(
+      loader({
+        abortController: new AbortController(),
+        deps: { schemaHash: 'schema-1' },
+        location: {
+          hash: 'rows',
+          pathname: '/conn/connection-1/tables/people',
+          searchStr: '?schema=schema-1&adminSecret=must-not-leak',
+        },
+        params: { connectionId: 'connection-1' },
+      }),
+    ).rejects.toMatchObject({
+      options: {
+        params: { connectionId: 'connection-1' },
+        replace: true,
+        search: {
+          recovery,
+          returnTo: '/conn/connection-1/tables/people?schema=schema-1#rows',
+        },
+        to: '/conn/edit/$connectionId',
+      },
+    })
   })
 
   it('validates the schema search parameter for loader dependencies', () => {
@@ -272,6 +319,13 @@ describe('connection route', () => {
 
     expect(screen.getByRole('alert').textContent).not.toContain('secret server detail')
     expect(screen.getByText('Connection interrupted')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Edit connection' }).getAttribute('href')).toBe(
+      '/conn/edit/connection-1',
+    )
+    expect(screen.getByRole('link', { name: 'Back to connections' }).getAttribute('href')).toBe(
+      '/conn',
+    )
+    expect(screen.queryByRole('button', { name: 'Technical details' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Reconnect' }))
     expect(connectionRecovery.reload).toHaveBeenCalledOnce()
   })
@@ -287,88 +341,8 @@ describe('connection route', () => {
       />,
     )
 
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toBe('Reconnecting…')
     expect(connectionRecovery.begin).toHaveBeenCalledOnce()
     expect(connectionRecovery.reload).toHaveBeenCalledOnce()
-  })
-
-  it('shows sanitized technical details for schema catalogue failures', () => {
-    const error = createSchemaCatalogueLoadError(
-      new Error(
-        'Schema hashes fetch failed: 503 appId=hidden-app adminSecret=must-not-leak body=private-response',
-      ),
-      { attempts: 3, serverUrl: 'https://v2.sync.jazz.tools/private-path' },
-    )
-
-    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
-
-    expect(screen.getByText('Jazz server is unavailable')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Technical details' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Copy technical details' })).toBeTruthy()
-  })
-
-  it('automatically reloads an exhausted network failure once', () => {
-    connectionRecovery.begin.mockReturnValueOnce(true)
-    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
-      attempts: 3,
-      serverUrl: 'https://v2.sync.jazz.tools',
-    })
-    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
-
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
-    expect(connectionRecovery.begin).toHaveBeenCalledOnce()
-    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
-  })
-
-  it('shows the terminal error after automatic recovery was already attempted', () => {
-    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
-      attempts: 3,
-      serverUrl: 'https://v2.sync.jazz.tools',
-    })
-    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
-
-    expect(screen.getByText('Jazz server connection failed')).toBeTruthy()
-    expect(screen.getByText(/browser allows this site to access the local network/u)).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Edit connection' }).getAttribute('href')).toBe(
-      '/conn/edit/connection-1',
-    )
-    expect(screen.getByRole('link', { name: 'Back to connections' }).getAttribute('href')).toBe(
-      '/conn',
-    )
-    expect(screen.getByRole('button', { name: 'Reconnect' })).toBeTruthy()
-    expect(connectionRecovery.reload).not.toHaveBeenCalled()
-  })
-
-  it('automatically recovers when browser connectivity returns', () => {
-    const online = vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(false)
-    connectionRecovery.begin.mockReturnValueOnce(true)
-    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
-      attempts: 3,
-      serverUrl: 'https://v2.sync.jazz.tools',
-    })
-    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
-
-    expect(connectionRecovery.begin).not.toHaveBeenCalled()
-    online.mockReturnValue(true)
-    fireEvent(window, new Event('online'))
-
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
-    expect(connectionRecovery.begin).toHaveBeenCalledOnce()
-    expect(connectionRecovery.reload).toHaveBeenCalledOnce()
-    online.mockRestore()
-  })
-
-  it('does not automatically recover rejected credentials when connectivity changes', () => {
-    const error = createSchemaCatalogueLoadError(
-      new Error('Schema hashes fetch failed: 403 Forbidden'),
-      { attempts: 1, serverUrl: 'https://v2.sync.jazz.tools' },
-    )
-    render(<ConnectionRouteError error={error} info={{ componentStack: '' }} reset={vi.fn()} />)
-
-    fireEvent(window, new Event('online'))
-
-    expect(screen.queryByText(/browser allows this site to access the local network/u)).toBeNull()
-    expect(connectionRecovery.begin).not.toHaveBeenCalled()
-    expect(connectionRecovery.reload).not.toHaveBeenCalled()
   })
 })

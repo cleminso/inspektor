@@ -2,6 +2,7 @@ import { Box } from '@inspektor/ds'
 import { useNavigate } from '@tanstack/react-router'
 
 import type { StoredConnection } from '@app/connections/connections'
+import type { ConnectionError } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
 
 import { ConnectionForm } from './connectionForm'
@@ -18,15 +19,26 @@ export function AddConnectionView(): React.ReactElement {
 }
 
 interface ConnectionFormViewProps {
+  cancelLabel?: string
   edit?: {
     branch: string
     connection: StoredConnection
     adminSecret: string
+    initialError?: ConnectionError
+    returnTo?: string
   }
   onClose: () => void
+  submitLabel?: string
+  submittingLabel?: string | null
 }
 
-export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): React.ReactElement {
+export function ConnectionFormView({
+  cancelLabel,
+  edit,
+  onClose,
+  submitLabel,
+  submittingLabel,
+}: ConnectionFormViewProps): React.ReactElement {
   const flow = useConnectionFormFlow(edit)
 
   return (
@@ -39,11 +51,14 @@ export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): 
       <ConnectionForm
         error={flow.error}
         formValues={flow.formValues}
+        cancelLabel={cancelLabel}
         isSubmitting={flow.isSubmitting}
         onCancel={onClose}
         onSubmit={flow.submitConnectionForm}
         onFieldValueChange={flow.updateFieldValue}
         onCredentialRetentionChange={flow.updateCredentialRetention}
+        submitLabel={submitLabel}
+        submittingLabel={submittingLabel}
       />
     </Box>
   )

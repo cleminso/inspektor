@@ -163,6 +163,8 @@ Memory holds every active admin secret and other non-restored interactions. Memo
 
 Credentials never belong in route state or local storage. A saved profile without an available memory or tab-session credential opens its edit form with profile metadata populated and the secret empty.
 
+A saved connection whose schema discovery fails replaces the failed content route with the edit form. Its non-secret search state identifies the finite recovery reason and carries only a sanitized return URL scoped to the same connection. The form maps authorization, missing-app, and invalid-URL reasons to repairable fields; reachability, server, and unknown reasons appear once as connection-level recovery notices above the form. Authorization recovery leaves the rejected secret in credential storage until a validated replacement is saved, while presenting an empty secret field to the user.
+
 ## Key decisions
 
 These decisions keep route identity independent from workspace tabs and local layout.

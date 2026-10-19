@@ -216,6 +216,7 @@ export function useTableViewState({
   const isReconnecting =
     queryRecovery.status === 'recovering' ||
     (queryRecovery.status === 'idle' && query.isRecoverableTransportFailure === true)
+  const isConnectionDiagnosisPending = pendingTableName !== null && query.error !== null
   const settledRowsRef = useRef(query.rows)
   useLayoutEffect(() => {
     if (retainDisabledRows === false) {
@@ -814,7 +815,7 @@ export function useTableViewState({
     recentlyAppliedCells,
     recentlyInsertedRowIds,
     detailPaneMode,
-    error: isReconnecting === true ? null : query.error,
+    error: isReconnecting === true || isConnectionDiagnosisPending === true ? null : query.error,
     table,
     rows,
     mutationExecutor: mutations,
@@ -822,7 +823,7 @@ export function useTableViewState({
     pageSize: searchState.pageSize,
     hasNextPage: query.hasNextPage,
     hasCellSelection: cellSelection.length > 0,
-    isInitialLoading: query.isInitialLoading || isReconnecting,
+    isInitialLoading: query.isInitialLoading || isReconnecting || isConnectionDiagnosisPending,
     isPageNavigationPending,
     isReconnecting,
     isRefreshing: query.isRefreshing,

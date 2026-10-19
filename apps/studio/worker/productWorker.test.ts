@@ -19,6 +19,7 @@ describe('product Worker routing', () => {
     ['/conn', '/'],
     ['/conn/', '/'],
     ['/conn/assets/app.js', '/assets/app.js'],
+    ['/conn/theme-bootstrap.js', '/theme-bootstrap.js'],
     ['/conn/saved-connection/tables', '/saved-connection/tables'],
   ])('maps %s into the product asset namespace', async (pathname, assetPathname) => {
     const fetchAsset = vi.fn(async (_request: Request) => new Response('asset'))
@@ -141,6 +142,9 @@ describe('product Worker routing', () => {
       'public, max-age=31536000, immutable, no-transform',
     )
     expect(response.headers.get('Content-Security-Policy')).toContain("default-src 'self'")
+    expect(response.headers.get('Content-Security-Policy')).toContain(
+      "script-src 'self' 'wasm-unsafe-eval'",
+    )
     expect(response.headers.get('Referrer-Policy')).toBe('no-referrer')
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })

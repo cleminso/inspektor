@@ -1,6 +1,6 @@
 import type { ConnectionCredentials } from './connections'
 
-type ConnectionField = 'serverUrl' | 'appId' | 'adminSecret'
+export type ConnectionField = 'serverUrl' | 'appId' | 'adminSecret'
 
 export interface ConnectionError {
   title: string
@@ -16,32 +16,13 @@ export type SchemaCatalogueFailureReason =
   | 'server'
   | 'unknown'
 
-export interface SchemaCatalogueDiagnostics {
-  stage: 'Schema catalogue'
-  server: string
-  response: string
-  attempts: number
-  browserNetwork: 'Online' | 'Offline' | 'Unavailable'
-}
-
 export class SchemaCatalogueLoadError extends Error {
-  readonly attempts: number
   readonly reason: SchemaCatalogueFailureReason
-  readonly server: string
-  readonly status: number | null
 
-  constructor({
-    attempts,
-    reason,
-    server,
-    status,
-  }: Omit<SchemaCatalogueLoadError, 'message' | 'name'>) {
+  constructor(reason: SchemaCatalogueFailureReason) {
     super('Schema catalogue request failed')
     this.name = 'SchemaCatalogueLoadError'
-    this.attempts = attempts
     this.reason = reason
-    this.server = server
-    this.status = status
   }
 }
 
@@ -58,6 +39,38 @@ const INVALID_SERVER_URL_ERROR: ConnectionError = {
   title: 'Invalid server URL',
   description: 'Enter a valid HTTP or HTTPS URL.',
   field: 'serverUrl',
+}
+
+const SCHEMA_CATALOGUE_RECOVERY_ERRORS = {
+  authorization: {
+    title: 'The server rejected this connection',
+    description: 'This admin secret was rejected.',
+    field: 'adminSecret',
+  },
+  'invalid-url': INVALID_SERVER_URL_ERROR,
+  network: {
+    title: 'Jazz server connection failed',
+    description: "Inspektor couldn't reach this server.",
+  },
+  'not-found': {
+    title: "Couldn't find this Jazz app",
+    description: 'This Jazz app could not be found on the server.',
+    field: 'appId',
+  },
+  server: {
+    title: 'Jazz server is unavailable',
+    description: 'This server is currently unavailable.',
+  },
+  unknown: {
+    title: "Couldn't connect to this app",
+    description: 'Check the server URL, app ID, and admin secret.',
+  },
+} satisfies Record<SchemaCatalogueFailureReason, ConnectionError>
+
+export function getSchemaCatalogueRecoveryError(
+  reason: SchemaCatalogueFailureReason,
+): ConnectionError {
+  return SCHEMA_CATALOGUE_RECOVERY_ERRORS[reason]
 }
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -120,103 +133,17 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
 
 export function normalizeSchemaFetchError(error: unknown): ConnectionError {
   if (error instanceof SchemaCatalogueLoadError) {
-    if (error.reason === 'invalid-url') {
-      return INVALID_SERVER_URL_ERROR
-    }
-
-    if (error.reason === 'network') {
-      return {
-        title: 'Jazz server connection failed',
-        description:
-          "Inspektor couldn't reach the Jazz server. Check your network connection and that the server is available, then reconnect.",
-      }
-    }
-
-    if (error.reason === 'server') {
-      return {
-        title: 'Jazz server is unavailable',
-        description:
-          'The Jazz server could not load this app. Check the server status, then reconnect.',
-      }
-    }
+    return getSchemaCatalogueRecoveryError(error.reason)
   }
 
   const status = getHttpErrorStatus(error)
-
-  if (status === 401 || status === 403) {
-    return {
-      title: 'The server rejected this connection',
-      description: 'Check the app ID and admin secret.',
-    }
-  }
-
-  if (status === 404) {
-    return {
-      title: "Couldn't find this Jazz app",
-      description: 'Check the server URL and app ID.',
-    }
-  }
-
-  if (status !== null && status >= 500) {
-    return {
-      title: "Couldn't load schemas",
-      description: 'Check that the server is available, then try again.',
-    }
-  }
-
-  if (error instanceof TypeError && error.message.toLowerCase().includes('invalid url')) {
-    return INVALID_SERVER_URL_ERROR
-  }
-
-  return {
-    title: "Couldn't connect to this app",
-    description: 'Check the server URL, app ID, and admin secret.',
-  }
+  return getSchemaCatalogueRecoveryError(getSchemaCatalogueFailureReason(error, status))
 }
 
-export function createSchemaCatalogueLoadError(
-  error: unknown,
-  options: { attempts: number; serverUrl: string },
-): SchemaCatalogueLoadError {
+export function createSchemaCatalogueLoadError(error: unknown): SchemaCatalogueLoadError {
   const status = getHttpErrorStatus(error)
   const reason = getSchemaCatalogueFailureReason(error, status)
-  let server = 'Invalid server URL'
-
-  try {
-    server = new URL(options.serverUrl).origin
-  } catch {
-    // The validated connection path normally supplies a URL. Do not expose an invalid raw value.
-  }
-
-  return new SchemaCatalogueLoadError({
-    attempts: options.attempts,
-    reason,
-    server,
-    status,
-  })
-}
-
-export function isSchemaCatalogueNetworkError(error: unknown): boolean {
-  return error instanceof SchemaCatalogueLoadError && error.reason === 'network'
-}
-
-export function getSchemaCatalogueDiagnostics(error: unknown): SchemaCatalogueDiagnostics | null {
-  if (error instanceof SchemaCatalogueLoadError === false) {
-    return null
-  }
-
-  return {
-    stage: 'Schema catalogue',
-    server: error.server,
-    response: error.status === null ? 'No response' : `HTTP ${error.status}`,
-    attempts: error.attempts,
-    browserNetwork:
-      typeof navigator === 'undefined'
-        ? 'Unavailable'
-        : navigator.onLine === true
-          ? 'Online'
-          : 'Offline',
-  }
+  return new SchemaCatalogueLoadError(reason)
 }
 
 export function isTransientSchemaFetchError(error: unknown): boolean {

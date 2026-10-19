@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSchemaCatalogueLoadError,
-  getSchemaCatalogueDiagnostics,
   isTransientSchemaFetchError,
   normalizeSchemaFetchError,
   validateConnectionInput,
@@ -103,36 +102,13 @@ describe('validateConnectionInput', () => {
 })
 
 describe('normalizeSchemaFetchError', () => {
-  it('describes exhausted route network failures without blaming credentials', () => {
-    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'), {
-      attempts: 3,
-      serverUrl: 'https://v2.sync.jazz.tools/path',
-    })
+  it('maps exhausted route network failures to the server URL', () => {
+    const error = createSchemaCatalogueLoadError(new TypeError('Failed to fetch'))
 
     expect(normalizeSchemaFetchError(error)).toEqual({
       title: 'Jazz server connection failed',
-      description:
-        "Inspektor couldn't reach the Jazz server. Check your network connection and that the server is available, then reconnect.",
+      description: "Inspektor couldn't reach this server.",
     })
-    expect(getSchemaCatalogueDiagnostics(error)).toEqual({
-      stage: 'Schema catalogue',
-      server: 'https://v2.sync.jazz.tools',
-      response: 'No response',
-      attempts: 3,
-      browserNetwork: expect.stringMatching(/^(Online|Offline|Unavailable)$/),
-    })
-  })
-
-  it('keeps route diagnostics free of credentials and raw server details', () => {
-    const error = createSchemaCatalogueLoadError(
-      new Error('Schema hashes fetch failed: 503 - adminSecret=must-not-leak'),
-      { attempts: 3, serverUrl: 'https://v2.sync.jazz.tools' },
-    )
-    const serialized = JSON.stringify(getSchemaCatalogueDiagnostics(error))
-
-    expect(serialized).toContain('HTTP 503')
-    expect(serialized).not.toContain('must-not-leak')
-    expect(serialized).not.toContain('adminSecret')
   })
 
   it.each([
@@ -148,17 +124,27 @@ describe('normalizeSchemaFetchError', () => {
     expect(isTransientSchemaFetchError(error)).toBe(expected)
   })
 
-  it.each([401, 403])('normalizes direct authorization status %s', (status) => {
-    expect(normalizeSchemaFetchError({ status })).toEqual({
+  it('normalizes rejected admin secrets as a field error', () => {
+    expect(normalizeSchemaFetchError({ status: 401 })).toEqual({
       title: 'The server rejected this connection',
-      description: 'Check the app ID and admin secret.',
+      description: 'This admin secret was rejected.',
+      field: 'adminSecret',
+    })
+  })
+
+  it('normalizes forbidden connections as an admin-secret field error', () => {
+    expect(normalizeSchemaFetchError({ status: 403 })).toEqual({
+      title: 'The server rejected this connection',
+      description: 'This admin secret was rejected.',
+      field: 'adminSecret',
     })
   })
 
   it('normalizes missing Jazz apps', () => {
     expect(normalizeSchemaFetchError({ status: 404 })).toEqual({
       title: "Couldn't find this Jazz app",
-      description: 'Check the server URL and app ID.',
+      description: 'This Jazz app could not be found on the server.',
+      field: 'appId',
     })
   })
 
@@ -169,14 +155,24 @@ describe('normalizeSchemaFetchError', () => {
       ),
     ).toEqual({
       title: 'The server rejected this connection',
-      description: 'Check the app ID and admin secret.',
+      description: 'This admin secret was rejected.',
+      field: 'adminSecret',
     })
   })
 
   it('normalizes status-bearing server errors', () => {
     expect(normalizeSchemaFetchError({ response: { status: 503 } })).toEqual({
-      title: "Couldn't load schemas",
-      description: 'Check that the server is available, then try again.',
+      title: 'Jazz server is unavailable',
+      description: 'This server is currently unavailable.',
+    })
+  })
+
+  it('normalizes classified route failures onto their repair fields', () => {
+    expect(
+      normalizeSchemaFetchError(createSchemaCatalogueLoadError(new TypeError('Failed to fetch'))),
+    ).toEqual({
+      title: 'Jazz server connection failed',
+      description: "Inspektor couldn't reach this server.",
     })
   })
 
@@ -188,18 +184,19 @@ describe('normalizeSchemaFetchError', () => {
     })
   })
 
-  it.each([new TypeError('Failed to fetch'), new Error('Failed to fetch')])(
-    'normalizes opaque fetch failures without claiming a network cause',
-    (error) => {
-      const normalized = normalizeSchemaFetchError(error)
+  it('maps opaque browser fetch failures to the server URL', () => {
+    expect(normalizeSchemaFetchError(new TypeError('Failed to fetch'))).toEqual({
+      title: 'Jazz server connection failed',
+      description: "Inspektor couldn't reach this server.",
+    })
+  })
 
-      expect(normalized).toEqual({
-        title: "Couldn't connect to this app",
-        description: 'Check the server URL, app ID, and admin secret.',
-      })
-      expect(`${normalized.title} ${normalized.description}`).not.toContain('Failed to fetch')
-    },
-  )
+  it('keeps unclassified fetch-like errors connection-wide', () => {
+    expect(normalizeSchemaFetchError(new Error('Failed to fetch'))).toEqual({
+      title: "Couldn't connect to this app",
+      description: 'Check the server URL, app ID, and admin secret.',
+    })
+  })
 
   it('normalizes unknown errors without exposing their contents', () => {
     expect(normalizeSchemaFetchError({ adminSecret: 'must-not-leak' })).toEqual({

@@ -10,6 +10,31 @@ export function getCredentialSafeRelativeUrl({ pathname, search, hash }: UrlPart
   return `${pathname}${sanitizeParameterString(search, '?')}${sanitizeHash(hash)}`
 }
 
+export function getCredentialSafeConnectionReturnUrl(
+  candidate: unknown,
+  connectionId: string,
+): string | null {
+  if (typeof candidate !== 'string') return null
+
+  const baseUrl = new URL('https://inspektor.invalid')
+  let url: URL
+  try {
+    url = new URL(candidate, baseUrl)
+  } catch {
+    return null
+  }
+
+  const connectionPath = `/conn/${encodeURIComponent(connectionId)}`
+  if (
+    url.origin !== baseUrl.origin ||
+    (url.pathname !== connectionPath && url.pathname.startsWith(`${connectionPath}/`) === false)
+  ) {
+    return null
+  }
+
+  return getCredentialSafeRelativeUrl(url)
+}
+
 export function sanitizeCurrentCredentialUrl(): void {
   const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`
   const safeUrl = getCredentialSafeRelativeUrl(window.location)

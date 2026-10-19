@@ -112,6 +112,45 @@ describe('ConnectionForm', () => {
     expect(screen.getByRole('status').textContent).toContain(
       'Check the server URL, app ID, and admin secret.',
     )
+    expect(screen.getByLabelText('Server URL').getAttribute('aria-invalid')).not.toBe('true')
+  })
+
+  it('announces contextual progress while checking the connection', () => {
+    render(
+      <ConnectionForm
+        error={null}
+        formValues={formValues}
+        isSubmitting={true}
+        submittingLabel="Reconnecting…"
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+        onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('status').textContent).toBe('Reconnecting…')
+  })
+
+  it('can rely on the busy submit button without visible progress copy', () => {
+    render(
+      <ConnectionForm
+        error={null}
+        formValues={formValues}
+        isSubmitting={true}
+        submittingLabel={null}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+        onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(screen.queryByText('Reconnecting…')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Save connection' }).getAttribute('aria-busy')).toBe(
+      'true',
+    )
   })
 
   it('uses aria-required and noValidate instead of native required validation', () => {
@@ -206,6 +245,25 @@ describe('ConnectionForm', () => {
         .getAttribute('aria-checked'),
     ).toBe('false')
     expect(screen.queryByLabelText('Default branch')).toBeNull()
+  })
+
+  it('presents credential recovery as a reconnect action', () => {
+    render(
+      <ConnectionForm
+        error={null}
+        formValues={formValues}
+        isSubmitting={false}
+        submitLabel="Reconnect"
+        cancelLabel="Back to connections"
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+        onFieldValueChange={vi.fn()}
+        onCredentialRetentionChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Reconnect' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Back to connections' })).toBeTruthy()
   })
 
   it('lets the user opt in to tab-scoped credential retention', () => {

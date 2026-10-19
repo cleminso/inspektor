@@ -17,6 +17,11 @@
 
 - [x] Keep reconnect available while adding direct routes to edit the failed connection or return to the saved connection list.
 - [x] Explain the browser local-network permission check conditionally for terminal network failures without claiming that every opaque failure is a permission denial.
+- [x] Send classified schema-discovery failures directly to a recovery edit form that exposes field-specific or connection-level feedback, validates the repair, and returns to the interrupted route.
+- [x] Keep network and server failures as one connection-level recovery notice above the form so a syntactically valid Server URL is not marked invalid and the failure is not repeated near the actions.
+- [x] Diagnose failed workspace query preparation through schema discovery, suppress the transient grid error, and redirect confirmed connection failures to the existing recovery edit form instead of showing a table-specific toast.
+- [x] Apply the saved or system theme before React starts so full-document recovery does not flash the opposite canvas color.
+- [x] Give connection route, runtime, workspace, and form-submission loading surfaces visible contextual copy.
 
 [15/09/26]
 
@@ -385,6 +390,14 @@
 - Do not apply Jazz Cloud identifier constraints to self-hosted servers.
 
 ## Settled interaction decisions
+
+[19/10/26]
+
+- Classified schema-discovery failures open the edit form with immediate field or form feedback after their bounded retry policy is exhausted. This supersedes the exhausted-network document reload and schema-diagnostic terminal surface recorded below.
+- Only unexpected runtime or descendant failures use the generic terminal route error and bounded document reload.
+- Network and server failures remain connection-level because they do not prove the saved Server URL is invalid; invalid URL syntax remains field-specific.
+- Full-page connection loading keeps the static wordmark and adds visible contextual status instead of relying on an accessible name alone.
+- The document applies its initial theme background before React initialization so bounded reload recovery does not flash the opposite theme.
 
 [14/09/26]
 

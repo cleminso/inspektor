@@ -100,6 +100,8 @@ flowchart TD
 
 The route resolves a complete target through [[apps/studio/src/routes/conn/$connectionId.tsx#Route]]. [[apps/studio/src/app/routing/inspectorNavigation.ts#resolveStoredRuntimeTarget]] combines the stored connection with the selected schema metadata.
 
+If schema discovery fails, the connection loader replaces the failed route with recovery on the sibling edit route. Authorization, missing-app, and invalid-URL reasons map to fields; reachability, server, and unknown reasons remain connection-level statuses. Successful validation saves the repaired connection and navigates to the sanitized interrupted connection URL. Unexpected runtime and descendant failures remain owned by the connection route error boundary.
+
 The onboarding layout starts shared WASM preparation after it commits. Form submission starts the same shared preparation while it fetches the schema catalogue. Direct connection routes and connection switching also start preparation before the runtime needs it. [[apps/studio/src/app/runtime/jazzWasmPreparation.ts#prepareJazzWasm]] returns one shared promise, so these entry points reuse one preparation attempt.
 
 `InspectorProvider` waits for that promise before creating the admin client. It publishes the client only after the selected schema is verified. A failed, replaced, or unmounted runtime shuts down any client that resolves after it is no longer current.

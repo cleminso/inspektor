@@ -14,6 +14,7 @@
 [19/10/26]
 
 - [x] Let terminal saved-connection errors exit directly to the failed profile's edit route or the saved connection list without remounting the failed runtime.
+- [x] Replace failed saved-connection discovery with reason-specific recovery editing while retaining only a sanitized same-connection return URL.
 
 [07/09/26]
 

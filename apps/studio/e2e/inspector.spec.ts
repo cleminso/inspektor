@@ -451,30 +451,23 @@ test('recovers when connection schema validation initially finds no schemas', as
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
 })
 
-test('leaves a terminal saved-connection error through edit or the connection list', async ({
+test('replaces a rejected saved credential and returns to the interrupted route', async ({
   page,
 }) => {
   await connectToFixture(page, { rememberSecretForTab: true })
   const connectionUrl = page.url()
-  const connectionId = /\/conn\/([^/]+)/u.exec(new URL(connectionUrl).pathname)?.[1]
-  expect(connectionId).toBeTruthy()
 
   const serverUrl = new URL(connection.serverUrl)
   const basePath = serverUrl.pathname.replace(/\/+$/, '')
   const cataloguePath = `${basePath}/apps/${encodeURIComponent(connection.appId)}/schemas`
-  let boundaryRequestCount = 0
-  page.on('request', (request) => {
-    const url = new URL(request.url())
-    if (
-      request.resourceType() === 'document' ||
-      (url.origin === serverUrl.origin && url.pathname === cataloguePath)
-    ) {
-      boundaryRequestCount += 1
-    }
-  })
+  let rejectCatalogue = true
   await page.route(
     (url) => url.origin === serverUrl.origin && url.pathname === cataloguePath,
     async (route) => {
+      if (rejectCatalogue === false) {
+        await route.fallback()
+        return
+      }
       await route.fulfill({
         status: 401,
         contentType: 'text/plain',
@@ -486,26 +479,19 @@ test('leaves a terminal saved-connection error through edit or the connection li
 
   await page.reload()
 
+  await expect(page.getByRole('heading', { name: 'Reconnect connection' })).toBeVisible()
   await expect(
-    page.getByRole('heading', { name: 'The server rejected this connection' }),
+    page.getByText(/server is reachable, but it rejected the saved admin secret/u),
   ).toBeVisible()
-
-  const requestsBeforeEdit = boundaryRequestCount
-  await page.getByRole('link', { name: 'Edit connection' }).click()
-  await expect(page).toHaveURL(`/conn/edit/${connectionId}`)
   await expect(page.getByRole('textbox', { name: 'Connection name' })).toHaveValue(connection.name)
-  await page.getByRole('button', { name: 'Cancel' }).click()
-  await expect(page).toHaveURL('/conn')
-  expect(boundaryRequestCount).toBe(requestsBeforeEdit)
+  await expect(page.getByLabel('Admin secret')).toHaveValue('')
+  await expect(page.getByRole('button', { name: 'Technical details' })).toHaveCount(0)
 
-  await page.goto(connectionUrl)
-  await expect(
-    page.getByRole('heading', { name: 'The server rejected this connection' }),
-  ).toBeVisible()
-  const requestsBeforeBack = boundaryRequestCount
-  await page.getByRole('link', { name: 'Back to connections' }).click()
-  await expect(page).toHaveURL('/conn')
-  expect(boundaryRequestCount).toBe(requestsBeforeBack)
+  rejectCatalogue = false
+  await page.getByLabel('Admin secret').fill(connection.adminSecret)
+  await page.getByRole('button', { name: 'Reconnect' }).click()
+  await expect(page).toHaveURL(connectionUrl)
+  await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
 
   expect(
     browserErrors.every((message) => message.includes('401')),

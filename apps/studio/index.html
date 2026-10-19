@@ -10,6 +10,33 @@
       name="description"
       content="A browser-based inspector for Jazz applications."
     />
+    <style>
+      :root {
+        color-scheme: light;
+        background: #fafafa;
+      }
+
+      :root.dark {
+        color-scheme: dark;
+        background: #0a0a0a;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not(.light) {
+          color-scheme: dark;
+          background: #0a0a0a;
+        }
+      }
+
+      body {
+        margin: 0;
+        background: inherit;
+      }
+    </style>
+    <script
+      vite-ignore
+      src="%BASE_URL%theme-bootstrap.js"
+    ></script>
     <link
       rel="icon"
       href="%BASE_URL%%FAVICON_PREFIX%.ico"

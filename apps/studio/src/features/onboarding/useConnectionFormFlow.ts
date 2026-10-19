@@ -45,6 +45,8 @@ interface UseConnectionFormFlowOptions {
   branch: string
   connection: StoredConnection
   adminSecret: string
+  initialError?: ConnectionError
+  returnTo?: string
 }
 
 /**
@@ -81,7 +83,7 @@ export function useConnectionFormFlow(
         },
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<ConnectionError | null>(null)
+  const [error, setError] = useState<ConnectionError | null>(options?.initialError ?? null)
   const isSubmittingRef = useRef(false)
 
   const updateFieldValue = (
@@ -129,12 +131,16 @@ export function useConnectionFormFlow(
     }
     handoffStoredRuntimeTarget(draft, { branch, connectionId, schemaCatalogue, schemaHash })
 
-    await navigate({
-      to: appRoutes.tables,
-      params: {
-        connectionId,
-      },
-    })
+    if (options?.returnTo !== undefined && connectionId === options.connection.id) {
+      await navigate({ href: options.returnTo })
+    } else {
+      await navigate({
+        to: appRoutes.tables,
+        params: {
+          connectionId,
+        },
+      })
+    }
   }
 
   const submitConnectionForm: FormEventHandler<HTMLFormElement> = async (event) => {

@@ -1,13 +1,22 @@
 import { createContext, use, useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
-import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import {
+  useInspectorSessionState,
+  useRuntimeClient,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
+import { SchemaCatalogueLoadError } from '@app/connections/connectionValidation'
+import { appRoutes } from '@app/routing/appRoutes'
+import { getCredentialSafeConnectionReturnUrl } from '@app/routing/credentialSafeUrl'
+import { fetchConnectionSchemaCatalogueWithRetry } from '@app/routing/inspectorNavigation'
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { prefetchJazzQuery } from '@tables/query/prefetchJazzQuery'
 import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
 import type { TableRowsSearchState } from '@tables/tableTypes'
 
 type PreparationPolicy = 'ignore' | 'replace'
-type PreparationResult = 'busy' | 'committed' | 'superseded' | 'unavailable'
+type PreparationResult = 'busy' | 'committed' | 'recovery' | 'superseded' | 'unavailable'
 
 interface PrepareTableNavigationOptions {
   policy: PreparationPolicy
@@ -16,6 +25,7 @@ interface PrepareTableNavigationOptions {
 }
 
 interface ActivePreparation {
+  abort: () => void
   cancel: () => void
 }
 
@@ -42,7 +52,9 @@ export function TableNavigationPreparationProvider({
   identity,
   scope,
 }: TableNavigationPreparationProviderProps): React.ReactElement {
+  const { activeConnection } = useInspectorSessionState()
   const client = useRuntimeClient()
+  const navigate = useNavigate()
   const wasmSchema = useRuntimeSchema()
   const activeRef = useRef<ActivePreparation | null>(null)
   const [pendingTableName, setPendingTableName] = useState<string | null>(null)
@@ -50,6 +62,7 @@ export function TableNavigationPreparationProvider({
   const cancelActive = useCallback(() => {
     const active = activeRef.current
     activeRef.current = null
+    active?.abort()
     active?.cancel()
     setPendingTableName(null)
   }, [])
@@ -59,9 +72,10 @@ export function TableNavigationPreparationProvider({
     return () => {
       const active = activeRef.current
       activeRef.current = null
+      active?.abort()
       active?.cancel()
     }
-  }, [client, identity, scope, wasmSchema])
+  }, [activeConnection, client, identity, scope, wasmSchema])
 
   const prepare = useCallback(
     async (
@@ -72,7 +86,7 @@ export function TableNavigationPreparationProvider({
         if (options.policy === 'ignore') return 'busy'
         cancelActive()
       }
-      if (client === null || wasmSchema === null) {
+      if (activeConnection === null || client === null || wasmSchema === null) {
         return 'unavailable'
       }
 
@@ -86,18 +100,51 @@ export function TableNavigationPreparationProvider({
         INSPEKTOR_QUERY_OPTIONS,
       )
       let cancel: () => void = () => undefined
+      const abortController = new AbortController()
       const cancelled = new Promise<'superseded'>((resolve) => {
         cancel = () => resolve('superseded')
       })
-      const active = { cancel }
+      const active = { abort: () => abortController.abort(), cancel }
       activeRef.current = active
       setPendingTableName(options.tableName)
 
       try {
-        const readiness = await Promise.race([
-          lease.promise.then(() => 'ready' as const),
-          cancelled,
-        ])
+        let readiness: 'ready' | 'superseded'
+        try {
+          readiness = await Promise.race([lease.promise.then(() => 'ready' as const), cancelled])
+        } catch (queryError) {
+          if (activeRef.current !== active) {
+            return 'superseded'
+          }
+
+          try {
+            await fetchConnectionSchemaCatalogueWithRetry(activeConnection, abortController.signal)
+          } catch (connectionError) {
+            if (abortController.signal.aborted === true || activeRef.current !== active) {
+              return 'superseded'
+            }
+            if (connectionError instanceof SchemaCatalogueLoadError) {
+              await navigate({
+                to: appRoutes.editConnection,
+                params: { connectionId: activeConnection.id },
+                search: {
+                  recovery: connectionError.reason,
+                  returnTo:
+                    getCredentialSafeConnectionReturnUrl(identity, activeConnection.id) ??
+                    undefined,
+                },
+                replace: true,
+              })
+              return 'recovery'
+            }
+            throw queryError
+          }
+
+          if (activeRef.current !== active) {
+            return 'superseded'
+          }
+          throw queryError
+        }
         if (readiness === 'superseded' || activeRef.current !== active) {
           return 'superseded'
         }
@@ -112,7 +159,7 @@ export function TableNavigationPreparationProvider({
         }
       }
     },
-    [cancelActive, client, wasmSchema],
+    [activeConnection, cancelActive, client, identity, navigate, wasmSchema],
   )
 
   return (

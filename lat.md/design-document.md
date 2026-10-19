@@ -521,6 +521,8 @@ The schema switcher shows which schema hash is latest.
 
 If validation fails, render the validation error and keep the edit form open. If the server returns no schema hashes, use the same error handling as the add-connection flow.
 
+When saved-connection schema discovery fails, replace the failed content route with the edit form in recovery mode. Show authorization failures on the admin secret, missing apps on the app ID, and syntactically invalid URLs on the server URL. Reachability, server, and unknown failures appear once as connection-level recovery notices above the form because they do not prove that a saved field is invalid. A new failed reconnect attempt can replace that notice with fresh form feedback. Reconnection uses the submit button's busy state without adding separate progress copy below the form. Keep profile metadata and credential-retention policy populated, and return to the interrupted credential-safe connection URL after the edited connection validates. Authorization recovery presents an empty secret field without deleting the stored credential; a rejected replacement remains in the form as an admin-secret field error.
+
 #### Saved connection availability
 
 Saved connections persist non-secret profile metadata, credential-retention policy, and preferences in local storage.
@@ -540,21 +542,21 @@ schema or create the admin client.
 
 Saved-route schema discovery retries opaque network failures and HTTP 502, 503, and 504 responses with bounded backoff while
 the route loading surface remains visible. Authorization, missing-app, invalid-URL, and unknown failures remain single-attempt
-failures. An exhausted network failure automatically reloads the current document once when the browser is online or later
-reports restored connectivity. Unclassified errors caught by the connection route use the same recovery because that boundary
-also owns runtime and descendant failures that route invalidation cannot fully replace. A per-location session marker prevents
-reload loops. After successful admin-client publication, the next healthy visible-to-hidden transition clears the marker for a
-later return-from-inactivity interruption; publication alone does not clear it because a descendant can still fail immediately.
+failures. Every classified discovery failure opens recovery editing after its retry policy is exhausted. Unclassified errors
+caught by the connection route still reload the current document once because that boundary can receive stale router, runtime,
+or descendant state that route invalidation cannot fully replace. A per-location session marker prevents reload loops. After
+successful admin-client publication, the next healthy visible-to-hidden transition clears the marker for a later
+return-from-inactivity interruption; publication alone does not clear it because a descendant can still fail immediately.
 Post-publication transport recovery remains runtime-owned. Jazz does not expose public WebSocket health, and local-first query
 subscriptions can retain stale fulfilled state after transport failure. When a published client returns from at least five minutes
 hidden, `InspectorProvider` calls the public `db.reconnect()` once for that hidden episode. This replaces the transport while
 preserving the in-memory client, subscriptions, local writes, and mounted workspace. A reconnect rejection enters the existing
 runtime error retry path, which recreates the scoped client rather than reloading the document.
-If automatic recovery is unavailable or has already run, a viewport-centered route error offers actions to edit the failed
-connection, reconnect it, or return to the saved connection list. Network failures conditionally remind developers to check
-the browser's local-network permission when the server runs on their device or local network. The error includes collapsed,
-copyable diagnostics limited to the request stage, server origin, response status, attempt count, and browser network state;
-credentials, app IDs, URL paths, and raw upstream details remain hidden.
+Classified schema-discovery failures bypass the terminal route error and open connection recovery because repeating the saved
+values cannot repair them. Network recovery reminds developers to check whether the server is running and whether the browser
+can access the device or local network. Unexpected runtime and descendant failures retain the viewport-centered route error with
+actions to edit the connection, reconnect it, or return to the saved connection list. Credentials, app IDs, URL paths, and raw
+upstream details remain hidden.
 
 UI representation:
 
@@ -610,7 +612,9 @@ Startup proceeds from connection intent through schema verification to the first
    starts a separate recovery episode.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
 
-The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. The loading surface centers the theme-appropriate Inspektor wordmark while retaining an accessible loading status. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
+The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. The loading surface centers the theme-appropriate Inspektor wordmark and visibly identifies whether Inspektor is checking, reconnecting, loading the connection, or loading the workspace. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
+
+Studio applies the saved or system theme and its matching document background before React starts. Critical system-aware CSS provides a no-script fallback, while a same-origin parser-blocking bootstrap applies an explicit saved preference without weakening the product Content Security Policy. This prevents a light browser canvas from flashing between a dark connection surface and the route loading surface during full-document recovery.
 
 Table mounting does not preload CodeMirror. A structured editor mount starts the deferred editor import and exposes a controlled, geometry-stable textarea until CodeMirror replaces it. Data-grid reordering remains optional post-mount work so the first configured drag can begin without putting DND in the static application graph.
 

@@ -1,6 +1,7 @@
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { createSchemaCatalogueLoadError } from '@app/connections/connectionValidation'
 import {
   TableNavigationPreparationProvider,
   useTableNavigationPreparation,
@@ -13,22 +14,38 @@ interface ControlledPreparation {
   resolve: () => void
 }
 
-const { prefetchJazzQueryMock, runtime } = vi.hoisted(() => ({
+const { checkConnection, navigate, prefetchJazzQueryMock, runtime } = vi.hoisted(() => ({
+  checkConnection: vi.fn(),
+  navigate: vi.fn(),
   prefetchJazzQueryMock: vi.fn(),
   runtime: {
+    activeConnection: {
+      id: 'connection-1',
+      serverUrl: 'https://sync.example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+    },
     client: {} as object | null,
     schema: { accounts: { columns: [] }, profiles: { columns: [] } } as object | null,
   },
 }))
-const providerState = { identity: 'accounts:page-1' }
+const providerState = { identity: '/conn/connection-1/tables/accounts?page=1' }
+
+vi.mock('@tanstack/react-router', () => ({ useNavigate: () => navigate }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
+  useInspectorSessionState: () => ({ activeConnection: runtime.activeConnection }),
   useRuntimeClient: () => runtime.client,
   useRuntimeSchema: () => runtime.schema,
 }))
 
 vi.mock('@tables/query/prefetchJazzQuery', () => ({
   prefetchJazzQuery: prefetchJazzQueryMock,
+}))
+
+vi.mock('@app/routing/inspectorNavigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@app/routing/inspectorNavigation')>()),
+  fetchConnectionSchemaCatalogueWithRetry: checkConnection,
 }))
 
 function createPreparation(): ControlledPreparation {
@@ -64,8 +81,16 @@ const pageOne = {
 
 beforeEach(() => {
   runtime.client = {}
+  runtime.activeConnection = {
+    id: 'connection-1',
+    serverUrl: 'https://sync.example.com',
+    appId: 'app-1',
+    adminSecret: 'secret',
+  }
   runtime.schema = { accounts: { columns: [] }, profiles: { columns: [] } }
-  providerState.identity = 'accounts:page-1'
+  providerState.identity = '/conn/connection-1/tables/accounts?page=1'
+  checkConnection.mockReset()
+  navigate.mockReset()
   prefetchJazzQueryMock.mockReset()
 })
 
@@ -141,6 +166,7 @@ describe('TableNavigationPreparationProvider', () => {
     prefetchJazzQueryMock.mockReturnValue(preparation)
     const { result } = renderHook(() => useTableNavigationPreparation(), { wrapper: Wrapper })
     const error = new Error('query failed')
+    checkConnection.mockResolvedValueOnce([])
 
     let navigation: Promise<string> | undefined
     act(() => {
@@ -161,6 +187,89 @@ describe('TableNavigationPreparationProvider', () => {
     preparation.reject(error)
     await expect(navigation).rejects.toBe(error)
     expect(preparation.release).toHaveBeenCalledOnce()
+    expect(checkConnection).toHaveBeenCalledOnce()
+    expect(navigate).not.toHaveBeenCalled()
+  })
+
+  it('redirects a lost connection to recovery instead of propagating the table error', async () => {
+    const preparation = createPreparation()
+    providerState.identity =
+      '/conn/connection-1/tables/accounts?page=1&adminSecret=must-not-leak#rows'
+    prefetchJazzQueryMock.mockReturnValue(preparation)
+    checkConnection.mockRejectedValueOnce(
+      createSchemaCatalogueLoadError(new TypeError('Failed to fetch')),
+    )
+    const commit = vi.fn()
+    const { result } = renderHook(() => useTableNavigationPreparation(), { wrapper: Wrapper })
+
+    const navigation = result.current.prepare(
+      { policy: 'replace', search: pageOne, tableName: 'profiles' },
+      commit,
+    )
+    preparation.reject(new Error('query failed'))
+
+    await expect(navigation).resolves.toBe('recovery')
+    expect(commit).not.toHaveBeenCalled()
+    expect(navigate).toHaveBeenCalledWith({
+      to: '/conn/edit/$connectionId',
+      params: { connectionId: 'connection-1' },
+      search: {
+        recovery: 'network',
+        returnTo: '/conn/connection-1/tables/accounts?page=1#rows',
+      },
+      replace: true,
+    })
+    expect(preparation.release).toHaveBeenCalledOnce()
+  })
+
+  it('does not redirect after the failed preparation is superseded during diagnosis', async () => {
+    const preparation = createPreparation()
+    prefetchJazzQueryMock.mockReturnValue(preparation)
+    let finishCheck: () => void = () => undefined
+    checkConnection.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishCheck = resolve
+      }),
+    )
+    const { result, rerender } = renderHook(() => useTableNavigationPreparation(), {
+      wrapper: Wrapper,
+    })
+
+    const navigation = result.current.prepare(
+      { policy: 'replace', search: pageOne, tableName: 'profiles' },
+      vi.fn(),
+    )
+    await act(async () => {
+      preparation.reject(new Error('query failed'))
+      await Promise.resolve()
+    })
+    expect(checkConnection).toHaveBeenCalledOnce()
+
+    providerState.identity = '/conn/connection-1/tables/accounts?page=2'
+    rerender()
+    await act(async () => finishCheck())
+
+    await expect(navigation).resolves.toBe('superseded')
+    expect(navigate).not.toHaveBeenCalled()
+    expect(preparation.release).toHaveBeenCalledOnce()
+  })
+
+  it('does not diagnose a router commit failure as a lost connection', async () => {
+    const preparation = createPreparation()
+    prefetchJazzQueryMock.mockReturnValue(preparation)
+    const commitError = new Error('router commit failed')
+    const commit = vi.fn().mockRejectedValueOnce(commitError)
+    const { result } = renderHook(() => useTableNavigationPreparation(), { wrapper: Wrapper })
+
+    const navigation = result.current.prepare(
+      { policy: 'replace', search: pageOne, tableName: 'profiles' },
+      commit,
+    )
+    preparation.resolve()
+
+    await expect(navigation).rejects.toBe(commitError)
+    expect(checkConnection).not.toHaveBeenCalled()
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   it('does not commit before runtime query inputs are available', async () => {

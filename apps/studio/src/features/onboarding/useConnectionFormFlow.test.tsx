@@ -207,13 +207,13 @@ describe('useConnectionFormFlow', () => {
     const { result } = await submitValidConnectionForm()
 
     expect(result.current.error).toEqual({
-      title: "Couldn't connect to this app",
-      description: 'Check the server URL, app ID, and admin secret.',
+      title: 'Jazz server connection failed',
+      description: "Inspektor couldn't reach this server.",
     })
 
     act(() => result.current.updateFieldValue('appId', 'another-app'))
 
-    await waitFor(() => expect(result.current.error?.title).toBe("Couldn't connect to this app"))
+    await waitFor(() => expect(result.current.error?.title).toBe('Jazz server connection failed'))
   })
 
   it('clears only a matching field validation error when that field is edited', async () => {
@@ -280,6 +280,93 @@ describe('useConnectionFormFlow', () => {
     expect(navigate).toHaveBeenCalledWith({
       to: '/conn/$connectionId/tables',
       params: { connectionId: 'connection-2' },
+    })
+  })
+
+  it('returns a recovered connection to its interrupted route', async () => {
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
+    const connection = {
+      id: 'connection-2',
+      name: 'Local demo',
+      serverUrl: 'https://self-hosted.example.com',
+      appId: 'local-app',
+      env: 'dev',
+      credentialRetention: 'session' as const,
+    }
+    const { result } = renderHook(() =>
+      useConnectionFormFlow({
+        connection,
+        adminSecret: '',
+        branch: 'main',
+        initialError: {
+          title: 'The server rejected this connection',
+          description: 'This admin secret was rejected.',
+          field: 'adminSecret',
+        },
+        returnTo: '/conn/connection-2/live-queries?schema=schema-1',
+      }),
+    )
+
+    expect(result.current.error?.field).toBe('adminSecret')
+    act(() => result.current.updateFieldValue('adminSecret', 'replacement-secret'))
+    expect(result.current.error).toBeNull()
+    await act(async () => {
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(saveConnectionWithContext).toHaveBeenCalledWith(
+      expect.objectContaining({ adminSecret: 'replacement-secret' }),
+      'connection-2',
+      'main',
+      'schema-1',
+    )
+    expect(navigate).toHaveBeenCalledWith({
+      href: '/conn/connection-2/live-queries?schema=schema-1',
+    })
+  })
+
+  it('does not replace the saved credential when recovery validation fails', async () => {
+    fetchSchemaCatalogue.mockRejectedValueOnce(
+      new Error('Schema hashes fetch failed: 401 Unauthorized'),
+    )
+    const connection = {
+      id: 'connection-2',
+      name: 'Local demo',
+      serverUrl: 'https://self-hosted.example.com',
+      appId: 'local-app',
+      env: 'dev',
+      credentialRetention: 'session' as const,
+    }
+    const { result } = renderHook(() =>
+      useConnectionFormFlow({
+        connection,
+        adminSecret: '',
+        branch: 'main',
+        initialError: {
+          title: "Couldn't restore this saved connection",
+          description: 'Review the connection details.',
+        },
+        returnTo: '/conn/connection-2/live-queries?schema=schema-1',
+      }),
+    )
+
+    expect(result.current.error?.title).toBe("Couldn't restore this saved connection")
+    act(() => result.current.updateFieldValue('adminSecret', 'rejected-replacement'))
+    await act(async () => {
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(fetchSchemaCatalogue).toHaveBeenCalledWith(
+      expect.objectContaining({ adminSecret: 'rejected-replacement' }),
+    )
+    expect(saveConnectionWithContext).not.toHaveBeenCalled()
+    expect(setConnectionContext).not.toHaveBeenCalled()
+    expect(navigate).not.toHaveBeenCalled()
+    expect(result.current.formValues.adminSecret).toBe('rejected-replacement')
+    expect(result.current.error).toEqual({
+      title: 'The server rejected this connection',
+      description: 'This admin secret was rejected.',
+      field: 'adminSecret',
     })
   })
 

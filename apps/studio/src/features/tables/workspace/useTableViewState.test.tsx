@@ -38,6 +38,7 @@ const searchState = {
 let tableRowsOptions: unknown
 let queryHasNextPage = false
 let queryIsInitialLoading = false
+let queryError: Error | null = null
 let queryRows = [
   { id: 'row-1', name: 'Ada' },
   { id: 'row-2', name: 'Grace' },
@@ -70,6 +71,7 @@ const queryRecoveryState = vi.hoisted(() => ({
   observe: vi.fn(),
   status: 'idle' as 'exhausted' | 'idle' | 'recovering',
 }))
+let pendingTableName: string | null = null
 const schemaColumns = [tableColumns[1]!.column!]
 
 function useTableViewState(
@@ -123,7 +125,7 @@ vi.mock('@tables/query/useTableRows', () => ({
     tableRowsOptions = options
     return {
       columns: tableColumns,
-      error: null,
+      error: queryError,
       hasNextPage: queryHasNextPage,
       isInitialLoading: queryIsInitialLoading,
       isRecoverableTransportFailure: false,
@@ -135,7 +137,7 @@ vi.mock('@tables/query/useTableRows', () => ({
 
 vi.mock('@tables/routing/tableNavigationPreparation', () => ({
   useTableNavigationPreparation: () => ({
-    pendingTableName: null,
+    pendingTableName,
     prepare: prepareNavigationMock,
   }),
 }))
@@ -161,6 +163,8 @@ beforeEach(() => {
   tableRowsOptions = undefined
   queryHasNextPage = false
   queryIsInitialLoading = false
+  queryError = null
+  pendingTableName = null
   queryRows = [
     { id: 'row-1', name: 'Ada' },
     { id: 'row-2', name: 'Grace' },
@@ -233,6 +237,30 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('hides a rejected grid state while connection diagnosis is pending', () => {
+    queryError = new Error('query failed')
+    pendingTableName = 'profiles'
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.error).toBeNull()
+    expect(result.current.isInitialLoading).toBe(true)
+
+    pendingTableName = null
+    rerender()
+
+    expect(result.current.error).toBe(queryError)
+    expect(result.current.isInitialLoading).toBe(false)
+  })
+
+  it('keeps settled rows visible during ordinary prepared navigation', () => {
+    pendingTableName = 'profiles'
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.error).toBeNull()
+    expect(result.current.isInitialLoading).toBe(false)
+    expect(result.current.rows).toEqual(queryRows)
+  })
+
   it('keeps filter updates rejected when preparation fails', async () => {
     const error = new Error('query failed')
     prepareNavigationMock.mockRejectedValue(error)

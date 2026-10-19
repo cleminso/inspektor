@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { getCredentialSafeRelativeUrl, sanitizeCurrentCredentialUrl } from './credentialSafeUrl'
+import {
+  getCredentialSafeConnectionReturnUrl,
+  getCredentialSafeRelativeUrl,
+  sanitizeCurrentCredentialUrl,
+} from './credentialSafeUrl'
 
 afterEach(() => {
   window.history.replaceState(null, '', '/')
@@ -49,5 +53,20 @@ describe('credential-safe URLs', () => {
         hash: '#appId%3Dapp-1%26adminSecret%3Dencoded-secret',
       }),
     ).toBe('/conn/new#appId=app-1')
+  })
+
+  it('accepts only credential-safe routes for the recovering connection', () => {
+    expect(
+      getCredentialSafeConnectionReturnUrl(
+        '/conn/connection-1/tables/people?schema=schema-1&adminSecret=secret#rows',
+        'connection-1',
+      ),
+    ).toBe('/conn/connection-1/tables/people?schema=schema-1#rows')
+    expect(
+      getCredentialSafeConnectionReturnUrl('/conn/connection-2/tables', 'connection-1'),
+    ).toBeNull()
+    expect(
+      getCredentialSafeConnectionReturnUrl('https://example.com/conn/connection-1', 'connection-1'),
+    ).toBeNull()
   })
 })

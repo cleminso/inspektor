@@ -22,6 +22,7 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => {
     const params = useParams({ strict: false })
     return {
+      activeConnection: null,
       currentConnectionId: params.connectionId ?? null,
       currentTableName: params.tableName ?? null,
     }

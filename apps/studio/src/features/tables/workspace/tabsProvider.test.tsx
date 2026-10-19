@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { toasts } from '@inspektor/ds'
 
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
 import {
@@ -56,7 +57,10 @@ vi.mock('@tables/schema/useAvailableTables', () => ({
   useAvailableTables: () => schemaState,
 }))
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 beforeEach(() => {
   navigate.mockReset()
@@ -186,6 +190,18 @@ describe('TableTabsProvider', () => {
         search: {},
       }),
     )
+  })
+
+  it('does not show a table error when preparation redirects to connection recovery', async () => {
+    const toastError = vi.spyOn(toasts, 'error').mockImplementation(() => 0)
+    prepareNavigationMock.mockResolvedValueOnce('recovery')
+    render(<Harness />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open profiles' }))
+
+    await waitFor(() => expect(prepareNavigationMock).toHaveBeenCalledOnce())
+    expect(navigate).not.toHaveBeenCalled()
+    expect(toastError).not.toHaveBeenCalled()
   })
 
   it('opens a missing routed table as replaceable and persists it through bulk open', async () => {
