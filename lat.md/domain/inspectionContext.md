@@ -22,7 +22,7 @@ Two browser tabs can use different connections. Mounted tabs do not automaticall
 
 The schema hash selects stored schema metadata. The local branch label does not select Jazz data.
 
-An available explicit URL schema takes precedence. Otherwise, connection entry uses the first schema in the catalogue. Discovery places the deployed schema first when the permissions head identifies it.
+An available explicit URL schema takes precedence. Otherwise, connection entry uses the first schema in the catalogue. [[jazzAccess#Metadata access]] defines discovery ordering.
 
 [[apps/studio/src/app/routing/inspectorNavigation.ts#buildSchemaCatalogue]] owns catalogue ordering. [[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] treats branch as local runtime identity only.
 

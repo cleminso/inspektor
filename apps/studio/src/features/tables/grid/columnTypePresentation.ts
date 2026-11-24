@@ -7,7 +7,6 @@ const columnTypeLabels = {
   Bytea: 'Binary',
   Double: 'Float',
   Enum: 'Enum',
-  EnumPayload: 'Payload enum',
   Integer: 'Integer',
   Json: 'JSON',
   Row: 'Row',

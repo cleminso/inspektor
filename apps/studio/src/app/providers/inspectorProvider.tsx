@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { useStore } from '@nanostores/react'
 
-import type { StoredPermissionsResponse, WasmSchema } from 'jazz-tools'
+import type { PublishedBundle, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
 // Jazz exposes browser admin client creation through this unstable development entry point.
 import { createInspectorAdminClient } from 'jazz-tools/_dev/inspector-client'
@@ -383,7 +383,7 @@ export function useRuntimeSchemaHashes(): readonly string[] {
   return useStore(runtime.$schemaCatalogue).map(({ hash }) => hash)
 }
 
-export function useRuntimePermissions(): StoredPermissionsResponse | null {
+export function useRuntimePermissions(): PublishedBundle | null {
   const runtime = useInspectorRuntimeContext()
   return useStore(runtime.$storedPermissions)
 }

@@ -2,9 +2,9 @@ import { useEffect, useMemo } from 'react'
 import { atom, type ReadableAtom, type WritableAtom } from 'nanostores'
 
 import {
-  fetchStoredPermissions,
+  fetchPublishedBundles,
   fetchStoredWasmSchema,
-  type StoredPermissionsResponse,
+  type PublishedBundle,
   type WasmSchema,
 } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
@@ -23,7 +23,7 @@ export interface InspectorRuntimeStore {
   $isPermissionsLoading: ReadableAtom<boolean>
   $isWasmSchemaLoading: ReadableAtom<boolean>
   $schemaCatalogue: ReadableAtom<readonly SchemaCatalogueRecord[]>
-  $storedPermissions: ReadableAtom<StoredPermissionsResponse | null>
+  $storedPermissions: ReadableAtom<PublishedBundle | null>
   $wasmSchema: ReadableAtom<WasmSchema | null>
   clearClient: (client: JazzClient) => void
   publishClient: (client: JazzClient) => void
@@ -36,14 +36,14 @@ interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
   $isPermissionsLoading: WritableAtom<boolean>
   $isWasmSchemaLoading: WritableAtom<boolean>
   $schemaCatalogue: WritableAtom<readonly SchemaCatalogueRecord[]>
-  $storedPermissions: WritableAtom<StoredPermissionsResponse | null>
+  $storedPermissions: WritableAtom<PublishedBundle | null>
   $wasmSchema: WritableAtom<WasmSchema | null>
   getMetadataRequests: () => RuntimeMetadataRequests | null
   publishSchemaError: (error: unknown) => void
 }
 
 interface RuntimeMetadataRequests {
-  permissions: ReturnType<typeof fetchStoredPermissions>
+  permissions: ReturnType<typeof fetchPublishedBundles>
   schema: ReturnType<typeof fetchStoredWasmSchema>
 }
 
@@ -62,7 +62,7 @@ function createInspectorRuntimeStore(
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null)
   const $wasmSchema = atom<WasmSchema | null>(null)
-  const $storedPermissions = atom<StoredPermissionsResponse | null>(null)
+  const $storedPermissions = atom<PublishedBundle | null>(null)
   const $schemaCatalogue = atom<readonly SchemaCatalogueRecord[]>([])
   const $error = atom<InspectorRuntimeError | null>(null)
   const $isPermissionsLoading = atom(isWasmSchemaLoading)
@@ -146,7 +146,7 @@ export function useInspectorRuntime({
         connection === null || branch === null || schemaHash === null
           ? undefined
           : () => ({
-              permissions: fetchStoredPermissions(connection.serverUrl, {
+              permissions: fetchPublishedBundles(connection.serverUrl, {
                 appId: connection.appId,
                 adminSecret: connection.adminSecret,
               }),
@@ -182,9 +182,9 @@ export function useInspectorRuntime({
       },
     )
     void requests.permissions.then(
-      (permissions) => {
+      (bundles) => {
         if (active === true) {
-          runtime.$storedPermissions.set(permissions)
+          runtime.$storedPermissions.set(bundles.at(-1) ?? null)
           runtime.$isPermissionsLoading.set(false)
         }
       },

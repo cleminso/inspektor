@@ -25,7 +25,11 @@ Use measurements to separate application work from Jazz startup and transport.
   - Complete when: record cold and warm asset transfers and connection phases through first rows; verify the deployed WASM response and warm font, JavaScript, CSS, worker, and WASM caching. Keep credentials and inspected values out of artifacts.
   - Compare startup with and without [WASM preparation](../apps/studio/src/app/runtime/jazzWasmPreparation.ts) before changing its policy.
   - Evidence: [runtime startup](../apps/studio/src/app/runtime/useInspectorRuntime.tsx) and [WASM preparation](../apps/studio/src/app/runtime/jazzWasmPreparation.ts) own the exercised boundaries.
+- [ ] [deferred] Smoke-test deployed Studio after the Jazz upgrade.
+  - Trigger: Studio deployment.
+  - Complete when: connection, reads, writes, reconnect, and connection switching pass.
+  - Evidence limit: deployed Studio behavior remains unverified.
 
 ## Evidence
 
-Evidence is limited to configuration and source. Deployed responses, browser traces, and current cache results remain unverified.
+Cold/warm startup measurements remain unverified.

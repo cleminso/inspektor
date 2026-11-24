@@ -28,9 +28,9 @@ Browser profiles, inspected rows, and connection captures remain sensitive. Cred
 
 Connection discovery needs the server URL, app ID, and admin secret before runtime creation.
 
-[[apps/studio/src/app/routing/inspectorNavigation.ts#fetchConnectionSchemaCatalogue]] fetches schema hashes and attempts to read the permissions head with `X-Jazz-Admin-Secret`. Head failure does not discard a successful catalogue.
+[[apps/studio/src/app/routing/inspectorNavigation.ts#fetchConnectionSchemaCatalogue]] fetches schema hashes and published permission bundles with `X-Jazz-Admin-Secret`. It places the latest published bundle's schema first. Bundle failure does not discard a successful catalogue.
 
-[[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] fetches the selected stored schema by hash and fetches stored app permissions separately. These requests do not establish a schema-version-matched permission snapshot.
+[[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] fetches the selected stored schema by hash and loads the latest published permission bundle separately. No bundles means no permission document. These requests do not establish a schema-version-matched permission snapshot or identify the bundle pinned by another session.
 
 Schema defines tables, column types, nullability, defaults, and references. The Schema representation exposes schema and permission documents; it does not predict whether an individual mutation will succeed.
 

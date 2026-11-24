@@ -340,19 +340,6 @@ export function classifySchemaValue(
       return typeof rawValue === 'string' && column.column_type.variants.includes(rawValue) === true
         ? { kind: 'enum', displayValue: rawValue, rawValue, value: rawValue }
         : invalid(rawValue, `one of: ${column.column_type.variants.join(', ')}`)
-    case 'EnumPayload': {
-      try {
-        const caseName = isSupportedRecord(rawValue) === true ? rawValue.type : undefined
-        const isKnownCase =
-          typeof caseName === 'string' &&
-          column.column_type.cases.some((candidate) => candidate.name === caseName) === true
-        return isKnownCase === true
-          ? structured(rawValue, 'json', 'a payload enum object')
-          : invalid(rawValue, 'a payload enum object with a known type')
-      } catch {
-        return invalid(rawValue, 'a payload enum object', 'Could not inspect the structured value')
-      }
-    }
     case 'Array':
       try {
         return Array.isArray(rawValue) === true

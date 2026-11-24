@@ -7,10 +7,7 @@
  */
 import { redirect } from '@tanstack/react-router'
 
-import {
-  matchesConnectionCredentials,
-  normalizeServerUrl,
-} from '@app/connections/connectionIdentity'
+import { matchesConnectionCredentials } from '@app/connections/connectionIdentity'
 import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
 import {
   createSchemaCatalogueLoadError,
@@ -76,7 +73,7 @@ interface RuntimeTargetHandoff {
 let handedOffRuntimeTarget: RuntimeTargetHandoff | null = null
 const schemaCatalogueRetryDelays = [250, 750] as const
 
-/** Places the deployed schema first while preserving the advertised order of every other schema. */
+/** Places the latest published bundle's schema first, then preserves the advertised order. */
 export function buildSchemaCatalogue(
   { hashes, schemas }: SchemaCatalogueResponse,
   latestSchemaHash: string | null = null,
@@ -92,33 +89,12 @@ export function buildSchemaCatalogue(
 async function fetchConnectionLatestSchemaHash(
   connection: ConnectionCredentials,
 ): Promise<string | null> {
-  const serverUrl = normalizeServerUrl(connection.serverUrl)
-  const response = await fetch(
-    `${serverUrl}/apps/${encodeURIComponent(connection.appId)}/admin/permissions/head`,
-    {
-      headers: { 'X-Jazz-Admin-Secret': connection.adminSecret },
-    },
-  )
-  if (response.ok === false) {
-    throw new Error(`Permissions head fetch failed: ${response.status} ${response.statusText}`)
-  }
-
-  const body: unknown = await response.json()
-  if (typeof body !== 'object' || body === null || !('head' in body)) {
-    throw new Error('Permissions head fetch returned an invalid response')
-  }
-  if (body.head === null) {
-    return null
-  }
-  if (
-    typeof body.head !== 'object' ||
-    body.head === null ||
-    !('schemaHash' in body.head) ||
-    typeof body.head.schemaHash !== 'string'
-  ) {
-    throw new Error('Permissions head fetch returned an invalid response')
-  }
-  return body.head.schemaHash
+  const { fetchPublishedBundles } = await import('jazz-tools')
+  const bundles = await fetchPublishedBundles(connection.serverUrl, {
+    appId: connection.appId,
+    adminSecret: connection.adminSecret,
+  })
+  return bundles.at(-1)?.schemaHash ?? null
 }
 
 export async function fetchConnectionSchemaCatalogue(

@@ -38,8 +38,6 @@ function getBaseMarker(columnType: ColumnDescriptor['column_type']): BaseMarker 
       return { label, symbol: 'ID' }
     case 'Enum':
       return { label, symbol: 'E' }
-    case 'EnumPayload':
-      return { label, symbol: '{E}' }
     case 'Json':
       return { label, symbol: columnType.schema === undefined ? '{ }' : '{T}' }
     case 'Row':
