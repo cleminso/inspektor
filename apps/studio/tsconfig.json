@@ -10,7 +10,6 @@
     "paths": {
       "@app/*": ["./src/app/*"],
       "@tables/*": ["./src/features/tables/*"],
-      "@liveQueries/*": ["./src/features/live-queries/*"],
       "@onboarding/*": ["./src/features/onboarding/*"],
       "@shared/*": ["./src/shared/*"]
     }

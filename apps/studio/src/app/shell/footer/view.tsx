@@ -8,8 +8,8 @@ import {
   useShellLayout,
 } from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
-import { Link, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
-import { Rss, Search } from 'lucide-react'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
+import { Search } from 'lucide-react'
 
 import { appHotkeyOptions, runAppHotkey } from '@app/hotkeys/appHotkeys'
 import { productGlyphs } from '@app/icons/productGlyphs'
@@ -27,7 +27,7 @@ interface WorkspaceDockControlProps {
   label: string
   openHotkey: React.ComponentProps<typeof KeyboardInput>['hotkey']
   selected: boolean
-  to: typeof appRoutes.tables | typeof appRoutes.liveQueries
+  to: typeof appRoutes.tables
   onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
@@ -82,19 +82,10 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
   const { connectionId } = useParams({ from: appRoutes.connection })
   const navigate = useNavigate()
   const { isOpen, toggle } = useShellLayout().leftDock
-  const isLiveQueriesActive = useRouterState({
-    select: (state) => state.location.pathname.endsWith('/live-queries'),
-  })
-
-  const isTablesSelected = isOpen === true && isLiveQueriesActive === false
-  const isLiveQueriesSelected = isOpen === true && isLiveQueriesActive === true
+  const isTablesSelected = isOpen === true
   const openTables = () => {
     if (isOpen === false) toggle()
     void navigate({ to: appRoutes.tables, params: { connectionId } })
-  }
-  const openLiveQueries = () => {
-    if (isOpen === false) toggle()
-    void navigate({ to: appRoutes.liveQueries, params: { connectionId } })
   }
   const toggleDockFromLink = (event: React.MouseEvent, selected: boolean) => {
     if (selected === true) event.preventDefault()
@@ -103,11 +94,6 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
 
   useHotkey(appHotkeys.toggleLeftDock, (event) => runAppHotkey(event, toggle), appHotkeyOptions)
   useHotkey(appHotkeys.openTablesDock, (event) => runAppHotkey(event, openTables), appHotkeyOptions)
-  useHotkey(
-    appHotkeys.openLiveQueriesDock,
-    (event) => runAppHotkey(event, openLiveQueries),
-    appHotkeyOptions,
-  )
 
   return (
     <Box
@@ -135,15 +121,6 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
           selected={isTablesSelected}
           to={appRoutes.tables}
           onClick={(event) => toggleDockFromLink(event, isTablesSelected)}
-        />
-        <WorkspaceDockControl
-          artwork={Rss}
-          connectionId={connectionId}
-          label="live queries"
-          openHotkey={appHotkeys.openLiveQueriesDock}
-          selected={isLiveQueriesSelected}
-          to={appRoutes.liveQueries}
-          onClick={(event) => toggleDockFromLink(event, isLiveQueriesSelected)}
         />
         <Box
           as="span"

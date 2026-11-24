@@ -1,9 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { formatStudioDocumentTitle } from '@shared/documentTitle'
+import { appRoutes } from '@app/routing/appRoutes'
 
+/** Keep existing bookmarks usable without mounting the removed telemetry feature. */
 export const Route = createFileRoute('/conn/$connectionId/live-queries')({
-  head: () => ({
-    meta: [{ title: formatStudioDocumentTitle('Live queries') }],
-  }),
+  beforeLoad: ({ params, search }) => {
+    throw redirect({
+      to: appRoutes.tables,
+      params: { connectionId: params.connectionId },
+      search: { schema: search.schema },
+      replace: true,
+    })
+  },
 })

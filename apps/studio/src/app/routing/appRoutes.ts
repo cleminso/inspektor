@@ -10,6 +10,5 @@ export const appRoutes = {
   editConnection: '/conn/edit/$connectionId',
   connection: '/conn/$connectionId',
   tables: '/conn/$connectionId/tables',
-  liveQueries: '/conn/$connectionId/live-queries',
   table: '/conn/$connectionId/tables/$tableName',
 } as const

@@ -7,7 +7,7 @@ import {
   useRef,
   type PropsWithChildren,
 } from 'react'
-import { useBlocker, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
+import { useBlocker, useNavigate, useParams } from '@tanstack/react-router'
 
 import {
   getConnectionDisplayName,
@@ -94,16 +94,10 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const runtimeScopeExitGuardRef = useRef(runtimeScopeExitGuard)
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
-  const isLiveQueriesRoute = useRouterState({
-    select: (state) =>
-      state.matches.some((candidate) => candidate.routeId === '/conn/$connectionId/live-queries'),
-  })
   const schemaNavigationOrigin =
     routeParams.tableName !== undefined
       ? '/conn/$connectionId/tables/$tableName/'
-      : isLiveQueriesRoute === true
-        ? appRoutes.liveQueries
-        : appRoutes.tables
+      : appRoutes.tables
   const navigateSchema = useNavigate({ from: schemaNavigationOrigin })
   const routeConnectionId = routeParams.connectionId ?? null
   const currentConnectionId = routeConnectionId ?? session.activeConnectionId

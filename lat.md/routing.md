@@ -21,7 +21,7 @@ This table of contents links to the document sections.
 The route identifies one saved local connection and the active content inside the workbench described by [[workspace-dom-structure#Table workspace structure|the table workspace structure]].
 
 - Header: connection, branch, schema hash, and global context controls.
-- Left dock: Tables or Live queries resource navigator.
+- Left dock: Tables resource navigator.
 - Main workspace: open workspace items represented by tabs.
 - Route: active resource, representation, and shareable representation state.
 
@@ -29,7 +29,7 @@ The route does not represent the visual tab strip, open item order, pane arrange
 
 ## Route structure
 
-The route tree places table and live-query resources under one saved connection.
+The route tree places table resources under one saved connection. The legacy Live queries URL remains only as a redirect.
 
 ```text
 /conn                         → transparent outlet boundary
@@ -40,10 +40,12 @@ The route tree places table and live-query resources under one saved connection.
     ├── tables/
     │   └── :tableName/
     │       └── index         → Data or Schema representation
-    └── live-queries          → Live queries navigator entry
+    └── live-queries          → beforeLoad redirect to Tables; replace history entry
 ```
 
 Data is the primary table surface and does not add a `/data` segment.
+
+The legacy redirect preserves `connectionId` and schema search state. It has no child index view or feature content. Live queries navigation and `Alt+Q` are removed; [[query-interface#Live queries interface]] records the reason.
 
 Filters, sorting, and other shareable Data state use search parameters. Schema is a distinct representation selected with
 `view=schema` on the table route.
@@ -169,17 +171,17 @@ A saved connection whose schema discovery fails replaces the failed content rout
 
 These decisions keep route identity independent from workspace tabs and local layout.
 
-| Decision                                      | Rationale                                                                                |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Keep connection id in the path                | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
-| Keep branch out of content routes             | It is visible header context and a saved preference of the selected connection.          |
-| Allow schema in parent route search           | It selects a schema explicitly and remains available across connection child navigation. |
-| Omit `/data`                                  | Data is the default table representation.                                                |
-| Select Schema with `view=schema`              | Schema is a distinct workspace-item representation on the table route.                   |
-| Keep tabs out of routes                       | Tabs are one presentation of workspace items and may later exist in several panes.       |
-| Keep filters in search parameters             | Filters are shareable state of a Data item.                                              |
-| Keep Tables and Live queries in the left dock | They are different resource navigators and switching them must not replace main content. |
-| Keep `/conn` as a transparent outlet          | Onboarding layout changes cannot remount the connection runtime and restart its work.    |
+| Decision                             | Rationale                                                                                |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Keep connection id in the path       | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
+| Keep branch out of content routes    | It is visible header context and a saved preference of the selected connection.          |
+| Allow schema in parent route search  | It selects a schema explicitly and remains available across connection child navigation. |
+| Omit `/data`                         | Data is the default table representation.                                                |
+| Select Schema with `view=schema`     | Schema is a distinct workspace-item representation on the table route.                   |
+| Keep tabs out of routes              | Tabs are one presentation of workspace items and may later exist in several panes.       |
+| Keep filters in search parameters    | Filters are shareable state of a Data item.                                              |
+| Keep only Tables in the left dock    | Standalone Live queries is removed; its legacy route redirects without mounting a view.  |
+| Keep `/conn` as a transparent outlet | Onboarding layout changes cannot remount the connection runtime and restart its work.    |
 
 ## Browser-tab behavior
 
@@ -195,7 +197,7 @@ That would require branch and schema route identity or a separate per-window wor
 
 ## Example URLs
 
-These examples show canonical routes for table data, schema, and live queries.
+These examples show canonical table routes and the legacy redirect.
 
 ```text
 # Default Data representation
@@ -210,7 +212,7 @@ These examples show canonical routes for table data, schema, and live queries.
 # Table Schema representation with an explicit schema hash
 /conn/local-profile-id/tables/users?view=schema&schema=schema-hash
 
-# Live queries navigator
+# Legacy URL: redirects to /conn/local-profile-id/tables with replace
 /conn/local-profile-id/live-queries
 
 ```

@@ -308,7 +308,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       blockerOptions?.shouldBlockFn({
         current,
         next: {
-          fullPath: '/conn/$connectionId/live-queries',
+          fullPath: '/conn/edit/$connectionId',
           params: { connectionId: 'connection-1' },
         },
       }),

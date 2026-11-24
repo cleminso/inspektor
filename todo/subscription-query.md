@@ -1,5 +1,7 @@
 # Live queries
 
+Standalone Live queries is retired. Earlier blocks describe historical behavior, not active requirements. The retirement entry supersedes all unfinished feature work below.
+
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
@@ -10,6 +12,16 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+[24/11/26]
+
+- [x] [done] Retire the standalone Live queries view, telemetry polling, history, filters, details pane, navigation item, and `Alt+Q` shortcut.
+  - Evidence: [current product boundary and beta.1 source evidence](../lat.md/query-interface.md).
+- [x] [done] Keep the legacy connection-scoped URL only as a `beforeLoad` redirect to Tables, preserving `connectionId` and schema search state with history replacement.
+- [x] [done] Preserve table data subscriptions and reusable `SwimlaneTimeline` components, documentation, examples, and tests.
+  - Component ownership: [Swimlane timeline checklist](./swimlaneTimeline.md).
+  - Exclusions: no Effect rewrite, Jazz upgrade, design-system removal, or documentation-app change.
+  - Validation: focused removal and table-query tests pass. Full acceptance remains blocked as recorded below.
 
 [05/09/26]
 
@@ -136,7 +148,7 @@
 
 ## Open product work
 
-No open product work is recorded for the implemented foundation.
+No standalone Live queries work remains active. Earlier feature implementation and validation items are superseded by the retirement entry under Implemented foundation.
 
 ## Work outside the foundation scope
 
@@ -155,6 +167,11 @@ No open product work is recorded for the implemented foundation.
 - Query editors, query results, result loading states, and result error states remain separate product work.
 
 ## Settled interaction decisions
+
+[24/11/26]
+
+- Standalone Live queries is removed because the beta.1 server always returns an empty query list. Earlier populated deployment observations do not establish beta.1 support.
+- [Current product boundary](../lat.md/query-interface.md) supersedes the historical Live queries proposals and the interaction decisions below.
 
 [03/09/26]
 
@@ -238,11 +255,26 @@ No open product work is recorded for the implemented foundation.
 
 ## Open design decisions
 
+[24/11/26]
+
+- [x] [superseded] The earlier route-owned versus connection-owned history decision is closed by removal of telemetry collection. See the retirement entry under Implemented foundation.
+
 [01/09/26]
 
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[24/11/26]
+
+- [x] [done] Verify beta.1 release commit `c73bed9a4e868071f10de490ae3f753f3081772f`: the handler sets `queries: Vec::new()`, and the server test requires an empty response.
+- [x] [superseded] Retained-query-pane browser checks and configured-server feature verification below are no longer acceptance requirements. See the retirement entry under Implemented foundation.
+- [x] [done] Focused Studio checks pass: 22 files and 138 tests, including table query behavior. The two legacy-route checks also pass after the test-router type correction.
+- [x] [done] The retained `SwimlaneTimeline` suite passes all six tests. Its package source, documentation, exports, and examples remain unchanged.
+- [x] [done] Studio lint, production bundling, and the E2E, Node, Worker, and generated Worker-type checks pass.
+- Full Studio build and typecheck are blocked by table-editor tests referencing removed floating-widget APIs. The package suite reports 95 passing files and eight failing files in that existing table-editor work. Its owner remains [Row Editor](./rowEditor.md); this removal does not change those tests.
+- Browser acceptance for dock controls and legacy bookmarks is blocked before server startup by the same build typecheck failure. No browser acceptance is claimed.
+- Documentation validation is blocked by the existing missing `research/instrumentSans/instrumentSans.md` link in `lat.md/websiteBrand.md`; `lat check` reports no errors in the changed documents.
 
 [05/09/26]
 

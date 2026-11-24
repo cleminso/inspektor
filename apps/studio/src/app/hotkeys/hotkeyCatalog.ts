@@ -16,7 +16,6 @@ export const appHotkeys = {
   nextTablePage: 'Mod+ArrowRight',
   nextSelectedRow: 'J',
   openCommandPalette: 'Mod+K',
-  openLiveQueriesDock: 'Alt+Q',
   openTablesDock: 'Alt+T',
   openTableView: 'Alt+N',
   previousTablePage: 'Mod+ArrowLeft',

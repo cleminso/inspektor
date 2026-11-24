@@ -303,7 +303,7 @@ describe('useConnectionFormFlow', () => {
           description: 'This admin secret was rejected.',
           field: 'adminSecret',
         },
-        returnTo: '/conn/connection-2/live-queries?schema=schema-1',
+        returnTo: '/conn/connection-2/tables?schema=schema-1',
       }),
     )
 
@@ -321,7 +321,7 @@ describe('useConnectionFormFlow', () => {
       'schema-1',
     )
     expect(navigate).toHaveBeenCalledWith({
-      href: '/conn/connection-2/live-queries?schema=schema-1',
+      href: '/conn/connection-2/tables?schema=schema-1',
     })
   })
 
@@ -346,7 +346,7 @@ describe('useConnectionFormFlow', () => {
           title: "Couldn't restore this saved connection",
           description: 'Review the connection details.',
         },
-        returnTo: '/conn/connection-2/live-queries?schema=schema-1',
+        returnTo: '/conn/connection-2/tables?schema=schema-1',
       }),
     )
 

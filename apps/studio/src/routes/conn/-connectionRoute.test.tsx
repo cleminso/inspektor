@@ -49,7 +49,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ),
   useParams: () => ({ connectionId: 'connection-1' }),
   useRouterState: ({ select }: { select: (state: unknown) => unknown }) =>
-    select({ location: { pathname: '/conn/connection-1/live-queries' } }),
+    select({ location: { pathname: '/conn/connection-1/tables' } }),
 }))
 
 vi.mock('@app/routing/inspectorNavigation', () => ({
@@ -295,14 +295,14 @@ describe('connection route', () => {
         deps: { schemaHash: 'missing-schema' },
         location: {
           hash: 'rows',
-          pathname: '/conn/connection-1/live-queries',
+          pathname: '/conn/connection-1/tables/accounts',
           searchStr: '?schema=missing-schema&filter=active',
         },
         params: { connectionId: 'connection-1' },
       }),
     ).rejects.toMatchObject({
       options: {
-        href: '/conn/connection-1/live-queries?schema=schema-1&filter=active#rows',
+        href: '/conn/connection-1/tables/accounts?schema=schema-1&filter=active#rows',
         replace: true,
       },
     })

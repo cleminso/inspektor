@@ -82,31 +82,26 @@ function createTestRouter(initialPath: string) {
     getParentRoute: () => tablesRoute,
     path: '$tableName',
   })
-  const queriesRoute = createRoute({
-    getParentRoute: () => connectionRoute,
-    path: 'live-queries',
-  })
 
   return createRouter({
     history: createMemoryHistory({ initialEntries: [`${initialPath}?schema=schema-1`] }),
     routeTree: rootRoute.addChildren([
-      connectionRoute.addChildren([tablesRoute.addChildren([tableRoute]), queriesRoute]),
+      connectionRoute.addChildren([tablesRoute.addChildren([tableRoute])]),
     ]),
   })
 }
 
 describe('InspectorSessionProvider schema navigation', () => {
-  it.each([
-    '/conn/connection-1/tables',
-    '/conn/connection-1/tables/accounts',
-    '/conn/connection-1/live-queries',
-  ])('preserves %s while changing the selected schema', async (initialPath) => {
-    const router = createTestRouter(initialPath)
-    render(<RouterProvider router={router} />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Switch schema' }))
+  it.each(['/conn/connection-1/tables', '/conn/connection-1/tables/accounts'])(
+    'preserves %s while changing the selected schema',
+    async (initialPath) => {
+      const router = createTestRouter(initialPath)
+      render(<RouterProvider router={router} />)
+      fireEvent.click(await screen.findByRole('button', { name: 'Switch schema' }))
 
-    await waitFor(() => expect(router.state.location.search.schema).toBe('schema-2'))
-    expect(router.state.location.pathname).toBe(initialPath)
-    expect(session.setConnectionContext).toHaveBeenCalledWith('connection-1', 'main', 'schema-2')
-  })
+      await waitFor(() => expect(router.state.location.search.schema).toBe('schema-2'))
+      expect(router.state.location.pathname).toBe(initialPath)
+      expect(session.setConnectionContext).toHaveBeenCalledWith('connection-1', 'main', 'schema-2')
+    },
+  )
 })

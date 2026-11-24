@@ -4,7 +4,7 @@ Jazz exposes application subscriptions, framework bindings, local traces, and st
 
 ## Table of contents
 
-This reference separates query execution APIs from the telemetry that Inspektor can observe.
+This reference separates retained query APIs from historical standalone telemetry research. The standalone Live queries feature is removed.
 
 - [Purpose](#purpose)
 - [Source basis](#source-basis)
@@ -17,7 +17,7 @@ This reference separates query execution APIs from the telemetry that Inspektor 
 - [Advanced binding APIs](#advanced-binding-apis)
 - [Inspektor telemetry sources](#inspektor-telemetry-sources)
 - [Standalone server telemetry contract](#standalone-server-telemetry-contract)
-- [Official Jazz Inspektor implementation](#official-jazz-inspector-implementation)
+- [Official Jazz Inspektor implementation](#official-jazz-inspektor-implementation)
 - [Polling and snapshot semantics](#polling-and-snapshot-semantics)
 - [Observable and unavailable information](#observable-and-unavailable-information)
 - [Security and privacy](#security-and-privacy)
@@ -34,18 +34,20 @@ It separates three related but different systems:
 2. Framework bindings that manage subscription state for application components.
 3. Inspektor telemetry APIs that observe active subscription definitions.
 
-Product structure and interaction decisions belong in [[lat.md/query-interface#Live queries interface]]. Implementation tasks belong in [Subscription query implementation checklist](../todo/subscription-query.md).
+The removal decision belongs in [[lat.md/query-interface#Live queries interface]]. Historical work remains in the [Live queries ledger](../todo/subscription-query.md). Table data subscriptions remain active and are not part of the removal.
 
 ## Source basis
 
-The investigation used:
+The historical investigation used the following sources. Their API details are not a beta.1 compatibility guarantee.
 
 - Jazz source tag `v2.0.0-alpha.56` for the original telemetry investigation.
-- The installed Inspektor `jazz-tools` alpha.57 declarations for current read-tier options.
+- The Inspektor `jazz-tools` alpha.57 declarations for read-tier options.
 - The official Jazz Inspektor live-query page.
 - A deployed Jazz Inspektor response containing populated server subscription groups.
 
-The deployed server and the inspected Jazz server source do not expose identical behavior. The source handler validates the request but returns an empty query list, while the deployed endpoint returns populated groups. The exported TypeScript response contract matches the deployed response. Package version alone must not be used to infer server capability.
+The current removal decision uses Jazz beta.1 release commit `c73bed9a4e868071f10de490ae3f753f3081772f`. Its server handler always returns `queries: Vec::new()`, and its test requires an empty response until core telemetry exists.
+
+The earlier deployed response contained populated groups. It is historical evidence from another deployment, not a beta.1 guarantee. The sections below preserve useful API research; standalone telemetry descriptions do not describe an active Inspektor feature.
 
 ## Terminology
 
@@ -71,7 +73,7 @@ A telemetry snapshot is the grouped set of server-visible subscriptions returned
 
 Jazz uses "live query" in its documentation, but does not export a public TypeScript function named `liveQuery`.
 
-The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. Inspektor names the product workspace "Live queries."
+The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. The removed Inspektor workspace was named "Live queries."
 
 ## Application query APIs
 
@@ -157,11 +159,11 @@ Sources:
 
 Application-facing `QueryOptions` includes:
 
-| Option   | Values                                                                          | Meaning              |
-| -------- | ------------------------------------------------------------------------------- | -------------------- |
+| Option   | Values                                                                               | Meaning              |
+| -------- | ------------------------------------------------------------------------------------ | -------------------- |
 | `tier`   | `ReadTier.LocalFirst`, `Remote`, `LocalFirstUnlessEmpty`, or legacy durability names | Read policy          |
-| `branch` | scalar or qualified branch                                                      | Branch head          |
-| `base`   | live branch or branch/snapshot pair                                             | Optional branch base |
+| `branch` | scalar or qualified branch                                                           | Branch head          |
+| `base`   | live branch or branch/snapshot pair                                                  | Optional branch base |
 
 `localUpdates`, `propagation`, and `visibility` are internal controls rather than public query
 options. Inspektor table reads use `ReadTier.Remote`, which withholds the initial result until the
@@ -294,15 +296,15 @@ Sources:
 
 ### Standalone server telemetry
 
-The standalone Inspektor calls the admin introspection endpoint through `fetchServerSubscriptions`.
+The removed standalone Live queries feature called the admin introspection endpoint through `fetchServerSubscriptions`.
 
-This path observes grouped subscriptions visible to the connected server and app. It does not expose an inspected client's local trace list or JavaScript stack.
+The transport shape describes grouped subscriptions visible to the connected server and app. Beta.1 returns no groups. It does not expose an inspected client's local trace list or JavaScript stack.
 
-Regarde uses this path. It must not attempt to derive external telemetry from its own `Db` or subscription store.
+Inspektor no longer polls this endpoint. Its own `Db` or subscription store cannot substitute for external application telemetry.
 
 ## Standalone server telemetry contract
 
-The public call is:
+The historical public transport call is retained here as API research, not an active feature contract.
 
 `fetchServerSubscriptions(serverUrl, { appId, adminSecret })`
 
@@ -329,9 +331,9 @@ Each query group contains:
 
 The API does not define result rows, result counts, query source, execution duration, latency, settlement, errors, or lifecycle events.
 
-The client helper coerces a non-number `generatedAt` to `0` and a non-array `queries` value to `[]`. Inspektor validates every returned group before accepting a snapshot, but code downstream of this helper cannot distinguish those malformed top-level values from a valid zero marker or empty snapshot.
+The inspected client helper coerces a non-number `generatedAt` to `0` and a non-array `queries` value to `[]`. The removed feature validated returned groups, but downstream code could not distinguish those malformed top-level values from a valid zero marker or empty snapshot.
 
-Non-success responses include status, status text, and response body in the thrown error. Inspektor must normalize these errors and avoid rendering arbitrary response bodies.
+Non-success responses include status, status text, and response body in the thrown error. Any consumer must normalize these errors and avoid rendering arbitrary response bodies.
 
 Sources:
 
@@ -340,7 +342,7 @@ Sources:
 
 ### Source and deployment discrepancy
 
-The inspected Jazz server handler:
+The beta.1 server handler at release commit `c73bed9a4e868071f10de490ae3f753f3081772f`:
 
 - validates the admin secret
 - validates `appId`
@@ -349,16 +351,16 @@ The inspected Jazz server handler:
 
 Its test preserves that empty shell until core telemetry backs it.
 
-The deployed Jazz Inspektor demonstrates populated groups using the same exported response shape. Regarde should implement against the public transport contract and verify capability against its target server rather than inferring it from the package version.
+The earlier deployed Jazz Inspektor returned populated groups using the same exported response shape. That observation does not establish beta.1 support. Inspektor removes the standalone feature instead of presenting empty responses as a working subscription inventory.
 
 Sources:
 
-- `crates/jazz-server/src/server/routes/http.rs:1216-1269`
-- `crates/jazz-server/src/server/routes/mod.rs:2420-2457`
+- `crates/jazz-server/src/server/routes/http.rs:211-239` at the beta.1 release commit.
+- `crates/jazz-server/src/server/routes/mod.rs:1285-1319` at the beta.1 release commit.
 
 ## Official Jazz Inspektor implementation
 
-The official page lives under `packages/inspector/src/pages/live-query/`:
+The historically inspected official page lived under `packages/inspector/src/pages/live-query/`:
 
 - `index.tsx`
 - `index.module.css`
@@ -403,7 +405,7 @@ For a query timeline, a segment means that the group was observed in a successfu
 
 ## Observable and unavailable information
 
-Overlay traces and standalone telemetry expose different metadata, but neither exposes result rows or performance measurements.
+Overlay traces and the historical standalone transport shape describe different metadata. Neither exposes result rows or performance measurements. Beta.1 returns no standalone query groups.
 
 | Information                  | Overlay trace                        | Standalone telemetry |
 | ---------------------------- | ------------------------------------ | -------------------- |
@@ -425,7 +427,7 @@ Overlay traces and standalone telemetry expose different metadata, but neither e
 | Transaction attribution      | No                                   | No                   |
 | Source component or owner    | No                                   | No                   |
 
-The standalone API can support inventory, churn, persistence, and grouped-count debugging. It cannot explain changed application rows or query performance.
+Populated snapshots could support inventory, churn, persistence, and grouped-count debugging. Beta.1's empty response supports none of those uses. The transport shape cannot explain changed application rows or query performance.
 
 ## Security and privacy
 
@@ -439,9 +441,9 @@ Subscription telemetry contains credentials and application filter values that r
 
 ## Inspektor implications
 
-Inspektor must use the standalone endpoint as sampled, server-scoped telemetry and preserve its uncertainty.
+The standalone feature is removed because beta.1 has no populated server telemetry. The following constraints remain research guidance, not active feature requirements.
 
-- Regarde's standalone Live queries feature must use `fetchServerSubscriptions`, not `Db.subscribe`, local trace accessors, or `getSubscriptionStore`.
+- External server telemetry cannot be replaced by `Db.subscribe`, local trace accessors, or `getSubscriptionStore` on Inspektor's own client.
 - Connection identity is `serverUrl`, `appId`, and `adminSecret`.
 - Branch and schema selection do not scope the introspection request.
 - An empty successful snapshot means no server-visible groups were returned. It does not prove the application performed no reads.
@@ -452,10 +454,10 @@ Inspektor must use the standalone endpoint as sampled, server-scoped telemetry a
 
 ## Source references
 
-These references connect the telemetry contract to its product design and implementation work.
+These references connect retained API research to the removal decision and reusable component guidance.
 
 - [[lat.md/query-interface#Live queries interface]]
 - [Subscription query implementation checklist](../todo/subscription-query.md)
 - [Swimlane timeline implementation checklist](../todo/swimlaneTimeline.md)
 
-The current implementation validates snapshots in [[apps/studio/src/features/live-queries/querySubscriptions.ts#validateQuerySubscriptionsResponse]], projects timeline lanes in [[apps/studio/src/features/live-queries/querySubscriptions.ts#projectQuerySubscriptionsTimeline]], and polls in [[apps/studio/src/features/live-queries/useQuerySubscriptionsTelemetry.ts#useQuerySubscriptionsTelemetry]].
+The former snapshot validator, timeline projection, polling hook, and feature view are removed. Table subscriptions remain documented in [[tableRowsQueryLifecycle]]. Reusable `SwimlaneTimeline` components, documentation, and tests remain independent of the retired consumer.

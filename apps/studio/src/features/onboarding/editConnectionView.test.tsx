@@ -84,7 +84,7 @@ describe('EditConnectionView', () => {
         connectionId="connection-1"
         recovery={{
           reason: 'authorization',
-          returnTo: '/conn/connection-1/live-queries?schema=schema-1',
+          returnTo: '/conn/connection-1/tables?schema=schema-1',
         }}
       />,
     )
@@ -103,7 +103,7 @@ describe('EditConnectionView', () => {
           description: 'This admin secret was rejected.',
           field: 'adminSecret',
         },
-        returnTo: '/conn/connection-1/live-queries?schema=schema-1',
+        returnTo: '/conn/connection-1/tables?schema=schema-1',
       }),
     )
     expect(screen.getByRole('status', { name: 'Form presentation' }).textContent).toBe(

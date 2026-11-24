@@ -18,8 +18,8 @@ This index links the maintained product, architecture, design-system, Jazz, and 
 - [[jazzAlignmentAndInspectorPolicies]] - Jazz defaults and Inspektor-specific policies.
 - [[mental-model-ds-package]] - Design-system package resolution and build model.
 - [[permissions-mapping]] - Jazz permission metadata and UI mapping.
-- [[query-interface]] - Live-query product behavior and presentation.
-- [[query-subscriptions]] - Live-query telemetry technical contract.
+- [[query-interface]] - Standalone Live queries removal, legacy redirect, and retained timeline guidance.
+- [[query-subscriptions]] - Retained query API research and historical telemetry contract; beta.1 returns no query groups.
 - [[routing]] - Route state and workspace navigation model.
 - [[runtimeConnectionStartup]] - Jazz runtime connection phases, ownership, measurement, and optimization order.
 - [[shellLayout]] - Application shell ownership and persistence.

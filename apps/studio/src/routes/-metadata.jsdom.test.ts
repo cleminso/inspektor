@@ -5,7 +5,6 @@ import { Route as RootRoute } from './__root'
 import { Route as ConnectionsRoute } from './conn'
 import { Route as EditConnectionRoute } from './conn/edit/$connectionId'
 import { Route as NewConnectionRoute } from './conn/new'
-import { Route as QueriesRoute } from './conn/$connectionId/live-queries'
 import { Route as TablesRoute } from './conn/$connectionId/tables'
 import { Route as TableRoute } from './conn/$connectionId/tables/$tableName/index'
 
@@ -26,7 +25,6 @@ describe('route metadata', () => {
     [EditConnectionRoute, { connectionId: 'connection-1' }, 'Inspektor | Edit connection'],
     [NewConnectionRoute, {}, 'Inspektor | Add connection'],
     [TablesRoute, {}, 'Inspektor | Tables'],
-    [QueriesRoute, {}, 'Inspektor | Live queries'],
     [TableRoute, { connectionId: 'connection-1', tableName: 'accounts' }, 'Inspektor | accounts'],
   ])('sets the routed document title', async (route, params, title) => {
     expect(await getTitle(route, params)).toBe(title)

@@ -21,7 +21,6 @@ import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
 import { TableNavigationPreparationProvider } from '@tables/routing/tableNavigationPreparation'
 import { createTableWorkspaceScope } from '@tables/workspace/scope'
-import { TableCommands } from '@tables/workspace/tableCommands'
 
 import { ConnectionRouteError, ConnectionRouteLoading } from './-connectionRouteStatus'
 import { ConnectionNotFound } from './-connectionNotFound'
@@ -121,7 +120,6 @@ function InspectorRuntimeRoute(): React.ReactElement {
   const location = useRouterState({
     select: (state) => state.location,
   })
-  const isLiveQueriesRoute = location.pathname.endsWith('/live-queries')
   const workspaceScope = createTableWorkspaceScope({
     branch: target.branch,
     connectionId: target.connectionId,
@@ -137,8 +135,7 @@ function InspectorRuntimeRoute(): React.ReactElement {
         identity={location.href}
         scope={workspaceScope}
       >
-        <InspectorLayout pageTitle={isLiveQueriesRoute === true ? 'Live queries' : 'Tables'}>
-          {isLiveQueriesRoute === true ? <TableCommands /> : null}
+        <InspectorLayout pageTitle="Tables">
           <Outlet />
         </InspectorLayout>
       </TableNavigationPreparationProvider>

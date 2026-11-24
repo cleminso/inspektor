@@ -45,14 +45,9 @@ async function renderFooter(onOpenCommands = () => undefined) {
     path: 'tables',
     component: () => <InspectorFooter onOpenCommands={onOpenCommands} />,
   })
-  const queriesRoute = createRoute({
-    getParentRoute: () => connectionRoute,
-    path: 'live-queries',
-    component: () => <InspectorFooter onOpenCommands={onOpenCommands} />,
-  })
   const router = createRouter({
     history: createMemoryHistory({ initialEntries: ['/conn/connection-1/tables'] }),
-    routeTree: rootRoute.addChildren([connectionRoute.addChildren([tablesRoute, queriesRoute])]),
+    routeTree: rootRoute.addChildren([connectionRoute.addChildren([tablesRoute])]),
   })
 
   await router.load()
@@ -67,21 +62,21 @@ async function renderFooter(onOpenCommands = () => undefined) {
 }
 
 describe('InspectorFooter', () => {
-  it('switches the active dock icon without closing the left dock', async () => {
+  it('offers tables without a live queries entry', async () => {
     const router = await renderFooter()
     const tablesLink = screen.getByRole('link', { name: 'Close tables' })
-    const queriesLink = screen.getByRole('link', { name: 'Open live queries' })
 
     expect(tablesLink.getAttribute('aria-current')).toBe('page')
+    expect(screen.queryByRole('link', { name: /live queries/i })).toBeNull()
+    expect(router.state.location.pathname).toBe('/conn/connection-1/tables')
+  })
 
-    fireEvent.click(queriesLink)
+  it('closes the table dock without navigating away', async () => {
+    const router = await renderFooter()
+    fireEvent.click(screen.getByRole('link', { name: 'Close tables' }))
 
-    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/live-queries')
-    expect(screen.getByRole('link', { name: 'Open tables' })).toBeTruthy()
-    expect(
-      screen.getByRole('link', { name: 'Close live queries' }).getAttribute('aria-current'),
-    ).toBe('page')
-    expect(leftDock.toggle).not.toHaveBeenCalled()
+    expect(leftDock.toggle).toHaveBeenCalledOnce()
+    expect(router.state.location.pathname).toBe('/conn/connection-1/tables')
   })
 
   it('toggles the left dock with the shared shortcut', async () => {
@@ -92,13 +87,23 @@ describe('InspectorFooter', () => {
     expect(leftDock.toggle).toHaveBeenCalledOnce()
   })
 
-  it('switches dock icons with their individual shortcuts', async () => {
+  it('does not handle the removed live queries shortcut', async () => {
     const router = await renderFooter()
 
     fireEvent.keyDown(document.body, { key: 'q', altKey: true })
 
-    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/live-queries')
+    expect(router.state.location.pathname).toBe('/conn/connection-1/tables')
     expect(leftDock.toggle).not.toHaveBeenCalled()
+  })
+
+  it('opens the table dock with its shortcut', async () => {
+    leftDock.isOpen = false
+    const router = await renderFooter()
+
+    fireEvent.keyDown(document.body, { key: 't', altKey: true })
+
+    expect(leftDock.toggle).toHaveBeenCalledOnce()
+    expect(router.state.location.pathname).toBe('/conn/connection-1/tables')
   })
 
   it('opens the command palette from the command action', async () => {

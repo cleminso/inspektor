@@ -264,30 +264,50 @@ test('keeps one centered loading view until the first table rows settle', async 
   await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
 })
 
-test('opens, closes, and switches the left dock', async ({ page }) => {
+test('opens and closes the table dock without a live queries entry', async ({ page }) => {
   await connectToFixture(page)
   const resizeHandle = page.locator('[data-slot="resizable-handle"]')
 
   await expect(resizeHandle).toBeVisible()
+  await expect(page.getByRole('link', { name: /live queries/iu })).toHaveCount(0)
   await expect(page).toHaveURL(/\/tables\/[^/]+$/u)
   const tablesUrl = page.url()
   await page.getByRole('link', { name: 'Close tables' }).click()
   await expect(page).toHaveURL(tablesUrl)
   await expect(resizeHandle).toBeHidden()
 
-  await page.getByRole('link', { name: 'Open live queries' }).click()
-  await expect(page).toHaveURL(/\/live-queries$/u)
+  await page.getByRole('link', { name: 'Open tables' }).click()
+  await expect(page).toHaveURL(/\/tables(?:\/[^/]+)?$/u)
   await expect(resizeHandle).toBeVisible()
   await resizeHandle.hover()
   await expect
     .poll(() => resizeHandle.evaluate((element) => getComputedStyle(element).cursor))
     .not.toBe('auto')
-  await page.getByRole('link', { name: 'Close live queries' }).click()
+  await page.getByRole('link', { name: 'Close tables' }).click()
   await expect(resizeHandle).toBeHidden()
 
   await page.getByRole('link', { name: 'Open tables' }).click()
   await expect(page).toHaveURL(/\/tables(?:\/[^/]+)?$/u)
   await expect(resizeHandle).toBeVisible()
+})
+
+test('redirects legacy live queries bookmarks to tables without fetching telemetry', async ({
+  page,
+}) => {
+  await connectToFixture(page, { rememberSecretForTab: true })
+  const connectionPath = new URL(page.url()).pathname.split('/tables')[0]
+  let telemetryRequests = 0
+  page.on('request', (request) => {
+    if (request.url().includes('/introspection/subscriptions') === true) telemetryRequests += 1
+  })
+
+  for (const suffix of ['live-queries', 'live-queries/']) {
+    await page.goto(`${connectionPath}/${suffix}`)
+    await expect(page).toHaveURL(/\/tables\/[^/]+$/u)
+    await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
+    await expect(page.getByRole('link', { name: /live queries/iu })).toHaveCount(0)
+  }
+  expect(telemetryRequests).toBe(0)
 })
 
 test('shows one highlighted command after pointer and keyboard navigation', async ({ page }) => {
@@ -309,108 +329,6 @@ test('shows one highlighted command after pointer and keyboard navigation', asyn
     keyboardOption.evaluate((element) => getComputedStyle(element).backgroundColor),
   ])
   expect(hoveredBackground).not.toBe(keyboardBackground)
-})
-
-test('keeps query details scrolling inside the workspace query section', async ({ page }) => {
-  const serverUrl = new URL(connection.serverUrl)
-  const basePath = serverUrl.pathname.replace(/\/+$/, '')
-  const subscriptionsPath = `${basePath}/apps/${encodeURIComponent(connection.appId)}/admin/introspection/subscriptions`
-  let generatedAt = 1_000
-
-  await page.route(
-    (url) => url.origin === serverUrl.origin && url.pathname === subscriptionsPath,
-    async (route) => {
-      if (route.request().method() !== 'GET') {
-        await route.continue()
-        return
-      }
-
-      await route.fulfill({
-        body: JSON.stringify({
-          appId: connection.appId,
-          generatedAt,
-          queries: [
-            {
-              branches: [
-                `${connection.env}-7f43cb822ba5-main`,
-                `${connection.env}-e7ebacf3577c-main`,
-                `${connection.env}-d8881b20708b-main`,
-                `${connection.env}-8b0b0be20153-main`,
-                `${connection.env}-4444a49d011b-main`,
-                `${connection.env}-69c962a1a907-main`,
-              ],
-              count: 2,
-              groupKey: 'accounts-by-name',
-              propagation: 'full',
-              query: JSON.stringify({ table: 'accounts', where: { name: 'Ada' } }),
-              table: 'accounts',
-            },
-          ],
-        }),
-        contentType: 'application/json',
-        headers: { 'access-control-allow-origin': '*' },
-        status: 200,
-      })
-      generatedAt += 100
-    },
-  )
-  await connectToFixture(page)
-  await page.getByRole('link', { name: 'Open live queries' }).click()
-  const refresh = page.getByRole('button', { name: 'Refresh', exact: true })
-  for (let capture = 0; capture < 8; capture += 1) {
-    await refresh.click()
-  }
-  const snapshots = page.getByRole('button', { name: /Open accounts-by-name at/ })
-  await expect(snapshots).toHaveCount(9)
-  const selectedSnapshot = snapshots.last()
-  await selectedSnapshot.click()
-
-  const details = page.getByRole('complementary', { name: 'Query details' })
-  const queryPanel = details.getByRole('region', { name: 'Query' })
-
-  await expect(page.locator('[data-slot="shell-layout-left-dock"]')).toBeVisible()
-  await expect(details).toBeVisible()
-  const detailsHandle = page.locator('[data-slot="resizable-handle"]').last()
-  const detailsHandleBox = await detailsHandle.boundingBox()
-  expect(detailsHandleBox).not.toBeNull()
-  await page.mouse.move(
-    detailsHandleBox!.x + detailsHandleBox!.width / 2,
-    detailsHandleBox!.y + detailsHandleBox!.height / 2,
-  )
-  await page.mouse.down()
-  await page.mouse.move(
-    detailsHandleBox!.x - 160,
-    detailsHandleBox!.y + detailsHandleBox!.height / 2,
-  )
-  await page.mouse.up()
-  await expect
-    .poll(async () => (await detailsHandle.boundingBox())?.x ?? detailsHandleBox!.x)
-    .toBeLessThan(detailsHandleBox!.x)
-  await expect
-    .poll(() =>
-      selectedSnapshot.evaluate((element) => {
-        const cell = element.closest('td')
-        const viewport = element.closest('[data-slot="scroll-area-viewport"]')
-        if (cell === null || viewport === null) return false
-        const cellBox = cell.getBoundingClientRect()
-        const viewportBox = viewport.getBoundingClientRect()
-        return cellBox.left >= viewportBox.left - 1 && cellBox.right <= viewportBox.right + 1
-      }),
-    )
-    .toBe(true)
-  await expect
-    .poll(() =>
-      selectedSnapshot.evaluate((element) => getComputedStyle(element.closest('td')!).outlineStyle),
-    )
-    .toBe('solid')
-  const selectedOutline = await selectedSnapshot.evaluate((element) => {
-    const style = getComputedStyle(element.closest('td')!)
-    return { color: style.outlineColor, width: style.outlineWidth }
-  })
-  expect(Number.parseFloat(selectedOutline.width)).toBeGreaterThan(0)
-  expect(selectedOutline.color).not.toBe('rgba(0, 0, 0, 0)')
-  await expect(details.locator('[data-slot="scroll-area"]')).toHaveCount(1)
-  await expect(queryPanel.locator('[data-slot="scroll-area"]')).toHaveCount(1)
 })
 
 test('recovers when connection schema validation initially finds no schemas', async ({ page }) => {

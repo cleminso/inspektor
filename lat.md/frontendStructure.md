@@ -23,11 +23,11 @@ The frontend uses explicit ownership boundaries instead of technical root bucket
 The web application assigns infrastructure, product behavior, route adapters, and shared code to explicit owners.
 
 - `app` owns application-wide infrastructure: providers, connection persistence, runtime setup, routing contracts, session state, and the connected-application shell.
-- `features` own product capabilities, including onboarding, Tables, and Live queries.
+- `features` own product capabilities, including onboarding and Tables.
 - `routes` contain TanStack Router adapters. Routes declare loaders, search validation, and route composition, then delegate product and runtime behavior to their owners.
 - `shared` contains code with multiple existing owners. It is not a staging area for code that might become shared.
 
-The connected header and footer chrome belong to `app/shell` and follow [[shellLayout#Shell Layout ownership|Shell Layout ownership]]. The header contains connection context and theme controls; connection and schema context wrap only when their available region cannot contain both groups, while the theme control remains at the end. Workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspektor layout preference, storage migration, and product controls. Tables and Live queries compose their content into shell regions without owning shell state.
+The connected header and footer chrome belong to `app/shell` and follow [[shellLayout#Shell Layout ownership|Shell Layout ownership]]. The header contains connection context and theme controls; connection and schema context wrap only when their available region cannot contain both groups, while the theme control remains at the end. Workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspektor layout preference, storage migration, and product controls. The Tables feature composes its content into shell regions without owning shell state.
 
 ## Implemented structure
 
@@ -47,9 +47,6 @@ src/
       shellLayoutStorage.ts
   features/
     onboarding/
-    queries/
-      navigation/
-      telemetry/
     tables/
       filters/
       grid/
@@ -65,6 +62,8 @@ src/
 ```
 
 The root `components`, `hooks`, `lib`, and product-wide `types` buckets are intentionally absent. Hooks, models, routing helpers, and types live beside their owner.
+
+The standalone `features/live-queries` implementation and `@liveQueries` alias are removed. Its legacy route remains only as a `beforeLoad` redirect to Tables, preserving connection and schema state with history replacement. See [[query-interface#Live queries interface]] for the superseding product decision. Table data subscriptions and reusable design-system `SwimlaneTimeline` components, documentation, and tests remain.
 
 ## Tables feature structure
 
@@ -91,7 +90,7 @@ Use the narrowest owner that explains both the behavior and its consumers:
 - Code moves to `shared` only after multiple owners consume it.
 - Route-specific declarations remain in `routes`; reusable behavior invoked by a route belongs to `app` or the relevant feature.
 
-A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspektor/ds`; universal Inspektor persistence and controls belong to `app/shell`; feature content remains with Tables or Live queries.
+A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspektor/ds`; universal Inspektor persistence and controls belong to `app/shell`; table feature content remains with Tables.
 
 ## Import direction
 
@@ -110,7 +109,7 @@ Additional rules:
 - One feature does not import another feature's internal modules.
 - `app` exposes infrastructure and routing contracts but does not own feature behavior.
 - Application-shell controls consume generic shell state without importing feature internals.
-- Use `@app/*`, `@tables/*`, `@queries/*`, `@onboarding/*`, and `@shared/*` for cross-owner imports.
+- Use `@app/*`, `@tables/*`, `@onboarding/*`, and `@shared/*` for cross-owner imports.
 - Prefer relative imports for modules within the same focused directory.
 - Avoid broad barrel exports that hide cross-owner dependencies.
 
