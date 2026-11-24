@@ -13,7 +13,7 @@
 
 This document records the historical alpha.55 adoption. The workspace resolves Jazz
 `2.0.0-alpha.57` for that upgrade; its explicit relationship migration and current validation are recorded in the
-current schema, package, and Inspektor Test documentation.
+current schema and Jazz policy documentation.
 
 ## Release behavior
 
@@ -58,4 +58,3 @@ The nullable JSON blocker and its upstream tracking are recorded in
 - [Jazz alpha.57 JSON blocker](./upgrade-0.57.md)
 - [Table row query lifecycle](../lat.md/tableRowsQueryLifecycle.md#authority-settled-openings)
 - [Jazz live-query and subscription telemetry](../lat.md/query-subscriptions.md)
-- [Inspektor Test](../apps/inspektor-test/README.md)

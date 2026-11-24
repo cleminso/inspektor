@@ -2,9 +2,8 @@
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.e2e.json" },
     { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.worker.json" },
+    { "path": "./tsconfig.worker.json" }
   ],
   "compilerOptions": {
     "paths": {
@@ -13,5 +12,5 @@
       "@onboarding/*": ["./src/features/onboarding/*"],
       "@shared/*": ["./src/shared/*"]
     }
-  },
+  }
 }

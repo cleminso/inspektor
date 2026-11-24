@@ -94,6 +94,11 @@ This block supersedes the floating-editor, pending-widget, batch Apply, staged-d
 
 [24/11/26]
 
+- [x] [done] Remove the Studio automated test suite and `apps/inspektor-test` before the Jazz upgrade.
+- Earlier test and browser results below are historical. Re-establish Row Editor acceptance after the Jazz migration and a new validation plan.
+
+[24/11/26]
+
 The checks below were recorded before the requested test rollback. Test-file changes were reverted at the user's request; no checks were rerun afterward.
 
 - Test-file changes and the added pane-editing test file are not retained.
@@ -104,7 +109,7 @@ The checks below were recorded before the requested test rollback. Test-file cha
 - [ ] [blocked] Obtain a passing complete Studio suite.
   - Blocked by: the unchanged filter-focus test `focuses the last applied clause before removing clauses from the end`, which also fails in isolation. The full run passes 1,078 other tests.
 - [ ] [blocked] Run canonical fixture-dependent Playwright acceptance.
-  - Blocked by: the existing optional-JSON NULL seeding failure documented in [Inspektor Test](../apps/inspektor-test/README.md#commands). The selected acceptance command fails before browser tests start.
+  - Blocked by: the removed fixture's optional-JSON NULL seeding failure. The selected acceptance command failed before browser tests started.
 - [ ] [blocked] Obtain a passing repository Lat check.
   - Blocked by: pre-existing links in `lat.md/query-subscriptions.md` and `lat.md/websiteBrand.md`; changed Lat sections introduce no reported errors.
 - Further test and review work stopped at the user's request. Full acceptance is not claimed.

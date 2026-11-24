@@ -14,12 +14,9 @@
     "check:worker": "pnpm build && wrangler deploy --dry-run --outdir .wrangler-dist",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
-    "test": "vitest run",
-    "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install chromium",
     "types:worker": "wrangler types --include-runtime false",
     "types:worker:check": "wrangler types --include-runtime false --check",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.worker.json --noEmit && pnpm types:worker:check"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.worker.json --noEmit && pnpm types:worker:check"
   },
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
@@ -42,19 +39,15 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260917.1",
-    "@playwright/test": "^1.62.1",
     "@stylexjs/unplugin": "catalog:",
     "@tanstack/devtools-vite": "^0.8.5",
-    "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "jsdom": "catalog:",
     "portless": "^0.15.6",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:",
     "wrangler": "^4.129.0"
   }
 }

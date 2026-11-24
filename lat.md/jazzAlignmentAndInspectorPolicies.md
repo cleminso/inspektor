@@ -131,9 +131,7 @@ Omission is operation-dependent: it requests the stored default during insert an
 
 Installed Jazz alpha.59 accepts populated optional JSON but rejects SQL-NULL writes. The direct isolated contract distinguishes the supported round-trip from this remaining runtime defect.
 
-Required JSON, omitted optional JSON, and populated object writes to `s.json().optional()` round-trip. Explicit SQL-NULL inserts and updates from omitted or populated values to null fail with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The independent `apps/inspektor-test/optionalJson.contract.test.ts` exercises these shapes against a fresh in-memory Jazz server.
-
-The canonical fixture retains both populated and null optional JSON cases. The root suite runs the focused contract but excludes the complete fixture; a root pass does not establish end-to-end optional JSON or Playwright acceptance. When explicit-null writes succeed in a released Jazz build, run the complete fixture and browser acceptance. The upstream issue is [#2733](https://github.com/garden-co/jazz/issues/2733); its proposed fix is [PR #3007](https://github.com/garden-co/jazz/pull/3007).
+The removed alpha.59 contract covered required JSON, omitted optional JSON, populated objects, and explicit SQL NULL. It observed successful round-trips for required, omitted, and populated values; explicit NULL writes failed with `Protocol: value does not match type Internal(InternalValueType(StoredScalar(Json)))`. The Studio and fixture tests are removed. Re-establish this contract against the selected Jazz release before relying on it. The upstream issue is [#2733](https://github.com/garden-co/jazz/issues/2733); its proposed fix is [PR #3007](https://github.com/garden-co/jazz/pull/3007).
 
 ### Nested Row fields
 

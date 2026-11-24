@@ -292,16 +292,18 @@ Filename conventions select the environment:
 
 The package and application boundaries are:
 
-| Workspace                | Vitest ownership                                                                                                                |
+| Workspace                | Automated validation ownership                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/design-system` | Node for pure and bundle tests; JSDOM for reusable component behavior                                                           |
-| `apps/studio`            | Node for pure, Worker, and bundle tests; JSDOM for product feature and route-composition behavior                               |
+| `apps/studio`            | No automated test suite; use lint, typecheck, and build                                                                         |
 | `apps/design-system`     | Registry and catalog contracts, plus `AppShell` and `ComponentDemo`; no page-level tests or assertions of component correctness |
 | `apps/website`           | Node for pure and Worker tests; JSDOM for website component behavior                                                            |
 
+We removed Studio's alpha.59 tests and fixture before the Jazz beta migration. Their contracts are not assumed to match the new SDK. Add replacement tests in a separate approved plan after the migration.
+
 `apps/design-system` tests its own registry, catalog, shell, and demo-rendering contracts. The documentation application does not own `@inspektor/ds` component correctness; that coverage belongs beside the component in `packages/design-system`.
 
-Standalone Playwright E2E owns behavior that must cross the built application, routing, server, real-browser, or fixture boundary. The repository does not use Vitest Browser Mode and does not maintain visual snapshots.
+Website Playwright E2E owns browser behavior that must cross the built application boundary. Studio has no automated tests or test fixtures. The repository does not use Vitest Browser Mode and does not maintain visual snapshots.
 
 ## Adding a dependency or export
 

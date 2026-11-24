@@ -64,29 +64,21 @@ Start the Studio application:
 pnpm dev:studio
 ```
 
-For an isolated Jazz application, run the fixture in another terminal:
-
-```sh
-pnpm inspektor-test:fixture
-```
-
-Use the direct HTTP Vite URL when connecting to the fixture. The fixture prints ephemeral credentials for local use and deletes its data when stopped. See [Inspektor Test](./apps/inspektor-test/README.md) for its scenarios and security rules.
-
 ## Validation
 
-Run the default workspace test suites:
+Run the remaining workspace test suites:
 
 ```sh
 pnpm test
 ```
 
-Run standalone Playwright E2E tests against built applications:
+Studio has no automated test suite. Validate Studio with lint, typecheck, and build. The remaining Playwright suite covers the website:
 
 ```sh
 pnpm test:e2e
 ```
 
-Install the Playwright browser before its first local run with `pnpm test:e2e:install`. The `pnpm check` command does not run Playwright. For a focused Vitest suite, use `pnpm --filter <package> test`.
+Install the Playwright browser before its first website E2E run with `pnpm test:e2e:install`. The `pnpm check` command does not run Playwright. For a focused suite in another package, use `pnpm --filter <package> test`.
 
 ## Project documentation
 

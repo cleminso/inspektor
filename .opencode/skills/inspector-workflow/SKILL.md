@@ -43,7 +43,7 @@ Do not promote work to a broader mode without an explicit request. Separate adja
 
 - Run only checks invalidated by changes since their last successful result.
 - Follow the focused-to-broad order in [validation.md](references/validation.md).
-- Use `inspector-testing` for test boundaries, fixtures, and browser verification.
+- Use `inspector-testing` for design-system and website test boundaries and browser verification.
 - Stabilize source APIs before generating metadata; generate and check it once.
 
 ## Review

@@ -2,7 +2,7 @@ import stylex from '@stylexjs/unplugin'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || '5173')
@@ -50,13 +50,11 @@ export default defineConfig(({ mode }) => ({
     exclude: ['@inspektor/ds'],
   },
   plugins: [
-    mode === 'test' ? null : devtools(),
-    mode === 'test'
-      ? null
-      : tanstackRouter({
-          target: 'react',
-          autoCodeSplitting: true,
-        }),
+    devtools(),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
     createStylexPlugin(),
     createFaviconMetadataPlugin(mode),
     viteReact(),
@@ -75,32 +73,5 @@ export default defineConfig(({ mode }) => ({
         pluginTimings: false,
       },
     },
-  },
-  test: {
-    exclude: ['e2e/**', 'node_modules/**'],
-    projects: [
-      {
-        extends: true,
-        test: {
-          name: 'node',
-          environment: 'node',
-          include: ['src/**/*.test.ts', 'src/**/*.node.test.tsx', 'worker/**/*.test.ts'],
-          exclude: ['src/**/*.jsdom.test.ts'],
-          sequence: { groupOrder: 1 },
-        },
-      },
-      {
-        extends: true,
-        test: {
-          name: 'jsdom',
-          environment: 'jsdom',
-          include: ['src/**/*.test.tsx', 'src/**/*.jsdom.test.ts'],
-          maxWorkers: 4,
-          sequence: { groupOrder: 2 },
-          exclude: ['src/**/*.node.test.tsx'],
-          setupFiles: ['./src/__test__/setup.ts'],
-        },
-      },
-    ],
   },
 }))

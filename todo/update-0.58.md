@@ -11,6 +11,8 @@
 
 The workspace resolves Jazz `2.0.0-alpha.58`. Studio loads its matching production WASM from a content-addressed R2 object. Populated optional JSON writes work, but explicit SQL-NULL writes still block the full fixture and fixture-dependent browser acceptance.
 
+This records alpha.58 behavior only. The Studio test suite and fixture have since been removed; the checks below are historical, not current acceptance.
+
 ## Validated adoption
 
 - [x] [done] Publish the matching WASM object and verify its SHA-256 against the installed `jazz-wasm` binary, `application/wasm` response, Brotli delivery, and immutable caching. Update Studio's production URL and contract test.
@@ -27,7 +29,6 @@ The workspace resolves Jazz `2.0.0-alpha.58`. Studio loads its matching producti
 ## References
 
 - [Jazz alpha.57 upgrade record](./upgrade-0.57.md)
-- [Optional JSON contract](../apps/inspektor-test/optionalJson.contract.test.ts)
-- [Inspektor Test fixture](../apps/inspektor-test/README.md)
+- [Optional JSON contract notes](../lat.md/jazzAlignmentAndInspectorPolicies.md#installed-optional-json-boundary)
 - [Jazz issue #2733](https://github.com/garden-co/jazz/issues/2733)
 - [Proposed Jazz fix, PR #3007](https://github.com/garden-co/jazz/pull/3007)

@@ -11,7 +11,9 @@
 
 ## Summary
 
-The workspace resolves Jazz `2.0.0-alpha.57`. Studio uses the matching content-addressed production WASM binary and waits at global durability for row mutations. Native writes to optional JSON columns still block complete fixture and fixture-dependent Playwright acceptance.
+The workspace resolved Jazz `2.0.0-alpha.57`. Studio used the matching content-addressed production WASM binary and waited at global durability for row mutations. Native writes to optional JSON columns blocked the fixture and fixture-dependent Playwright acceptance.
+
+This records alpha.57 behavior only. The Studio test suite and fixture have since been removed; the checks below are historical, not current acceptance.
 
 ## Nullable JSON blocker
 
@@ -51,5 +53,5 @@ Issue #2733 describes the nullable JSON native-protocol failure and is open unde
 
 ## References
 
-- [Inspektor Test fixture](../apps/inspektor-test/README.md)
+- [Optional JSON contract notes](../lat.md/jazzAlignmentAndInspectorPolicies.md#installed-optional-json-boundary)
 - [Historical alpha.55 adoption note](./upgrade-0.55.md)

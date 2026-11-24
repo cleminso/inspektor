@@ -581,6 +581,11 @@
 
 ## Validation checklist
 
+[24/11/26]
+
+- [x] [done] Remove the Studio automated test suite and `apps/inspektor-test` before the Jazz upgrade.
+- Earlier test and browser results below are historical. Re-establish connection acceptance after the Jazz migration and a new validation plan.
+
 [14/09/26]
 
 - [x] Cover transient recovery, exhausted retries, non-retryable failures, restored-connectivity recovery, centered presentation, and diagnostic redaction.

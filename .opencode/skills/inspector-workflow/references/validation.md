@@ -31,7 +31,7 @@ Run StyleX lint immediately after editing styles and follow a nearby passing pro
 
 Prefer contract invariants over manually calculated expectations for long identifiers, Unicode strings, ranges, and offsets.
 
-For browser verification, fixture ownership, and credential handling, load `inspector-testing`.
+For design-system or website browser verification, load `inspector-testing`.
 
 ## Preferred commands
 
@@ -43,9 +43,9 @@ For browser verification, fixture ownership, and credential handling, load `insp
 - Studio package: `pnpm --filter inspektor lint`, `pnpm --filter inspektor typecheck`, `pnpm --filter inspektor build`
 - Design-system package: `pnpm --filter @inspektor/ds lint`, `pnpm --filter @inspektor/ds typecheck`, `pnpm --filter @inspektor/ds build`
 - Design-system documentation: `pnpm --filter inspektor.design-system test`, `pnpm --filter inspektor.design-system lint`, `pnpm --filter inspektor.design-system typecheck`, `pnpm --filter inspektor.design-system build`
-- Inspektor Test validation and shared-cloud mutation boundaries are owned by `inspector-testing`.
+- Studio has no automated tests. Validate it with lint, typecheck, build, and Worker dry-run checks.
 
-Vitest uses Node for pure logic, Worker behavior, and bundle checks, and JSDOM for React component and feature behavior. Do not use Vitest Browser Mode. Playwright E2E owns built-application and real-browser behavior. The repository does not maintain visual snapshots.
+Remaining Vitest suites use Node for pure logic, Worker behavior, and bundle checks, and JSDOM for React component and feature behavior. Do not use Vitest Browser Mode. Website Playwright E2E owns built-site browser behavior. The repository does not maintain visual snapshots.
 
 The design-system documentation app owns only registry and catalog contracts, `AppShell`, and `ComponentDemo`. It has no page-level tests; component correctness belongs to `packages/design-system`.
 

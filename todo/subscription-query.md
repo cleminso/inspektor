@@ -267,6 +267,8 @@ No standalone Live queries work remains active. Earlier feature implementation a
 
 [24/11/26]
 
+The test counts and failures below were recorded before the wider Studio test reset. They are historical, not current acceptance.
+
 - [x] [done] Verify beta.1 release commit `c73bed9a4e868071f10de490ae3f753f3081772f`: the handler sets `queries: Vec::new()`, and the server test requires an empty response.
 - [x] [superseded] Retained-query-pane browser checks and configured-server feature verification below are no longer acceptance requirements. See the retirement entry under Implemented foundation.
 - [x] [done] Focused Studio checks pass: 22 files and 138 tests, including table query behavior. The two legacy-route checks also pass after the test-router type correction.

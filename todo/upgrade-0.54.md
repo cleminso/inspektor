@@ -1,5 +1,7 @@
 # Jazz alpha.54 migration
 
+This is a historical upgrade ledger. Studio tests and the fixture app were removed before the Jazz beta migration. Test and fixture items below are not current work; revisit them only in a new approved plan.
+
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
@@ -94,7 +96,7 @@ Alpha.55 adoption and remaining validation are tracked in [Jazz alpha.55 adoptio
 [10/09/26]
 
 - [ ] Create a fresh Jazz Cloud app or arrange migration assistance before connecting alpha.54 to alpha.53 data.
-- [ ] Reinitialize and reseed shared Inspektor Test cloud data only through an explicitly approved deployment.
+- [x] [superseded] Reinitialize and reseed shared Inspektor Test cloud data. The fixture workspace was removed before the Jazz beta migration.
 - [ ] Add bounded or streaming reads for large byte, text, and JSON columns.
 - [x] Add sortable `$createdAt` and `$updatedAt` provenance columns through Jazz selection.
 

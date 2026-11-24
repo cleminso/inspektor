@@ -46,7 +46,7 @@ Before editing files for a substantial task that changes TanStack behavior or di
 - Load `product-design` for user-visible product or design decisions and UI implementation checklists.
 - Load `create-inspector-component` when adding or changing `@inspektor/ds` components, public component APIs, Base UI wrappers, or StyleX component behavior.
 - Load `document-inspector-component` when adding a public component or changing its documentation, examples, registry metadata, or generated prop metadata.
-- Load `inspector-testing` when adding or changing tests, running browser verification, or working with Inspektor Test fixtures, schema, permissions, or seeded data.
+- Load `inspector-testing` when adding or changing design-system or website tests, or verifying those packages in a browser.
 
 ## Active workspace
 
@@ -56,7 +56,6 @@ Implementation work is limited to:
 - `apps/design-system`: documentation, playgrounds, and design-system validation.
 - `apps/studio`: Inspektor routes, product state, Jazz access, and feature composition.
 - `apps/website`: public website routes, copy, metadata, and brand-page composition.
-- `apps/inspektor-test`: deterministic test schema, data, deployment tooling, and isolated fixtures.
 
 Other workspace packages require an explicit user request.
 
@@ -92,7 +91,7 @@ Other workspace packages require an explicit user request.
 
 ## Repository invariants
 
-- Treat connection `adminSecret` values, fixture credentials, and persistent browser profiles as sensitive.
+- Treat connection `adminSecret` values and persistent browser profiles as sensitive.
 - Never hand-edit `apps/studio/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
 
 ## TypeScript conventions

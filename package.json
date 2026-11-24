@@ -19,15 +19,10 @@
     "deploy:production": "pnpm --dir apps/studio run deploy:worker && pnpm --dir apps/website run deploy:worker",
     "build": "pnpm -r build",
     "lint": "pnpm -r --if-present lint",
-    "inspektor-test:deploy": "pnpm --filter inspektor-test cloud:deploy",
-    "inspektor-test:fixture": "pnpm --filter inspektor-test fixture:start",
-    "inspektor-test:initialize": "pnpm --filter inspektor-test cloud:initialize",
-    "inspektor-test:seed": "pnpm --filter inspektor-test cloud:seed",
-    "inspektor-test:validate": "pnpm --filter inspektor-test cloud:validate",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --filter='!inspektor-test' --workspace-concurrency=1 --if-present test && pnpm --filter inspektor-test test:root && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
-    "test:e2e": "pnpm --filter inspektor test:e2e && pnpm --filter inspektor.website test:e2e",
-    "test:e2e:install": "pnpm --filter inspektor test:e2e:install",
+    "test": "pnpm -r --workspace-concurrency=1 --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
+    "test:e2e": "pnpm --filter inspektor.website test:e2e",
+    "test:e2e:install": "pnpm --filter inspektor.website exec playwright install chromium",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm --filter inspektor check:worker && pnpm --filter inspektor.website check:worker"
   },
   "devDependencies": {
