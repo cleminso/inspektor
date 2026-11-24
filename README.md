@@ -82,13 +82,9 @@ Install the Playwright browser before its first website E2E run with `pnpm test:
 
 ## Project documentation
 
-- [Architecture](./ARCHITECTURE.md)
-- [Knowledge graph](./lat.md/lat.md)
-- [Frontend structure](./lat.md/frontendStructure.md)
-- [Product design](./lat.md/design-document.md)
-- [Implementation checklists](./todo/)
-- [Specifications](./specs/)
-- [Research](./research/)
+- [Documentation](./lat.md/lat.md)
+- [Glossary](./GLOSSARY.md)
+- [Open work](./todo.md/index.md)
 
 ## License
 
