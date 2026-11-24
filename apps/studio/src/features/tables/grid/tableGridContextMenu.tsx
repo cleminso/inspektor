@@ -49,10 +49,6 @@ interface TableGridContextMenuProps {
   onDuplicateRow: (rowId: string) => void
   onSelectRow: (rowId: string) => void
   onTouchCellContextMenuOpen: (target: DataGridCellTarget) => void
-  revertField: (rowId: string, fieldName: string) => void
-  revertRowUpdate: (rowId: string) => void
-  stagedDeletionRowIds: ReadonlySet<string>
-  stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
 }
 
 interface TableGridCellActions {
@@ -75,13 +71,8 @@ export function TableGridContextMenu({
   onDuplicateRow,
   onSelectRow,
   onTouchCellContextMenuOpen,
-  revertField,
-  revertRowUpdate,
-  stagedDeletionRowIds,
-  stagedFieldsByRowId,
 }: TableGridContextMenuProps): ReactElement {
   const [target, setTarget] = useState<GridContextTarget | null>(null)
-  const finalFocusTargetRef = useRef<HTMLElement | null>(null)
   const suppressFinalFocusRef = useRef(false)
   const setContextTarget = useCallback(
     (
@@ -103,35 +94,23 @@ export function TableGridContextMenu({
     },
     [],
   )
-  const rowHasUpdate = useCallback(
-    (rowId: string) => {
-      const stagedFields = stagedFieldsByRowId[rowId]
-      return (
-        stagedDeletionRowIds.has(rowId) === false &&
-        stagedFields !== undefined &&
-        stagedFields.size > 0
-      )
-    },
-    [stagedDeletionRowIds, stagedFieldsByRowId],
-  )
   const hasContextActions = useCallback(
     ({ columnId, rowId }: { columnId?: string; rowId: string }) => {
       if (canMutateRow(rowId) === true || canSelectRow(rowId) === true) {
         return true
       }
       if (columnId === undefined) {
-        return rowHasUpdate(rowId)
+        return false
       }
       const actions = getCellActions({ columnId, rowId })
       return (
-        rowHasUpdate(rowId) === true ||
         actions.canEdit === true ||
         actions.canExclude === true ||
         actions.canFilterBy === true ||
         actions.canCopy === true
       )
     },
-    [canMutateRow, canSelectRow, getCellActions, rowHasUpdate],
+    [canMutateRow, canSelectRow, getCellActions],
   )
   const onCellContextMenu = useCallback<DataGridCellContextMenuHandler>(
     (cellTarget, event) => {
@@ -190,14 +169,6 @@ export function TableGridContextMenu({
     ),
     [],
   )
-  const stagedFields = target === null ? undefined : stagedFieldsByRowId[target.rowId]
-  const cellFieldName = target?.columnId
-  const hasRowUpdate = target !== null && rowHasUpdate(target.rowId)
-  const hasCellUpdate =
-    hasRowUpdate === true &&
-    stagedFields !== undefined &&
-    cellFieldName !== undefined &&
-    stagedFields.has(cellFieldName)
   const cellTarget =
     target === null || target.columnId === undefined
       ? null
@@ -215,7 +186,6 @@ export function TableGridContextMenu({
       cellActions.canFilterBy === true ||
       cellActions.canCopy === true)
   const hasRowActions = targetCanSelectRow === true || targetCanMutateRow === true
-  const hasRecoveryActions = hasCellUpdate === true || hasRowUpdate === true
 
   return (
     <ContextMenu.Root
@@ -245,9 +215,7 @@ export function TableGridContextMenu({
             suppressFinalFocusRef.current = false
             return false
           }
-          const finalFocusTarget = finalFocusTargetRef.current
-          finalFocusTargetRef.current = null
-          return finalFocusTarget ?? target?.returnFocus ?? true
+          return target?.returnFocus ?? true
         }}
       >
         {cellActions?.canEdit === true && cellTarget !== null ? (
@@ -327,33 +295,6 @@ export function TableGridContextMenu({
           </ContextMenu.Item>
         ) : null}
         {(hasPrimaryCellActions === true || hasRowActions === true) &&
-        hasRecoveryActions === true ? (
-          <ContextMenu.Separator />
-        ) : null}
-        {hasCellUpdate === true && target !== null && cellFieldName !== undefined ? (
-          <ContextMenu.Item
-            onClick={() => {
-              finalFocusTargetRef.current = target.origin
-              revertField(target.rowId, cellFieldName)
-            }}
-          >
-            Discard field change
-          </ContextMenu.Item>
-        ) : null}
-        {hasCellUpdate === true && hasRowUpdate === true ? <ContextMenu.Separator /> : null}
-        {hasRowUpdate === true && target !== null ? (
-          <ContextMenu.Item
-            onClick={() => {
-              finalFocusTargetRef.current = target.origin
-              revertRowUpdate(target.rowId)
-            }}
-          >
-            Discard row changes
-          </ContextMenu.Item>
-        ) : null}
-        {(hasPrimaryCellActions === true ||
-          hasRowActions === true ||
-          hasRecoveryActions === true) &&
         targetCanMutateRow === true ? (
           <ContextMenu.Separator />
         ) : null}

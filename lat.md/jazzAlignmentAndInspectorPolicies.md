@@ -2,9 +2,12 @@
 
 Inspektor adopts Jazz's sparse mutation and live-source patterns while keeping query, mutation, table state, and presentation separate.
 
+The side-pane-only contract is approved. [The Row Editor ledger](../todo/rowEditor.md) owns implementation and runtime acceptance;
+this note does not establish that the refactor has shipped.
+
 ## Table of contents
 
-This note records upstream findings, Inspektor policy differences, and the shared mutation model for pane and inline editing.
+This note records upstream findings, Inspektor policy differences, and the current-row mutation contract.
 
 - [Purpose](#purpose)
 - [Upstream findings](#upstream-findings)
@@ -170,27 +173,28 @@ See `packages/inspector/src/studio/data-explorer/TableDataGrid.tsx` and `row-mut
 Inspektor uses the same ownership rule:
 
 - Source-derived structured values may be formatted when an editor draft is created.
-- User-edited structured text is preserved exactly while staged and when the editor reopens.
+- User-edited structured text is preserved exactly while dirty and across pane representation changes.
 - Validation parses the text without replacing it with canonical output.
-- Canonical formatting requires an explicit user action; Save, staging, rebasing, and reopening do not format implicitly.
+- Canonical formatting requires an explicit user action; Save, rebasing, and reopening do not format implicitly.
 
 ### Verification scope
 
-The official Inspektor separates focused Vitest JSDOM component coverage from standalone Playwright E2E acceptance.
+The upstream official Inspektor separates focused Vitest JSDOM component coverage from standalone Playwright E2E acceptance.
 
-Component tests cover Enum editor activation, NULL actions, insert omission and default behavior, queued overlays, and live-source reconciliation.
+Upstream component tests cover Enum editor activation, NULL actions, insert omission and default behavior, queued overlays, and live-source reconciliation.
 
-Playwright E2E covers the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
+Upstream Playwright E2E covers the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
 
 Inspektor follows this acceptance split:
 
 - Pure tests cover state transitions, parsing, nested Row validation, omission, NULL, dirty equality, and payload construction.
 - Isolated Jazz contracts cover optional JSON required/omitted controls and the exact protocol error for unsupported optional writes without involving Inspektor's fixture seeder.
 - Component tests cover control composition, validation timing, focus, keyboard behavior, and local draft preservation.
-- Playwright E2E covers production-only boundaries: route activation, the real deferred structured editor, local staging or discard, and a representative persisted mutation observed after reload.
+- Playwright E2E covers production-only boundaries: requested-field activation in Details or Provenance, the real deferred structured editor, current-row Cancel, and a representative Save observed after reload.
 - Playwright E2E does not repeat every column type when focused tests exercise the same mutation contract. Add a type-specific E2E case only when that type crosses a distinct browser, deferred-module, focus, or runtime serialization boundary.
 
-For structured inline editing, routing alone is insufficient because it can pass while the production editor boundary is broken. Opening the real editor and recovering its staged text is the minimum browser contract. A separate representative Apply-and-reload test owns general persistence.
+For structured pane editing, routing alone is insufficient. Browser acceptance must open the real editor and preserve its raw input.
+A representative Save-and-reload test owns general persistence. The canonical checklist is in [Row Editor](../todo/rowEditor.md).
 
 ## Interaction decisions
 
@@ -205,52 +209,43 @@ These decisions complement the detailed table behavior in [[lat.md/tableExplorer
 Cells do not open hover cards or a separate inspection-only cell pane. Complete inspection remains available through the
 complete-row pane, explicit commands, copy actions, and relation navigation.
 
-Inspektor will support two editing surfaces:
-
-- Side-pane editing.
-- Inline cell editing when the field type supports it.
+The side pane is the only write surface. Floating field editors and the pending-change widget are removed.
 
 ## Editing surfaces
 
-Pane and inline editing are available at the same time and share provider-owned drafts.
+The complete-row pane owns all editing and full-value inspection.
 
-Row checkbox selection opens the complete-row pane. Cell double-click or Enter starts schema-appropriate inline editing. JSON, Array, and Row values use the Floating widget's expanded code editor.
+Row checkbox selection opens the pane for one row only. Another checkbox replaces that target; unchecking closes the pane.
+Dirty replacement or deselection asks before discarding. Checkbox range selection is disabled; multi-cell rectangles remain available.
 
-Relation and binary cells open the complete-row pane directly. Timestamp cells use an inline calendar when available. Generated, unsupported, and otherwise read-only values remain read-only in the grid.
-
-The activation route does not change parsing, validation, dirty tracking, `Apply changes`, `Discard`, or live-update behavior. Pane and
-inline surfaces share provider-owned drafts and do not require a transition decision.
+Cell double-click or Enter opens Details at the selected application field or ID, including read-only values.
+Synthetic `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy` cells open the existing read-only Provenance representation
+and focus the requested metadata field there. Details does not duplicate synthetic metadata.
+Schema-derived controls, parsing, validation, NULL, and omission rules remain unchanged.
 
 ## Pane editing
 
-The pane edits one focused row and stages valid changes in the shared table mutation ledger.
+The pane edits one focused row and saves only that row's sparse patch.
 
 - Selecting a row through its checkbox opens the row pane and makes that row the focused row.
-- The pane edits one focused row even when several rows are checked.
-- Valid pane fields automatically become table-scoped staged changes without persisting immediately.
-- The pane has no per-row persistence action; `Apply changes` persists the normalized table ledger.
-- Escape closes the pane and unchecks its active row while preserving other checked rows, valid staged fields, and recoverable invalid input.
-- The pane shows `Delete row` for one checked row and `Delete N checked rows` for several checked rows.
-- Confirm Delete stages the checked deletions, closes the pane, and unchecks the affected rows before the shared `Review changes`
-  and `Apply changes` flow.
+- Only one row can be selected and edited. Previous and next follow filtered and sorted page rows across page boundaries, not a checked-row batch.
+- Footer actions run left to right: `Delete row` / `Close` when clean, and `Save` / `Cancel` when dirty.
+- Cancel discards current-row overlays and invalid input while keeping the pane open.
+- Save validates all dirty input, sends a sparse current-row patch, and waits for global durability.
+- Successful Save keeps the pane open and clean. Failure retains raw edits and shows the error.
+- Dirty Close, Escape, row switching, and navigation ask before discarding; keeping edits cancels the transition.
+- Delete confirmation directly deletes the single current row; there is no checkbox batch deletion scope.
 
 ## Inline editing
 
-Inline editing stages supported cell changes without changing the shared mutation contract.
+Inline field editing is superseded by requested-field activation in the row pane.
 
-- Single-click selection remains separate from editing.
-- Double-click or Enter starts inline editing for a supported writable field.
-- Inline editing adds the changed cell to its provider-owned row draft; it does not persist immediately.
-- Moving between fields in the same row preserves the row draft.
-- `Apply changes` persists normalized sparse patches across every staged row in the table.
-- JSON, Array, and Row values use the Floating widget's expanded code editor.
-- Relation and binary fields open the complete-row pane focused on their field.
-- Full value inspection remains available through the complete-row pane; inline editing does not add hover details.
-- Inline controls consume the same parsing, validation, NULL, omission, dirty, save, and discard rules as pane controls.
+Single click remains selection. Double-click and Enter focus application fields and ID in Details, or synthetic metadata in
+Provenance, without creating a floating editor, field-local Save, or another persistence path. Read-only values remain inspectable.
 
 ## Mutation model
 
-The mutation business logic must not depend on the active editing surface. It owns:
+The mutation business logic remains separate from pane presentation. It owns:
 
 - Source row captured when editing starts.
 - Dirty field values only.
@@ -262,9 +257,8 @@ The mutation business logic must not depend on the active editing surface. It ow
 
 [[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#createUpdateRowDraft]] and [[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#createInsertRowDraft]] create the corresponding provider-owned drafts.
 
-The core abstraction is a per-row draft. Pane and inline orchestration may decide how many row drafts can be retained, but mutation
-parsing and patch construction operate on one row draft at a time. This avoids coupling the shared model to batch save and retry
-semantics.
+The core abstraction is a per-row draft. The internal ledger may remain as draft storage and lifecycle infrastructure, but only one
+row is edited at a time. It does not expose table-wide Apply, review, staged deletion, or batch retry to the user.
 
 ## Update drafts
 
@@ -275,7 +269,7 @@ input, a parsed value, and a validation error.
 - Editing a field creates or updates its dirty overlay.
 - Returning a field to its captured source value removes the overlay.
 - Invalid raw input remains in the draft and cannot enter the mutation patch.
-- Save constructs a patch from valid dirty fields only.
+- Save is blocked by invalid input and constructs a patch from valid dirty fields in the current row only.
 - Untouched fields never enter the patch.
 - Mutation failure preserves the draft and exposes a row-level failure state.
 - Complete mutation success clears the saved dirty fields.
@@ -296,23 +290,24 @@ Default-backed fields begin omitted so Jazz can apply the stored default. Omissi
 fields that cannot be omitted produce validation errors before mutation. The implementation must verify which default and
 generated-column facts are available in stored schema metadata before deriving initial insert states.
 
+Duplicate opens a prefilled insert pane, excluding automatic identity and provenance. It uses the existing direct Insert path
+with unchanged `Discard` and `Insert more` behavior, not a staged insertion.
+
 ## Live update reconciliation
 
-The initial staged-editing foundation applies sparse dirty fields so untouched database values are not overwritten. Continuous
-source reconciliation and changed-remotely indicators remain separate product work rather than provider responsibilities.
+Sparse dirty-field patches avoid overwriting untouched database values. Existing live-source reconciliation rules remain intact;
+this refactor does not introduce another conflict policy or changed-remotely UI.
 
 ## Draft lifecycle
 
-- Changing fields inside one row preserves the row draft.
-- Changing the focused row or editing surface preserves provider-owned drafts and pending changes within the mounted table view.
-- Changing the mounted table identity resets its table-local draft provider.
-- Opening read-only details does not disturb the active draft.
-- Switching between a row pane's Details and read-only JSON representations does not discard the draft.
-- Relation navigation cannot silently discard a dirty draft.
-- Escape dismissal unchecks the active row while preserving other checked rows, staged changes, and recoverable invalid input.
+One current-row draft survives field and representation changes, but destructive target transitions require consent.
 
-Both pane and inline editors consume the same mutation layer. They may differ in layout and supported field types, but not in
-parsing, validation, dirty tracking, `Apply changes`, or `Discard` semantics.
+- Changing fields inside one row preserves the draft.
+- Switching Details, JSON, or Provenance preserves dirty values and raw invalid input.
+- Cancel resets the current row and keeps the pane open; successful Save keeps it open and clean.
+- Dirty Close, Escape, row-target changes, and pane replacement ask before discarding.
+- Query, relation, table, workspace, and runtime-scope transitions must not silently lose dirty input.
+- Retained internal storage must not cause Save to write another row or revive a user-facing batch workflow.
 
 ## Migration constraint
 
@@ -320,8 +315,9 @@ The table explorer still contains replacement and legacy paths. Do not create a 
 
 Preferred sequence:
 
-1. Centralize dirty tracking, parsing, validation, and patch construction.
-2. Make the existing pane editor consume that mutation layer.
-3. Remove superseded mutation paths.
-4. Add inline editing as a second consumer.
-5. Extract a broader schema-value operation registry only if the two surfaces demonstrate a stable shared abstraction.
+1. Retain shared dirty tracking, parsing, validation, and sparse patch construction.
+2. Give the pane current-row Save, Cancel, and guarded transitions.
+3. Remove floating field editors, the pending-change widget, and staged duplicate/delete entry points.
+4. Retain useful internal draft storage and lifecycle protection without a user batch workflow.
+
+No Effect rewrite or Jazz upgrade is part of this change.

@@ -44,6 +44,7 @@ import {
 } from '@tables/rowEditor/mutation/draft'
 
 interface MutationFieldProps {
+  disabled?: boolean
   canOmit: boolean
   column: ColumnDescriptor
   controlRef?: RefCallback<HTMLElement>
@@ -166,6 +167,7 @@ function isValuePickerTarget(target: EventTarget | null): boolean {
 }
 
 export function MutationField({
+  disabled = false,
   canOmit,
   column,
   controlRef,
@@ -290,6 +292,7 @@ export function MutationField({
 
   return (
     <Field.Root
+      disabled={disabled}
       data-value-mode={
         input.mode === 'omitted'
           ? 'omitted'
@@ -395,6 +398,7 @@ export function MutationField({
         )
       ) : isBooleanColumn === true ? (
         <ToggleGroup
+          disabled={disabled}
           aria-describedby={describedBy}
           aria-invalid={hasFieldError === true ? true : undefined}
           value={
@@ -434,7 +438,7 @@ export function MutationField({
           gap="s"
         >
           <Select.Root
-            disabled={input.mode === 'null'}
+            disabled={disabled || input.mode === 'null'}
             open={valuePickerOpen}
             items={column.column_type.variants.map((variant) => ({
               label: variant,
@@ -497,6 +501,7 @@ export function MutationField({
               overflow={expanded === true ? 'hidden' : undefined}
             >
               <CodeEditor
+                disabled={disabled}
                 id={fieldId}
                 labelledBy={fieldLabelId}
                 describedBy={describedBy}
@@ -532,7 +537,7 @@ export function MutationField({
             />
           ) : (
             <DatePicker
-              disabled={isReadOnly === true}
+              disabled={disabled || isReadOnly === true}
               open={valuePickerOpen}
               value={timestampValue}
               onApply={(nextValue) =>
@@ -576,7 +581,7 @@ export function MutationField({
               id={fieldId}
               font="mono"
               value={input.text}
-              disabled={input.mode === 'null'}
+              disabled={disabled || input.mode === 'null'}
               readOnly={isReadOnly === true || isBinaryColumn === true}
               onValueChange={(text) => onInputChange(setMutationFieldInputText(input, text))}
             />

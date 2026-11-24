@@ -2,6 +2,9 @@
 
 This specification defines selection, focus, editing, and side-pane behavior in the Table Explorer.
 
+The side-pane-only contract below is approved. Implementation and runtime acceptance remain tracked in
+[the Row Editor ledger](../todo/rowEditor.md).
+
 ## Table of contents
 
 This table of contents links to the document sections.
@@ -46,20 +49,20 @@ The Inspektor remains schema-driven. Selection behavior is generic and does not 
 
 These terms distinguish row selection, cell selection, pane focus, drafts, and query position.
 
-- **Checked row**: a row included through its checkbox. Checked rows form the row-selection set.
-- **Focused row**: the checked row represented in the side pane. Only one checked row is focused.
+- **Checked row**: the single row selected through its checkbox.
+- **Focused row**: the selected row represented in the side pane.
 - **Selected cell**: a cell included in the cell-selection set.
 - **Focused cell**: the anchor of the latest TanStack cell-range operation and the cell receiving the strongest focus treatment.
-- **Row selection**: checked row IDs plus the focused row ID and checkbox-range anchor.
+- **Row selection**: zero or one selected row ID; there is no checkbox-range anchor.
 - **Cell selection**: ordered rectangular include and exclude operations resolved against the displayed rows and columns.
 - **Pane target**: the checked row represented in the side pane.
 - **Row draft**: the latest live source row plus dirty field overlays, raw input, parsed values, and validation state.
-- **Review operation**: one user-intent summary used for staged review, distinct from the row-level entries sent to Apply.
+- **Save**: validation and global persistence of the current row's sparse dirty-field patch.
 - **Query position**: a row's position in the active filtered and sorted result, not a stable row identity.
 
 ## Behavior model
 
-Selection, inline editing, and side-pane presentation are separate state.
+Selection, the active row draft, and side-pane presentation are separate state.
 
 - A cell can be focused without opening the side pane.
 - Multiple cells can be selected before the user chooses an explicit copy or mutation operation.
@@ -72,17 +75,17 @@ The side pane has these presentation modes:
 
 - `closed`: no pane target
 - `insert`: schema-driven row insertion
-- `rows`: checked row IDs plus one focused row
+- `rows`: one selected row represented in the pane
 
 Pane precedence is explicit:
 
 - a row-checkbox interaction opens `rows`
 - the insert action opens `insert`
 - a single cell click changes cell focus without changing pane mode
-- a double-click starts schema-appropriate inline editing or routes relation and binary fields to `rows`
+- a double-click or Enter opens `rows` at the selected field: application fields and ID use Details; synthetic metadata uses Provenance
 
-Pane and inline editing consume the same provider-owned row controller but are not shown simultaneously. Moving from inline editing
-to the complete-row pane preserves pending values and does not require a persistence decision.
+The side pane is the only write surface. Only one row is edited at a time. A dirty target change asks before discarding the current
+row draft; canceling the transition keeps its target and raw input.
 
 Selection belongs to the represented query result:
 
@@ -91,9 +94,11 @@ Selection belongs to the represented query result:
 - hiding an interior column contracts a visible range, while hiding a corner suspends that range until the corner returns
 - loading additional rows preserves cell-selection state; appended rows outside existing corner intervals remain unselected
 
+Selection resets cannot silently discard dirty input. Resolve the dirty transition before changing its target or query scope.
+
 ## Row selection scenarios
 
-These scenarios define checkbox selection, range selection, pane focus, and deselection.
+These scenarios define single-row checkbox selection, pane focus, and guarded deselection.
 
 ### Select one row
 
@@ -111,29 +116,23 @@ An unchecked selectable row can also be checked from the context menu opened on 
 
 ### Select rows individually
 
-Individual checkbox actions add or remove rows and keep one remaining row focused in the pane.
+Selecting another checkbox replaces the current row rather than adding to a checked set.
 
-- **Given** one or more rows are checked
-- **When** the user clicks another unchecked row checkbox without a range modifier
-- **Then** that row is added to the checked-row set
+- **Given** one row is checked
+- **When** the user clicks another unchecked row checkbox
+- **Then** that row replaces the selected row after any dirty-discard confirmation
 - **And** it becomes the focused row
-- **And** the pane header shows its position within the ordered selection
+- **And** the pane header shows its position in the current results
 
-Clicking a checked checkbox removes that row. If the focused row is removed, focus moves to the nearest remaining checked row.
-Removing the final checked row closes the row pane.
+Clicking the checked checkbox clears row selection and closes the pane after any dirty-discard confirmation.
+Canceling the transition retains the selected row, pane, and raw input.
 
 ### Select a row range
 
-A Shift-click applies checkbox selection from the stored anchor through the visible target row.
+Checkbox row ranges are not supported; row selection remains limited to one row.
 
-- **Given** a prior checkbox interaction established a row-selection anchor
-- **When** the user Shift-clicks another row checkbox
-- **Then** every visible row between the anchor and target becomes checked
-- **And** the target becomes the focused row
-- **And** the pane header shows the target's position within the ordered selection, such as `2 / 4`
-
-The selected-row order follows the active query order rather than click order. This keeps previous and next navigation
-predictable. Range selection applies only to rows represented by the active table result.
+Shift-click does not create a checked-row range. This restriction does not change Shift-based rectangular multi-cell selection.
+Previous and next follow rows in the active filtered and sorted page and continue across page boundaries, not through a checked set.
 
 ## Cell selection scenarios
 
@@ -157,27 +156,26 @@ side pane remain the place for selecting and editing text.
 
 ### Edit one cell
 
-A double-click or Enter opens the focused field's schema-derived editor when the pane is closed.
+A double-click or Enter opens the complete-row pane at the selected field in Details or Provenance.
 
-- **Given** a data cell is focused and the complete-row pane is closed
+- **Given** a data cell is focused
 - **When** the user double-clicks that cell
-- **Then** the schema-appropriate inline editor opens when the field supports inline editing
+- **Then** the pane opens Details for an application field or ID, or Provenance for synthetic metadata, and focuses that field
 - **And** the cell remains focused
-- **And** the row remains unchecked unless the user selected its checkbox separately
+- **And** only that row can own the active edit draft
 
 The Enter key offers an equivalent keyboard action when the table supports keyboard cell navigation. An unmodified double-click
-inside a multi-cell selection replaces that selection with the target cell before editing.
+inside a multi-cell selection replaces that selection with the target cell before opening the matching pane representation.
 
 While the complete-row pane is open, activating a cell in its focused checked row moves focus to the matching pane field.
-Double-clicking another row does not select it, add it to pane navigation, or open an inline editor.
+Activating another row selects its matching representation after any dirty-discard confirmation.
 
 Field routing is schema-derived:
 
-- primitive scalar and enum values use constrained inline controls
-- JSON, Array, and Row values use the Floating widget's expanded code editor with Save and Cancel actions
-- relation and binary values open the complete-row pane focused on their field
-- timestamps use an inline calendar when that control is available
-- generated, unsupported, and otherwise read-only values remain read-only in the grid
+- writable fields use schema-derived controls inside Details
+- structured values use the pane's structured editor
+- generated, unsupported, binary, and other read-only values remain inspectable in Details without gaining write controls
+- synthetic `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy` cells open the existing read-only Provenance representation and focus that metadata field; Details does not duplicate these fields
 
 Cells do not open a separate inspection-only pane or hover card. Complete and alternate field representations remain available
 through the complete-row pane.
@@ -198,141 +196,109 @@ and data columns. Dragging across body cells moves the latest operation's focus 
 
 ### Operate on a multi-cell selection
 
-Context-menu commands copy or mutate an existing multi-cell selection without collapsing it.
+Context-menu copy commands preserve an existing multi-cell selection without collapsing it.
 
 - **Given** multiple cells are selected
 - **When** the user right-clicks inside the selection
 - **Then** the existing selection remains intact
-- **And** the context menu offers copy or supported mutation operations for that selection
+- **And** the context menu offers copy operations for that selection
 
 Right-clicking an unselected cell replaces the cell selection with that cell before opening the context menu.
 
-Bulk editing is a separate explicit workflow rather than a read-only cell-inspection pane. A same-column selection can expose one
-shared schema-derived editor for an explicit bulk operation. Large selections use summaries and incremental rendering rather than
-mounting one expanded control per cell.
+Bulk editing is outside the approved row-editor scope. Cell ranges do not create another write surface or a batch Save workflow.
 
 ## Editing surfaces
 
-Inline editors and the complete-row pane use one provider-owned mutation model but do not appear together.
+The complete-row side pane is the only write surface; floating field editors and the pending-change widget are removed.
 
-Pane and inline editing use the same mutation model but are not presented simultaneously. Row checkbox selection opens the
-complete-row pane. With the pane closed, cell double-click or Enter starts inline editing without requiring row checkbox selection
-when the schema-derived field interaction supports it.
-Relation and binary fields route to the complete-row pane, and unsupported read-only fields remain read-only in the grid.
-
-Both surfaces consume the same provider-owned per-row draft, parsing, validation, dirty tracking, Apply, and Discard rules.
+Checkbox selection opens the row pane. Double-click or Enter focuses the selected application field or ID in Details, including
+read-only values. Synthetic metadata instead opens and focuses its field in Provenance.
+The provider-owned draft retains parsing, validation, dirty tracking, and raw input.
 The complete-row pane reveals field validation after focus leaves the complete field interaction context, not while focus moves
 between controls within that field. Leaving NULL mode moves focus into the value control or opens the field's picker. While the
-active row's Details representation owns every invalid draft, field errors render below their controls and the mutation widget
-retains Apply blocking without duplicating that feedback. The mutation widget provides the invalid-draft fallback for other rows,
-insertions, and non-field representations.
+active row's Details representation owns invalid input, field errors render below their controls. Invalid input blocks Save and
+remains recoverable when switching pane representations.
 
 ## Side-pane behavior
 
-The side pane presents insert or checked-row content without owning persistence.
+The side pane presents insert or checked-row content and owns the visible persistence actions.
 
 ### Row pane
 
-The row pane shows one focused checked row and preserves staged edits when dismissed.
+The row pane shows one focused row and provides current-row Save and Cancel.
 
 - The header shows the focused row's query position without a redundant edit heading.
-- With one checked row, previous and next replace the check with the adjacent filtered and sorted query row and continue across pages.
-- With multiple checked rows, the header shows the focused row's selected position, such as `2 / 4 selected`, and navigation keeps the checked set stable.
+- Previous and next replace the selected row with the adjacent filtered and sorted page row and continue across pages.
 - The body renders all schema fields, including hidden table columns, using their field components.
 - Clicking a cell in the focused checked row moves focus to that field's first available control and leaves the row pane open.
-- Only the focused row is edited. A row action is not treated as a bulk action unless its label explicitly says so.
-- Valid changed fields automatically enter the table's staged-change ledger without field or form confirmation.
-- The pane has no per-row persistence action; `Apply changes` persists the normalized table ledger.
-- Closing the pane preserves its valid pending fields and recoverable invalid input.
-- Double-clicking a field in the focused row keeps the pane open and focuses that field. Double-clicking another row does nothing.
-- If the final checked row is unchecked, the row pane closes.
-- If checked rows remain, the nearest checked row becomes focused and remains represented in the pane.
+- Only the focused row is edited or deleted; checked-row selection does not imply a bulk mutation.
+- Footer actions run left to right: `Delete row` / `Close` when clean, and `Save` / `Cancel` when dirty.
+- `Cancel` discards the current row's valid and invalid edits and keeps the pane open.
+- `Save` validates and globally persists only that row's sparse dirty values; success keeps the pane open and clean.
+- Validation or persistence failure retains raw edits and exposes the error.
+- Dirty Close, Escape, row switching, and previous/next navigation ask before discarding edits.
+- Double-clicking an application field or ID opens Details there; synthetic metadata opens Provenance at that field. Another row uses the same guarded target transition.
+- Unchecking the selected row closes the pane after any dirty-discard confirmation.
 
 ### Cell activation and pane routing
 
-Field type and active pane state determine whether activation opens a field editor or the complete-row pane.
+Cell activation opens Details for application fields and ID, or Provenance for synthetic metadata, with requested-field focus.
 
-- Double-click or Enter opens the Floating field editor for scalar and structured fields when the pane is closed, independently
-  from row checkbox selection.
-- Scalar Enter completes and moves down; Tab and Shift+Tab complete and move horizontally with row wrapping.
-- Structured Enter inserts a newline, Tab and Shift+Tab indent or outdent, Cmd/Ctrl+Enter completes, and Escape closes.
-- Completion saves the field and restores semantic grid focus without automatically opening another editor. Close or Escape
-  discards the uncommitted field input while preserving any previously staged value.
-- Relation and binary activation opens the complete-row pane and focuses the corresponding field.
-- Generated and unsupported read-only fields do not open a mutation surface.
+Read-only values remain inspectable. Activation does not persist a value. There is no floating field Save or spreadsheet
+completion route. Controls inside Details retain their native keyboard behavior.
 
 The footer `Close` action and Escape use the same row-pane dismissal behavior:
 
-- with a row pane open, dismissal closes the pane and unchecks every checked row
+- with a row pane open, dismissal closes the pane and clears the single selected row
 - row-pane dismissal returns focus to the checkbox for the focused row
 - insert-pane dismissal returns focus to the persistent toolbar `Insert row` action
-- clearing the checked rows closes selection-only widget state; staged changes keep the mutation widget available
 - without a pane open, Escape clears cell selection, semantic cell focus, and column focus while retaining DOM focus on the current grid cell
 
-Row-pane dismissal preserves valid staged fields and recoverable invalid input while clearing the checked rows. Staged changes
-are removed only through entry removal or the table-scoped `Discard` action.
+For a dirty row, dismissal runs only after discard confirmation. Keeping edits cancels dismissal and preserves raw input.
+Nested controls can consume Escape before the pane handles it.
 
 ## Mutation draft behavior
 
 The [[jazzAlignmentAndInspectorPolicies#Verified field representation contracts|verified Jazz field representation contracts]] define omission, SQL NULL, empty and invalid values, nested Row normalization, structured draft formatting, and verification scope.
 
-Pane and inline editors consume the same per-row mutation model:
+The pane consumes one active row draft:
 
 - The source row captured when editing starts is stored separately from sparse field overlays.
 - Returning a field to that source value removes the field from the dirty set.
-- Reverting one staged cell removes only that field overlay. Reverting a row update or undoing its review operation resets the
-  corresponding provider-owned row draft, including mounted pane fields, to the captured source.
+- Cancel resets all current-row overlays and invalid raw input to source values without closing the pane.
 - Invalid input retains its raw form and validation error but cannot enter a mutation patch.
-- Apply sends valid sparse fields only rather than reconstructing the complete row.
+- Save is blocked by invalid input and sends only the current row's valid sparse fields, never a reconstructed row.
 - Mutation failure preserves the draft.
+
+After global write acknowledgement, Save reads the current row through Jazz's remote query API and replaces the pane's source snapshot.
+The grid remains subscription-owned; there is no accepted-value cache or reconciliation layer. A failed refresh is reported as
+already saved, clears the submitted draft, and does not offer Save again for that write.
 
 Insert fields distinguish `omitted`, `null`, `valid`, and `invalid`. Omitted fields are absent from the payload so stored defaults
 can apply. Explicit NULL remains a separate user choice. The insert pane persists a valid row directly through `Insert`; `Discard`
 closes without persistence, and `Insert more` resets and keeps the form open after each successful insert.
 
-`Duplicate row` snapshots every schema field from the row's effective valid values, including staged values and hidden columns, but
-excludes automatic identity and provenance. The duplicate enters the pending ledger as an insertion and remains in mutation review
-until Apply or Undo. The grid continues to render only Jazz query results. After Apply, the live query introduces the persisted row once
-at its authoritative filtered and sorted position. A failed insertion remains available for retry or Undo, and a source staged for
-deletion cannot be duplicated. Staging keeps focus on the source cell without changing the viewport.
+`Duplicate row` reads the current row and opens a prefilled insert pane. It copies schema fields, including hidden columns, and excludes automatic identity
+and provenance. It uses the existing direct `Insert`, `Discard`, and `Insert more` path, not a staged insertion. Replacing a dirty
+row pane first asks before discarding its draft. The grid renders only Jazz query results; successful insertion appears at its
+authoritative filtered and sorted position.
 
-Provider-owned edit drafts survive movement between fields and pane dismissal within one mounted table view. Several rows can retain
-isolated staged updates, insertions, and deletions. Review remains available while the pane is open. The row pane shows `Delete row` for one
-checked row and `Delete N checked rows` for multiple checked rows as a full-width footer action. Activating it replaces the action
-with a 75/25 `Confirm delete` and `Cancel` row. Confirmation snapshots that checked scope, stages the deletions, closes the pane,
-and unchecks the affected rows. The pane's `Close` action remains at the right side of its header. `Apply changes` is the persistence
-boundary for staged updates, duplicated-row insertions, and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears row
-selection and closes an open row pane. It does not close or reset an unrelated insert draft.
-While Apply owns the mutation state, the insert toolbar action, direct Insert action, and `Insert more` switch are disabled. An
-already-open insert draft remains mounted so Apply cannot erase its local values.
+The internal ledger may remain as draft storage and lifecycle infrastructure. It does not expose multi-row staging, review,
+Apply, operation Undo, or a pending-change widget. Save cannot persist hidden drafts from another row.
 
-Rows staged for deletion remain visible with a danger-tinted, struck-through grid treatment until Apply. Their selection checkbox
-becomes an `Undo deletion` icon action, so they cannot be selected into the row pane again. Their cells cannot open inline editors or
-receive active-column emphasis. Undoing the deletion restores the checkbox, returns focus to it, and restores normal row interaction.
-
-Valid staged-update fields receive a warm amber cell treatment without changing the complete row background or replacing its
-selection checkbox. The staged marker survives selection and focus presentation. A staged cell context menu exposes `Revert this
-change`; the same grid context menu exposes row-scoped `Revert staged changes` whenever that row contains an update. Staged
-deletion takes precedence over staged-update presentation.
-
-The row context menu places `Delete row` last with danger presentation. It stages one deletion without confirmation and intentionally
-discards any staged update draft for that row. `Duplicate row` stages an insertion that can be reviewed, undone, applied, or retried
-after failure, but not edited in place.
-
-Review presents each mutation kind as an accordion trigger and renders plain-language operation summaries rather than an exhaustive
-affected-row inventory. Every expanded operation section contains a semantic list with its own scroll area, while the staged summary
-and Apply controls remain fixed below the review. Lists fit up to ten operation rows and scroll beyond that boundary. Each operation
-can be undone from review; long lists scroll within their section; `Discard` clears the complete table ledger.
+`Delete row` targets the single current row. Both pane and context-menu deletion require confirmation
+and call the direct delete path. They never stage deletion or replace the checkbox with Undo. A rejected delete retains the row
+and shows its error. Dirty edits cannot be silently lost through a context action.
 
 ## Column selection and bulk editing
 
-Column selection is an advanced, explicit action rather than the result of a normal header click.
+Column selection is an advanced, explicit action; the mutation examples below are future directions, not approved row-editor behavior.
 
 - **Given** the user right-clicks a data-column header
 - **When** the header context menu opens
 - **And** the user chooses a scoped column operation
 - **Then** the application selects the cells in the command's declared scope
-- **And** the selected operation opens its own review or editing surface when required
+- **And** copy does not open a write surface
 
 A normal header click remains available for column focus, dragging, resizing, and sorting behavior. The context action avoids an
 accidental large selection.
@@ -340,7 +306,7 @@ accidental large selection.
 Activating a column header clears cell focus and cell selection before the column receives its active treatment.
 
 The command must state its scope. A column operation cannot silently mean both visible rows and every matching row.
-Appropriate scoped commands include:
+Scoped command examples distinguish copy from a future, separately approved mutation:
 
 - `Copy visible column cells`
 - `Edit this column for matching rows…`
@@ -348,9 +314,8 @@ Appropriate scoped commands include:
 Visible cells are a table selection. Every matching row is a query-backed bulk operation that can include unloaded rows and
 requires separate confirmation.
 
-Same-column selection enables one schema-derived editor with an `Apply to N selected cells` action. Each write remains a partial
-row patch for that field. An all-or-nothing operation requires verification of the installed Jazz transaction API and the
-generic dynamic table proxy before the UI promises atomic behavior.
+Same-column mutation and query-backed bulk editing remain outside this refactor. They cannot restore a batch Apply workflow or
+another write surface without separate approval.
 
 ## Row and field information
 
@@ -376,22 +341,20 @@ The application can report total schema fields, visible fields, hidden fields, e
 The application can report:
 
 - position within loaded rows
-- position within checked rows
 - position within a page
 - position within a filtered and sorted query when a page offset is known
 
 The application cannot treat that position as stable identity or promise an exact table total without a count query. Live data,
 sorting, and filtering can change query position. Row ID remains the stable identity.
 
-Use labels such as `2 / 4 selected`, `Row 8 in current results`, or a page-offset position when that scope is known. Do not imply
+Use labels such as `Row 8 in current results` or a page-offset position when that scope is known. Do not imply
 that `Row 8` is an immutable database position.
 
 ## Visual behavior
 
-Distinct visual states identify checked rows, focused rows, selected cells, focused cells, validation, edits, and live updates.
+Distinct visual states identify the selected row, selected cells, focused cells, validation, edits, and live updates.
 
-- Checked rows use the selected-row background.
-- The focused checked row adds a distinct blue focus edge; adjacent checked rows retain only the selected background.
+- The selected row uses the selected-row background and a distinct blue focus edge.
 - Selected cells use the selected-cell background.
 - The focused cell receives the strongest blue focus border.
 - Row selection, cell selection, row focus, cell focus, validation, dirty state, and live-update state remain visually distinct.
@@ -417,24 +380,23 @@ does not reposition the pane.
 The foundation establishes:
 
 - row checkbox selection independent from cell selection
-- individual row selection and Shift range selection
-- one focused row within checked rows
+- single-row checkbox selection with guarded replacement and deselection
+- previous/next navigation through filtered and sorted page rows, including page boundaries
 - single-click cell focus without pane activation
-- double-click inline editing activation
-- pane and inline editing over one provider-owned update controller without simultaneous edit surfaces
-- table-scoped pending updates, duplicated-row insertions, and deletions with one Apply action, plus direct complete-row insertion
+- double-click and Enter activation into Details for application fields and ID, or Provenance for synthetic metadata, with requested-field focus
+- one current-row draft with pane Save, Cancel, and guarded discard transitions
+- confirmed direct deletion and direct insertion, including prefilled duplication
 - Command/Control additive multi-cell selection across rows and columns
 - Shift rectangular cell-range selection across visible rows and data columns
 - selection state independent from pane state
 - stable row-ID and column-ID targets
-- schema-derived row and inline editor presentation
-- structured editing in the Floating widget's expanded code editor
-- relation and binary activation into the complete-row pane
+- schema-derived row presentation and structured editing inside Details
+- read-only field activation into the complete-row pane
 - side-pane header, scrolling body, fixed footer, and accessible dismissal
 
 ## Recorded advanced behavior
 
-The following behavior is part of the product direction but is outside the foundation slice:
+These earlier advanced directions are outside this refactor and need separate approval before adding write surfaces or batch workflows:
 
 - selected-cell context menus with explicit copy and mutation commands
 - bulk-operation review and editing surfaces

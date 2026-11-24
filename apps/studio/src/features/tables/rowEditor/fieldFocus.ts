@@ -23,7 +23,9 @@ function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
  * after the relevant editor is rendered instead of observing the DOM for a future control.
  */
 export function focusRowEditorField(fieldName: string): boolean {
-  const field = document.getElementById(`row-editor-field-${fieldName}`)
+  const field =
+    document.getElementById(`row-editor-field-${fieldName}`) ??
+    document.getElementById(`row-provenance-field-${fieldName}`)
   if (field === null) {
     return false
   }

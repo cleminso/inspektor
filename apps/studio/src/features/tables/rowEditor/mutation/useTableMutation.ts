@@ -7,6 +7,9 @@
 import type { TableProxy, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
 
+import { GenericQueryBuilder } from '@tables/query/genericQueryBuilder'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { TABLE_PROVENANCE_COLUMN_NAMES } from '@tables/tableProvenance'
 import type { DynamicTableRow } from '@tables/tableTypes'
 
 interface UseTableMutationExecutorOptions {
@@ -50,6 +53,16 @@ export function useTableMutationExecutor({
   }
 
   return {
+    readRow: async (rowId: string): Promise<DynamicTableRow | null> => {
+      const runtime = getRuntime()
+      const query = new GenericQueryBuilder(tableName, runtime.tableProxy._schema)
+        .select('*', ...TABLE_PROVENANCE_COLUMN_NAMES)
+        .where({ id: { eq: rowId } })
+        .limit(1)
+      const rows = await runtime.client.db.all(query, INSPEKTOR_QUERY_OPTIONS)
+      const row = rows[0]
+      return row !== undefined && row.id === rowId ? row : null
+    },
     insertRow: async (values: Record<string, unknown>) => {
       const runtime = getRuntime()
       const insertedRow = await runtime.client.db

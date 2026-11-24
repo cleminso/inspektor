@@ -1,5 +1,7 @@
 # Mutation ledger
 
+This ledger preserves mutation infrastructure history. The approved pane-only workflow and all refactor implementation and validation work are owned by [Row Editor](rowEditor.md).
+
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
@@ -10,6 +12,11 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+[24/11/26]
+
+The older blocks below record the former batch workflow. Useful internal storage and lifecycle infrastructure can remain, but
+these records do not establish acceptance of the approved current-row Save contract.
 
 ### [05/09/26] Mutation command ownership
 
@@ -50,11 +57,21 @@
 
 ## Open product work
 
+[24/11/26]
+
+- [x] [superseded] Replace user-facing batch mutation work with [Row Editor open work](rowEditor.md#open-product-work).
+- The older remote-change question remains separate from this refactor; no new conflict policy is approved.
+
 ### [25/08/26] Remote changes
 
 - [ ] Define how staged drafts respond when live Jazz values change after the draft source snapshot.
 
 ## Work outside the foundation scope
+
+[24/11/26]
+
+No Effect rewrite, Jazz upgrade, transaction builder, or user-facing batch workflow. Duplicate uses the direct Insert pane.
+Internal ledger retention is limited to draft storage and lifecycle protection, not staged insertions or deletions.
 
 ### [25/08/26] Persistence transactions
 
@@ -62,6 +79,12 @@
 - Insert operations continue to persist outside the staged update and deletion ledger.
 
 ## Settled interaction decisions
+
+[24/11/26]
+
+Current-row Save replaces Apply. Cancel resets the current row and keeps the pane open. Confirmed Delete writes directly, and
+Duplicate opens a prefilled insert pane. These decisions supersede the old user-facing Apply and pending-widget rules below.
+See [Row Editor decisions](rowEditor.md#settled-interaction-decisions).
 
 ### [05/09/26] Pending mutation copy
 
@@ -76,11 +99,20 @@
 
 ## Open design decisions
 
+[24/11/26]
+
+The remote-conflict question below remains outside the approved refactor. It does not block removal of the batch UI.
+
 ### [25/08/26] Conflict policy
 
 - [ ] Choose last-write-wins, conflict presentation, or draft rebasing for remote source changes.
 
 ## Validation checklist
+
+[24/11/26]
+
+Older checks below are historical evidence for the previous workflow, not acceptance of its replacement.
+[Row Editor validation](rowEditor.md#validation-checklist) owns all refactor checks, including retained lifecycle protection.
 
 ### [25/08/26] Integration review commands
 

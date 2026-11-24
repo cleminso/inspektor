@@ -52,6 +52,7 @@ type ProviderAction =
     }
   | {
       initialDraft: RowMutationDraft
+      preserveSource: boolean
       rowId: string
       schemaColumns: readonly ColumnDescriptor[]
       type: 'updateDraft'
@@ -90,11 +91,11 @@ function reduceProviderState(
   if (action.type !== 'updateDraft') {
     return reduceTableMutationState(state, action)
   }
-  const currentDraft = rebaseUpdateRowDraft(
-    state.draftsByRowId[action.rowId] ?? action.initialDraft,
-    action.initialDraft.sourceValues,
-    action.schemaColumns,
-  )
+  const storedDraft = state.draftsByRowId[action.rowId] ?? action.initialDraft
+  const currentDraft =
+    action.preserveSource === true
+      ? storedDraft
+      : rebaseUpdateRowDraft(storedDraft, action.initialDraft.sourceValues, action.schemaColumns)
   const draft = typeof action.update === 'function' ? action.update(currentDraft) : action.update
   return reduceTableMutationState(state, {
     type: 'setDraft',
@@ -115,6 +116,7 @@ function createStoredTableMutationState(): StoredTableMutationState {
 const emptyStoredTableMutationState = createStoredTableMutationState()
 
 interface TableMutationLedgerWorkspaceContextValue {
+  isApplying: (scopeKey: string) => boolean
   discardPendingChanges: (scopeKey: string) => boolean
   dispatch: (scopeKey: string, action: ProviderAction) => void
   hasPendingChanges: (scopeKey: string) => boolean
@@ -159,8 +161,8 @@ export function TableMutationLedgerWorkspaceProvider({
   useLayoutEffect(() => {
     entriesByScopeRef.current = entriesByScope
   }, [entriesByScope])
-  const hasPending = Object.values(entriesByScope).some((entry) =>
-    hasUnresolvedMutationState(entry.state),
+  const hasPending = Object.values(entriesByScope).some(
+    (entry) => entry.execution.status === 'applying' || hasUnresolvedMutationState(entry.state),
   )
   useRegisterRuntimeScopeExitBlocker(hasPending)
 
@@ -178,8 +180,19 @@ export function TableMutationLedgerWorkspaceProvider({
   }, [hasPending])
 
   const dispatch = useCallback((scopeKey: string, action: ProviderAction) => {
+    if (
+      applyingScopesRef.current.has(scopeKey) === true &&
+      action.type !== 'acknowledgeAppliedEntries'
+    ) {
+      return
+    }
     setEntriesByScope((current) => {
       const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
+      // A matching live value can be an optimistic echo, not global acceptance. A rejected write
+      // must keep its original baseline and raw inputs until Save succeeds or Cancel discards it.
+      if (currentEntry.execution.status === 'failed' && action.type === 'rebaseRows') {
+        return current
+      }
       if (
         currentEntry.execution.status === 'applying' &&
         action.type !== 'acknowledgeAppliedEntries'
@@ -202,6 +215,10 @@ export function TableMutationLedgerWorkspaceProvider({
     if (applyingScopesRef.current.has(scopeKey)) {
       return false
     }
+    // Tab-close navigation follows this command before React commits the workspace update.
+    const nextEntries = { ...entriesByScopeRef.current }
+    delete nextEntries[scopeKey]
+    entriesByScopeRef.current = nextEntries
     setEntriesByScope((current) => {
       if (current[scopeKey] === undefined) {
         return current
@@ -244,14 +261,16 @@ export function TableMutationLedgerWorkspaceProvider({
     const entry = entriesByScopeRef.current[scopeKey]
     return entry !== undefined && hasUnresolvedMutationState(entry.state)
   }, [])
+  const isApplying = useCallback((scopeKey: string) => applyingScopesRef.current.has(scopeKey), [])
   const value = useMemo<TableMutationLedgerWorkspaceContextValue>(
     () => ({
       discardPendingChanges,
       dispatch,
       hasPendingChanges,
+      isApplying,
       setExecution,
     }),
-    [discardPendingChanges, dispatch, hasPendingChanges, setExecution],
+    [discardPendingChanges, dispatch, hasPendingChanges, isApplying, setExecution],
   )
 
   return (
@@ -264,6 +283,7 @@ export function TableMutationLedgerWorkspaceProvider({
 }
 
 interface TableMutationWorkspace {
+  isApplying: (scopeKey: string) => boolean
   discardPendingChanges: (scopeKey: string) => boolean
   hasPendingChanges: (scopeKey: string) => boolean
 }
@@ -438,28 +458,36 @@ export function useTableMutationEditorController({
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const schemaColumns = context.schemaColumns
-  const setExecution = context.setExecution
   const initialDraft = useMemo(() => createUpdateRowDraft(initialRowValues), [initialRowValues])
   const storedDraft = context.state.draftsByRowId[rowId]
   const draft = useMemo(
     () =>
       storedDraft === undefined
         ? initialDraft
-        : rebaseUpdateRowDraft(storedDraft, initialRowValues, schemaColumns),
-    [initialDraft, initialRowValues, schemaColumns, storedDraft],
+        : context.execution.status !== 'idle'
+          ? storedDraft
+          : rebaseUpdateRowDraft(storedDraft, initialRowValues, schemaColumns),
+    [context.execution.status, initialDraft, initialRowValues, schemaColumns, storedDraft],
   )
   const setDraft = useCallback<Dispatch<SetStateAction<RowMutationDraft>>>(
     (update) => {
-      contextDispatch({ type: 'updateDraft', initialDraft, rowId, schemaColumns, update })
-      setExecution((current) => (current.status === 'failed' ? idleExecution : current))
+      contextDispatch({
+        type: 'updateDraft',
+        initialDraft,
+        preserveSource: context.execution.status !== 'idle',
+        rowId,
+        schemaColumns,
+        update,
+      })
     },
-    [contextDispatch, initialDraft, rowId, schemaColumns, setExecution],
+    [context.execution.status, contextDispatch, initialDraft, rowId, schemaColumns],
   )
   useEffect(() => {
     if (storedDraft !== undefined && draft !== storedDraft) {
       contextDispatch({
         type: 'updateDraft',
         initialDraft,
+        preserveSource: context.execution.status !== 'idle',
         rowId,
         schemaColumns,
         update: draft,

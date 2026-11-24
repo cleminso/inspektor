@@ -1,5 +1,7 @@
 # Inline editing
 
+This ledger preserves inline-editing history. The approved side-pane-only refactor and all related implementation and acceptance work are owned by [Row Editor](rowEditor.md).
+
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
@@ -11,6 +13,11 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+[24/11/26]
+
+The older blocks below are implementation history. Their floating-editor, widget, staging, and Apply claims do not describe the
+approved replacement. No replacement runtime acceptance is claimed here.
 
 [14/09/26]
 
@@ -356,6 +363,11 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 
 ## Open product work
 
+[24/11/26]
+
+- [x] [superseded] Replace the inline-editor workflow with Details activation and current-row pane actions. See [Row Editor open work](rowEditor.md#open-product-work).
+- All older unchecked inline workflow items below are historical, not active tasks. The payload-enum question remains separate and outside this refactor.
+
 [14/09/26]
 
 ### Payload enum editing
@@ -365,8 +377,8 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 [14/08/26]
 
 The older blocks below record the superseded single-row draft design and are retained as implementation history. They are not
-active product requirements. Current work follows the implemented update-and-deletion ledger model above and the focused Floating
-mutation widget specification.
+active product requirements. The ledger model recorded above is also superseded by the side-pane-only contract in
+[Row Editor](rowEditor.md).
 
 [28/07/26]
 
@@ -432,6 +444,11 @@ mutation widget specification.
 
 ## Work outside the foundation scope
 
+[24/11/26]
+
+Floating field editors, batch Save, staged deletion, and a pending-change widget are excluded. Existing direct insertion and
+field parsing remain unchanged. The older unchecked exclusions below are historical notes, not implementation tasks.
+
 [28/07/26]
 
 - [ ] Inline insertion through a temporary grid row is not part of the current inline editing scope; insertion remains pane-based.
@@ -441,6 +458,12 @@ mutation widget specification.
 - [ ] Cell hover cards are not introduced as part of inline editing.
 
 ## Settled interaction decisions
+
+[24/11/26]
+
+The side pane is the only write surface. Double-click or Enter opens Details at the selected field, including read-only fields.
+Current-row Save, Cancel, guarded transitions, direct Delete, and prefilled Duplicate supersede the older decisions below.
+See [Row Editor decisions](rowEditor.md#settled-interaction-decisions).
 
 [28/08/26]
 
@@ -515,6 +538,11 @@ mutation widget specification.
 
 ## Open design decisions
 
+[24/11/26]
+
+The old floating-editor completion, placement, and batch-review questions below are superseded, not open requirements.
+The accepted replacement is recorded in [Row Editor](rowEditor.md#settled-interaction-decisions).
+
 [17/08/26]
 
 - [x] Supersede the pending-cell presentation question with a warm amber staged-cell treatment that remains distinct from selection and focus.
@@ -522,8 +550,8 @@ mutation widget specification.
 
 [14/08/26]
 
-The older completion, row-level persistence, and dirty-transition questions below are settled by the table-ledger model. Remaining
-product decisions concern timestamp interaction, pending-cell presentation, hidden pending columns, and pagination presentation.
+This historical block settled its earlier questions through the former table-ledger model. The current pane-only contract
+supersedes its floating-editor and pending-cell questions.
 
 [28/07/26]
 
@@ -538,6 +566,10 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 
 ## Mutation-boundary correctness
 
+[24/11/26]
+
+The parsing constraints below remain relevant to pane editing. They do not establish acceptance of the replacement workflow.
+
 [28/07/26]
 
 - [x] Restrict writable BigInt values to JavaScript's safe integer range because the installed Jazz boundary uses `Number`.
@@ -546,6 +578,11 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[24/11/26]
+
+Older checks below concern the former workflow. Unchecked floating-editor checks are superseded, not replacement acceptance tasks.
+All refactor validation is owned by [Row Editor validation](rowEditor.md#validation-checklist).
 
 [28/08/26]
 

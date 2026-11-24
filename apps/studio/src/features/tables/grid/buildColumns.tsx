@@ -861,6 +861,7 @@ export function buildDataGridColumns({
     enableResizing: false,
     enableSorting: false,
     header: ({ table }) => {
+      if (table.options.enableMultiRowSelection === false) return null
       const isAllSelected = table.getIsAllPageRowsSelected()
       const isSomeSelected = table.getIsSomePageRowsSelected()
       const pageRows = table.getRowModel().rows

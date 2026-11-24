@@ -13,12 +13,15 @@ interface RowEditorSidePanelProps {
   canNavigateNext?: boolean
   canNavigatePrevious?: boolean
   children: React.ReactNode
+  dirty?: boolean
   editedRowIds: TableRowId[]
   insertMoreEnabled?: boolean
   mode: 'insert' | 'edit'
   mutationDisabled?: boolean
   navigationLabel?: string | null
   onClose?: () => void
+  onCancel?: () => void
+  deleteRequested?: boolean
   onConfirmDelete?: (rowIds: readonly TableRowId[]) => void
   onInsertMoreEnabledChange?: (enabled: boolean) => void
   onNavigateNext: () => void
@@ -121,12 +124,15 @@ export function RowEditorSidePanel({
   canNavigateNext = false,
   canNavigatePrevious = false,
   children,
+  dirty = false,
   editedRowIds,
   insertMoreEnabled = false,
   mode,
   mutationDisabled = false,
   navigationLabel = null,
   onClose,
+  onCancel,
+  deleteRequested = false,
   onConfirmDelete,
   onInsertMoreEnabledChange,
   onNavigateNext,
@@ -135,13 +141,16 @@ export function RowEditorSidePanel({
   const [deleteConfirmationRowIds, setDeleteConfirmationRowIds] = useState<
     readonly TableRowId[] | null
   >(null)
+  const deleteTargetRowId = editedRowIds[0] ?? null
   useEffect(() => {
     setDeleteConfirmationRowIds(null)
-  }, [mode])
+  }, [deleteTargetRowId, mode])
+  useEffect(() => {
+    if (deleteRequested === true && deleteTargetRowId !== null) {
+      setDeleteConfirmationRowIds([deleteTargetRowId])
+    }
+  }, [deleteRequested, deleteTargetRowId])
   const insertMoreFieldId = 'insert-more'
-  const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds
-  const deleteLabel =
-    deleteRowIds.length === 1 ? 'Delete row' : `Delete ${deleteRowIds.length} checked rows`
   const footer =
     mode === 'edit' && (onConfirmDelete !== undefined || onClose !== undefined) ? (
       <Box
@@ -158,7 +167,34 @@ export function RowEditorSidePanel({
         paddingVertical="s"
         paddingRight="l"
       >
-        {deleteConfirmationRowIds === null || onConfirmDelete === undefined ? (
+        {dirty === true ? (
+          <>
+            <Box flex={1}>
+              <Button
+                type="submit"
+                form="edit-row-form"
+                size="s"
+                layout="fill"
+                variant="primary"
+                disabled={mutationDisabled}
+              >
+                Save
+              </Button>
+            </Box>
+            <Box flex={1}>
+              <Button
+                type="button"
+                size="s"
+                layout="fill"
+                variant="secondary"
+                disabled={mutationDisabled}
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </>
+        ) : deleteConfirmationRowIds === null || onConfirmDelete === undefined ? (
           <>
             {onConfirmDelete === undefined ? null : (
               <Box flex={1}>
@@ -168,9 +204,11 @@ export function RowEditorSidePanel({
                   layout="fill"
                   size="s"
                   variant="danger"
-                  onClick={() => setDeleteConfirmationRowIds([...editedRowIds])}
+                  onClick={() => {
+                    if (deleteTargetRowId !== null) setDeleteConfirmationRowIds([deleteTargetRowId])
+                  }}
                 >
-                  {deleteLabel}
+                  Delete row
                 </Button>
               </Box>
             )}
@@ -181,6 +219,7 @@ export function RowEditorSidePanel({
                   layout="fill"
                   size="s"
                   variant="secondary"
+                  disabled={mutationDisabled}
                   onClick={onClose}
                 >
                   Close

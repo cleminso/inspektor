@@ -15,7 +15,7 @@ import {
   useState,
 } from 'react'
 
-import { toasts, type DataGridCellTarget, type DataGridFocusRequest } from '@inspektor/ds'
+import { toasts, type DataGridCellTarget } from '@inspektor/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -30,7 +30,6 @@ import { useTableGrid } from '@tables/grid/useTableGrid'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
-import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { useTableMutationExecutor } from '@tables/rowEditor/mutation/useTableMutation'
 import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
@@ -45,13 +44,9 @@ import type {
   TablePageSize,
 } from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
-import {
-  getInlineFieldRoute,
-  resolveSpreadsheetCompletionTarget,
-  type SpreadsheetCompletionDirection,
-} from '@tables/grid/inlineEditing'
 
 interface UseTableViewStateOptions {
+  requestTransition?: (action: () => void) => void
   disabledRowIds?: ReadonlySet<TableRowId>
   onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
   retainDisabledRows?: boolean
@@ -65,6 +60,7 @@ const emptyDisabledRowIds: ReadonlySet<TableRowId> = new Set()
 const emptyRecentlyAppliedCells: TableFieldsByRowId = {}
 const emptyRecentlyInsertedRowIds: ReadonlySet<TableRowId> = new Set()
 const emptyStagedValuesByRowId: TableValuesByRowId = {}
+const runTransition = (action: () => void) => action()
 
 const recentChangeStatusDuration = 1200
 const recentlyAppliedTimerKey = Symbol('recentlyApplied')
@@ -75,7 +71,7 @@ interface InsertRowSaveOptions {
 
 type DetailPaneState =
   | { mode: 'closed' }
-  | { mode: 'insert' }
+  | { mode: 'insert'; values?: Record<string, unknown> }
   | { mode: 'rows'; activeRowId: TableRowId }
 
 type PendingPageRowNavigation = {
@@ -86,10 +82,10 @@ type PendingPageRowNavigation = {
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
  *
- * Row target changes only change the visible projection. Provider-owned pending changes remain in
- * the mounted table state until Apply or Discard resolves them.
+ * Row target changes pass through the pane transition guard before selection changes.
  */
 export function useTableViewState({
+  requestTransition = runTransition,
   disabledRowIds = emptyDisabledRowIds,
   onUndoRowDeletions,
   retainDisabledRows = false,
@@ -246,16 +242,12 @@ export function useTableViewState({
     }
   }, [searchState.sortColumn, sortColumn, sortDirection, wasmSchema])
   const [detailPane, setDetailPane] = useState<DetailPaneState>({ mode: 'closed' })
+  const [requestedField, setRequestedField] = useState<DataGridCellTarget | null>(null)
+  const [insertRevision, setInsertRevision] = useState(0)
   const detailPaneMode = detailPane.mode
   const activeRowId = detailPane.mode === 'rows' ? detailPane.activeRowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
-  const [activeFieldEditor, setActiveFieldEditor] = useState<{
-    rowValues: Record<string, unknown>
-    target: DataGridCellTarget
-  } | null>(null)
-  const activeFieldEditorTarget = activeFieldEditor?.target ?? null
-  const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>([])
   const pendingPageRowNavigationRef = useRef<PendingPageRowNavigation | null>(null)
   const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] = useState<ReadonlySet<TableRowId>>(
@@ -406,8 +398,7 @@ export function useTableViewState({
     () => validRowIds.filter((rowId) => disabledRowIds.has(rowId) === false),
     [disabledRowIds, validRowIds],
   )
-  const hasMultipleEditedRows = editedRowIds.length > 1
-  const navigationRowIds = hasMultipleEditedRows === true ? editedRowIds : navigablePageRowIds
+  const navigationRowIds = navigablePageRowIds
   const activeNavigationRowIndex = activeRowId === null ? -1 : navigationRowIds.indexOf(activeRowId)
   const visibleSelectedRowIds = useMemo(() => {
     const validRowIdSet = new Set(validRowIds)
@@ -434,21 +425,26 @@ export function useTableViewState({
         nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
           ? nextActiveRowId
           : nextSelectedRowIds[0]
-      setSelectedRowIds(nextSelectedRowIds)
-      setActiveColumnId(null)
-      setActiveFieldEditor(null)
+      const commit = () => {
+        setRequestedField(null)
+        setSelectedRowIds(resolvedActiveRowId === undefined ? [] : [resolvedActiveRowId])
+        setActiveColumnId(null)
 
-      if (resolvedActiveRowId === undefined) {
-        setDetailPane({ mode: 'closed' })
-        return
+        if (resolvedActiveRowId === undefined) {
+          setDetailPane({ mode: 'closed' })
+          return
+        }
+        setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
       }
-      setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
+      if (resolvedActiveRowId === activeRowId) commit()
+      else requestTransition(commit)
     },
-    [],
+    [activeRowId, requestTransition],
   )
 
   useLayoutEffect(() => {
     if (
+      retainDisabledRows === true ||
       activeRowId === null ||
       visibleActiveRow !== null ||
       activeRowQueryStatus !== 'fulfilled' ||
@@ -466,6 +462,7 @@ export function useTableViewState({
     activeRowId,
     activeRowQueryStatus,
     openRows,
+    retainDisabledRows,
     selectedRowIds,
     validRowIds,
     visibleActiveRow,
@@ -502,10 +499,10 @@ export function useTableViewState({
   }
 
   const resetSelection = useCallback((nextSelectedRowIds: TableRowId[] = []) => {
+    setRequestedField(null)
     setSelectedRowIds(nextSelectedRowIds)
     setCellSelection([])
     setActiveColumnId(null)
-    setActiveFieldEditor(null)
   }, [])
 
   useLayoutEffect(() => {
@@ -622,40 +619,32 @@ export function useTableViewState({
     }
   }, [activeRowId, selectedRow])
   const retainedActiveRow =
-    query.isInitialLoading === true && settledActiveRowRef.current?.rowId === activeRowId
+    (query.isInitialLoading === true || retainDisabledRows === true) &&
+    settledActiveRowRef.current?.rowId === activeRowId
       ? settledActiveRowRef.current.row
       : null
   const rowValues = useMemo(() => {
     if (detailPaneMode === 'insert') {
-      return {}
+      return detailPane.mode === 'insert' ? (detailPane.values ?? {}) : {}
     }
 
     return selectedRow ?? retainedActiveRow
-  }, [detailPaneMode, retainedActiveRow, selectedRow])
+  }, [detailPane, detailPaneMode, retainedActiveRow, selectedRow])
 
   const closeDetailPane = () => {
+    setRequestedField(null)
     pendingPageRowNavigationRef.current = null
     setDetailPane({ mode: 'closed' })
   }
 
   const closeRowEditor = () => {
-    setSelectedRowIds([])
-    closeDetailPane()
-  }
-
-  const requestCellFocus = (target: DataGridCellTarget) => {
-    setCellFocusRequest((current) => ({
-      requestId: (typeof current?.requestId === 'number' ? current.requestId : 0) + 1,
-      target,
-    }))
+    requestTransition(() => {
+      setSelectedRowIds([])
+      closeDetailPane()
+    })
   }
 
   const handleEscape = () => {
-    if (activeFieldEditorTarget !== null) {
-      setActiveFieldEditor(null)
-      requestCellFocus(activeFieldEditorTarget)
-      return
-    }
     if (detailPaneMode !== 'closed') {
       closeRowEditor()
       return
@@ -665,10 +654,13 @@ export function useTableViewState({
     setActiveColumnId(null)
   }
 
-  const openInsert = () => {
-    pendingPageRowNavigationRef.current = null
-    resetSelection()
-    setDetailPane({ mode: 'insert' })
+  const openInsert = (values?: Record<string, unknown>) => {
+    requestTransition(() => {
+      pendingPageRowNavigationRef.current = null
+      resetSelection()
+      setInsertRevision((revision) => revision + 1)
+      setDetailPane({ mode: 'insert', values })
+    })
   }
 
   const handleInsertSave = async (
@@ -684,32 +676,13 @@ export function useTableViewState({
     closeDetailPane()
   }
 
-  const handleMutationApplySuccess = () => {
-    if (detailPaneMode === 'insert') {
-      return
-    }
-    resetSelection()
-    closeDetailPane()
-  }
-
-  const handleRowsStagedForDeletion = (rowIds: readonly TableRowId[]) => {
-    const deletedRowIds = new Set(rowIds)
+  const handleRowDeleteSuccess = (rowId: TableRowId) => {
     setSelectedRowIds((currentRowIds) =>
-      currentRowIds.filter((rowId) => deletedRowIds.has(rowId) === false),
+      currentRowIds.filter((candidateId) => candidateId !== rowId),
     )
     setCellSelection([])
     setActiveColumnId(null)
-    setActiveFieldEditor(null)
     closeDetailPane()
-  }
-
-  const goToRowIndex = (nextActiveRowIndex: number) => {
-    const nextActiveRowId = editedRowIds[nextActiveRowIndex] ?? null
-    if (nextActiveRowId === null) {
-      return
-    }
-
-    setDetailPane({ mode: 'rows', activeRowId: nextActiveRowId })
   }
 
   const goToPageEdge = (page: number, edge: PendingPageRowNavigation['edge']) => {
@@ -730,10 +703,6 @@ export function useTableViewState({
   }
 
   const goToPreviousRow = () => {
-    if (hasMultipleEditedRows === true) {
-      goToRowIndex(Math.max(activeNavigationRowIndex - 1, 0))
-      return
-    }
     if (activeNavigationRowIndex > 0) {
       const previousRowId = navigablePageRowIds[activeNavigationRowIndex - 1]
       openRows(previousRowId === undefined ? [] : [previousRowId], previousRowId ?? null)
@@ -745,10 +714,6 @@ export function useTableViewState({
   }
 
   const goToNextRow = () => {
-    if (hasMultipleEditedRows === true) {
-      goToRowIndex(Math.min(activeNavigationRowIndex + 1, editedRowIds.length - 1))
-      return
-    }
     const nextRowId = navigablePageRowIds[activeNavigationRowIndex + 1]
     if (nextRowId !== undefined) {
       openRows([nextRowId], nextRowId)
@@ -760,61 +725,28 @@ export function useTableViewState({
   }
 
   const canNavigatePrevious =
-    activeNavigationRowIndex > 0 ||
-    (hasMultipleEditedRows === false && activeNavigationRowIndex === 0 && searchState.page > 1)
+    activeNavigationRowIndex > 0 || (activeNavigationRowIndex === 0 && searchState.page > 1)
   const canNavigateNext =
     activeNavigationRowIndex >= 0 &&
-    (activeNavigationRowIndex < navigationRowIds.length - 1 ||
-      (hasMultipleEditedRows === false && query.hasNextPage === true))
+    (activeNavigationRowIndex < navigationRowIds.length - 1 || query.hasNextPage === true)
   const lastLoadedRowNumber = (searchState.page - 1) * searchState.pageSize + rows.length
   const navigationLabel =
     activeRowId === null || activeNavigationRowIndex < 0
       ? null
-      : hasMultipleEditedRows === true
-        ? `${activeNavigationRowIndex + 1} / ${editedRowIds.length} selected`
-        : `${(searchState.page - 1) * searchState.pageSize + activePageRowIndex + 1} / ${
-            query.hasNextPage === true ? `${lastLoadedRowNumber + 1}+` : lastLoadedRowNumber
-          }`
-
-  const handleFieldEditorCancel = () => {
-    if (activeFieldEditorTarget === null) {
-      return
-    }
-    setActiveFieldEditor(null)
-    requestCellFocus(activeFieldEditorTarget)
-  }
-
-  const handleFieldEditorComplete = (direction: SpreadsheetCompletionDirection) => {
-    if (activeFieldEditorTarget === null) {
-      return
-    }
-    const focusableRows = table.getRowModel().rows.map((row) =>
-      row
-        .getVisibleCells()
-        .filter((cell) => cell.getCanSelect() === true)
-        .map((cell) => ({ columnId: cell.column.id, rowId: row.id })),
-    )
-    const target = resolveSpreadsheetCompletionTarget(
-      focusableRows,
-      activeFieldEditorTarget,
-      direction,
-    )
-    setActiveFieldEditor(null)
-    requestCellFocus(target)
-  }
+      : `${(searchState.page - 1) * searchState.pageSize + activePageRowIndex + 1} / ${
+          query.hasNextPage === true ? `${lastLoadedRowNumber + 1}+` : lastLoadedRowNumber
+        }`
 
   return {
     activeColumnId,
-    activeFieldEditorTarget,
-    activeFieldEditorRowValues: activeFieldEditor?.rowValues ?? null,
     canInspectSchema: wasmSchema !== null,
     canMutateRows: client !== null && wasmSchema !== null,
     canOpenRowEditor: wasmSchema !== null,
-    cellFocusRequest,
     reorderableColumnIds: columnIds,
     recentlyAppliedCells,
     recentlyInsertedRowIds,
     detailPaneMode,
+    insertRevision,
     error: isReconnecting === true || isConnectionDiagnosisPending === true ? null : query.error,
     table,
     rows,
@@ -834,6 +766,7 @@ export function useTableViewState({
     setFilters,
     tableColumns: query.columns,
     rowValues,
+    requestedField,
     rowEditorQueryError: activeRowQueryStatus === 'rejected' ? activeRowQuery.error : null,
     rowEditorQueryLoading:
       activeRowId !== null && visibleActiveRow === null && activeRowQueryStatus === 'pending',
@@ -850,47 +783,28 @@ export function useTableViewState({
     handleCellActivate: (target: DataGridCellTarget) => {
       setActiveColumnId(null)
       if (detailPaneMode === 'rows' && target.rowId === activeRowId) {
-        requestAnimationFrame(() => {
-          focusRowEditorField(target.columnId)
-        })
+        setRequestedField({ ...target })
       }
     },
     handleCellEditRequest: (target: DataGridCellTarget) => {
-      if (detailPaneMode !== 'closed') {
-        return
-      }
       const columnMeta = query.columns.find((column) => column.id === target.columnId)
       if (columnMeta === undefined) {
         return
       }
-      const route = getInlineFieldRoute(columnMeta)
-      if (route === 'rowPane') {
-        const nextSelectedRowIds = effectiveSelectedRowIds.includes(target.rowId)
-          ? effectiveSelectedRowIds
-          : [...effectiveSelectedRowIds, target.rowId]
-        openRows(nextSelectedRowIds, target.rowId)
-        requestAnimationFrame(() => {
-          focusRowEditorField(target.columnId)
-        })
-        return
+      const open = () => {
+        setSelectedRowIds([target.rowId])
+        setActiveColumnId(null)
+        setDetailPane({ mode: 'rows', activeRowId: target.rowId })
+        setRequestedField({ ...target })
       }
-      if (route !== 'fieldEditor') {
-        return
-      }
-      setActiveColumnId(null)
-      const row = rows.find((candidate) => String(candidate.id) === target.rowId)
-      if (row !== undefined) {
-        setActiveFieldEditor({ rowValues: { ...row }, target })
-      }
+      if (activeRowId === target.rowId) open()
+      else requestTransition(open)
     },
     handleEscape,
     handleColumnActivate,
-    handleFieldEditorCancel,
-    handleFieldEditorComplete,
     handleInsertSave,
-    handleMutationApplySuccess,
     handleMutationUpdatesApplied: highlightRecentlyAppliedCells,
-    handleRowsStagedForDeletion,
+    handleRowDeleteSuccess,
     closeRowEditor,
   }
 }

@@ -26,10 +26,12 @@ interface UseRowEditorFieldsOptions {
   draftController: RowDraftController
   mode: DetailPaneMode
   onSubmit: (values: Record<string, unknown>) => Promise<void> | void
+  onValidationFailure?: () => void
   schemaColumns: ColumnDescriptor[]
 }
 
 interface RowEditorFieldsProps {
+  disabled?: boolean
   errors: Record<string, string>
   expandedColumnName: string | null
   fieldStates: Record<string, MutationFieldInput>
@@ -53,6 +55,7 @@ export function useRowEditorFields({
   draftController,
   mode,
   onSubmit,
+  onValidationFailure,
   schemaColumns,
 }: UseRowEditorFieldsOptions) {
   const { draft } = draftController.state
@@ -138,6 +141,7 @@ export function useRowEditorFields({
 
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) {
+      onValidationFailure?.()
       // Collapse expanded editors so the first invalid field can be revealed and focused.
       setExpandedColumnName(null)
       const firstInvalidField = schemaColumns.find(
@@ -180,6 +184,7 @@ export function useRowEditorFields({
 
 /** Renders schema-derived fields from state and actions owned by `useRowEditorFields`. */
 export function RowEditorFields({
+  disabled = false,
   errors,
   expandedColumnName,
   fieldStates,
@@ -244,6 +249,7 @@ export function RowEditorFields({
 
         return (
           <MutationField
+            disabled={disabled}
             column={column}
             error={errors[column.name]}
             expanded={isExpanded}
@@ -252,7 +258,9 @@ export function RowEditorFields({
             initialValue={initialRowValues[column.name]}
             onExpandedChange={(expanded) => onFieldExpandedChange(column.name, expanded)}
             onContextLeave={() => onFieldContextLeave(column.name)}
-            onInputChange={(input) => onFieldInputChange(column.name, input)}
+            onInputChange={(input) => {
+              if (disabled === false) onFieldInputChange(column.name, input)
+            }}
             canOmit={mode === 'insert' && column.default !== undefined && readOnlyReason === null}
             readOnlyReason={readOnlyReason}
             sourceUnavailable={mode === 'edit' && initialRowValues[column.name] === undefined}

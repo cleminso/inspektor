@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -12,6 +12,7 @@ import {
   type FindBarSearchOptions,
   type FindBarState,
   type JsonViewSearchResults,
+  type DataGridCellTarget,
 } from '@inspektor/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
@@ -20,9 +21,13 @@ import { buildRowMutationValueProjection } from '@tables/rowEditor/mutation/draf
 import { RowProvenanceFields } from '@tables/rowEditor/provenanceFields'
 import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
 import { TABLE_PROVENANCE_COLUMNS } from '@tables/tableProvenance'
+import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 
 interface EditRowFormProps {
+  requestedField?: DataGridCellTarget | null
   draftController: RowDraftController
+  onSave: (values: Record<string, unknown>) => Promise<void>
+  disabled?: boolean
   onRepresentationChange: (representation: RowRepresentation) => void
   representation: RowRepresentation
   rowValues: Record<string, unknown>
@@ -145,8 +150,11 @@ function RowProvenanceRepresentation({
 }
 
 export function EditRowForm({
+  requestedField = null,
   draftController,
   onRepresentationChange,
+  onSave,
+  disabled = false,
   representation,
   rowValues,
   schemaColumns,
@@ -154,12 +162,61 @@ export function EditRowForm({
   const rowEditor = useRowEditorFields({
     draftController,
     mode: 'edit',
-    onSubmit: () => undefined,
+    onSubmit: onSave,
+    onValidationFailure: () => onRepresentationChange('details'),
     schemaColumns,
   })
+  const handledFieldRequest = useRef<DataGridCellTarget | null>(null)
+  const { expandedColumnName, isSaving, setFieldExpanded } = rowEditor
+  useLayoutEffect(() => {
+    if (
+      requestedField === null ||
+      handledFieldRequest.current === requestedField ||
+      requestedField.rowId !== String(rowValues.id) ||
+      disabled === true ||
+      isSaving === true
+    )
+      return
+    const requestedRepresentation = TABLE_PROVENANCE_COLUMNS.some(
+      (column) => column.name === requestedField.columnId,
+    )
+      ? 'provenance'
+      : 'details'
+    if (representation !== requestedRepresentation) {
+      onRepresentationChange(requestedRepresentation)
+      return
+    }
+    if (
+      requestedRepresentation === 'details' &&
+      expandedColumnName !== null &&
+      expandedColumnName !== requestedField.columnId
+    ) {
+      setFieldExpanded(expandedColumnName, false)
+      return
+    }
+    if (focusRowEditorField(requestedField.columnId) === true) {
+      handledFieldRequest.current = requestedField
+    }
+  }, [
+    disabled,
+    expandedColumnName,
+    isSaving,
+    onRepresentationChange,
+    representation,
+    requestedField,
+    rowValues.id,
+    setFieldExpanded,
+  ])
 
   return (
     <Box
+      as="fieldset"
+      disabled={disabled || rowEditor.isSaving}
+      inert={disabled || rowEditor.isSaving}
+      borderWidth={0}
+      padding="none"
+      margin="none"
+      minWidth={0}
       height="full"
       minHeight={0}
       flexDirection="column"
@@ -185,18 +242,28 @@ export function EditRowForm({
           <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
           <ToggleGroup.Item value="provenance">Provenance</ToggleGroup.Item>
         </ToggleGroup>
+        {rowEditor.saveError !== null ? (
+          <Text
+            color="error"
+            role="alert"
+          >
+            {rowEditor.saveError}
+          </Text>
+        ) : null}
       </Box>
-      {representation === 'details' ? (
-        <Box
-          as="form"
-          data-slot="edit-row-form"
-          height="full"
-          minHeight={0}
-          flexDirection="column"
-          mt="m"
-          overflow="hidden"
-          onSubmit={rowEditor.submit}
-        >
+      <Box
+        as="form"
+        id="edit-row-form"
+        inert={disabled || rowEditor.isSaving}
+        data-slot="edit-row-form"
+        height="full"
+        minHeight={0}
+        flexDirection="column"
+        mt="m"
+        overflow="hidden"
+        onSubmit={rowEditor.submit}
+      >
+        {representation === 'details' ? (
           <Box
             flexGrow={1}
             mb="m"
@@ -217,6 +284,7 @@ export function EditRowForm({
                 px="m"
               >
                 <RowEditorFields
+                  disabled={disabled || rowEditor.isSaving}
                   errors={rowEditor.errors}
                   expandedColumnName={rowEditor.expandedColumnName}
                   fieldStates={rowEditor.fieldStates}
@@ -227,28 +295,19 @@ export function EditRowForm({
                   onFieldExpandedChange={rowEditor.setFieldExpanded}
                   onFieldInputChange={rowEditor.setFieldInput}
                 />
-
-                {rowEditor.saveError !== null ? (
-                  <Text
-                    color="error"
-                    role="alert"
-                  >
-                    {rowEditor.saveError}
-                  </Text>
-                ) : null}
               </Box>
             </ScrollArea>
           </Box>
-        </Box>
-      ) : representation === 'json' ? (
-        <RowJsonRepresentation
-          draftController={draftController}
-          rowValues={rowValues}
-          schemaColumns={schemaColumns}
-        />
-      ) : (
-        <RowProvenanceRepresentation rowValues={rowValues} />
-      )}
+        ) : representation === 'json' ? (
+          <RowJsonRepresentation
+            draftController={draftController}
+            rowValues={rowValues}
+            schemaColumns={schemaColumns}
+          />
+        ) : (
+          <RowProvenanceRepresentation rowValues={rowValues} />
+        )}
+      </Box>
     </Box>
   )
 }

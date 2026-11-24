@@ -114,6 +114,7 @@ export function useTableGrid({
       autoResetCellSelection: false,
       columnResizeMode: 'onChange',
       enableRowSelection: (row) => disabledRowIds.has(row.id) === false,
+      enableMultiRowSelection: false,
       enableCellSelection: (cell) => disabledRowIds.has(cell.row.id) === false,
       manualSorting: true,
       state: {

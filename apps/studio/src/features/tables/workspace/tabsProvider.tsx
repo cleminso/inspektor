@@ -306,6 +306,20 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
 
   const closeTab = useCallback(
     (tabId: string) => {
+      if (
+        currentTableName !== null &&
+        mutationWorkspace.isApplying(createTableScope(scope, currentTableName)) === true
+      ) {
+        return
+      }
+      if (
+        tabId === activeTabId &&
+        currentTableName !== null &&
+        mutationWorkspace.hasPendingChanges(createTableScope(scope, currentTableName)) === true
+      ) {
+        setPendingTabClose({ tableName: currentTableName, tabId })
+        return
+      }
       const finalTableName = getFinalTableTabName(state.tabs, tabId)
       if (finalTableName !== null) {
         const scopeKey = createTableScope(scope, finalTableName)
@@ -319,14 +333,24 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       }
       closeTabWithoutConfirmation(tabId)
     },
-    [closeTabWithoutConfirmation, mutationWorkspace, scope, state.tabs],
+    [
+      activeTabId,
+      closeTabWithoutConfirmation,
+      currentTableName,
+      mutationWorkspace,
+      scope,
+      state.tabs,
+    ],
   )
 
   const discardPendingChangesAndCloseTab = useCallback(() => {
     if (pendingTabClose === null) {
       return
     }
-    if (getFinalTableTabName(state.tabs, pendingTabClose.tabId) === null) {
+    if (
+      getFinalTableTabName(state.tabs, pendingTabClose.tabId) === null &&
+      pendingTabClose.tabId !== activeTabId
+    ) {
       closeTabWithoutConfirmation(pendingTabClose.tabId)
       setPendingTabClose(null)
       return
@@ -340,7 +364,14 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     }
     closeTabWithoutConfirmation(pendingTabClose.tabId)
     setPendingTabClose(null)
-  }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope, state.tabs])
+  }, [
+    activeTabId,
+    closeTabWithoutConfirmation,
+    mutationWorkspace,
+    pendingTabClose,
+    scope,
+    state.tabs,
+  ])
 
   const openNewView = useCallback(() => {
     const tabs = openNewViewTab(state.tabs)
@@ -499,11 +530,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         }}
       >
         <AlertDialog.Content>
-          <AlertDialog.Title>Discard staged changes?</AlertDialog.Title>
+          <AlertDialog.Title>Discard changes?</AlertDialog.Title>
           <AlertDialog.Description>
             {pendingTabClose === null
               ? null
-              : `Closing the final ${pendingTabClose.tableName} view will discard any staged changes. This cannot be undone.`}
+              : `Closing this ${pendingTabClose.tableName} view will discard your unsaved row changes.`}
           </AlertDialog.Description>
           <AlertDialog.Actions>
             <AlertDialog.Close>Keep editing</AlertDialog.Close>
