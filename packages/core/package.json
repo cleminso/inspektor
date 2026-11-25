@@ -30,6 +30,21 @@
       "types": "./dist/studio/write.d.ts",
       "import": "./dist/studio/write.js"
     },
+    "./workbench/connection": {
+      "inspektor-source": "./src/workbench/connection.ts",
+      "types": "./dist/workbench/connection.d.ts",
+      "import": "./dist/workbench/connection.js"
+    },
+    "./workbench/exploration": {
+      "inspektor-source": "./src/workbench/exploration.ts",
+      "types": "./dist/workbench/exploration.d.ts",
+      "import": "./dist/workbench/exploration.js"
+    },
+    "./workbench/rowEditing": {
+      "inspektor-source": "./src/workbench/rowEditing.ts",
+      "types": "./dist/workbench/rowEditing.d.ts",
+      "import": "./dist/workbench/rowEditing.js"
+    },
     "./jazz/client": {
       "inspektor-source": "./src/jazz/client.ts",
       "types": "./dist/jazz/client.d.ts",
@@ -49,7 +64,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "oxlint .",
-    "test": "node tests/connection.ts && node tests/session.ts && node tests/query.ts && node tests/draft.ts && node tests/write.ts",
+    "test": "node tests/connection.ts && node tests/connectionRuntime.ts && node tests/session.ts && node tests/query.ts && node tests/draft.ts && node tests/write.ts && node tests/rowEditing.ts && node tests/exploration.ts",
     "test:jazz": "node tests/admin.ts && node tests/draftJazz.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "probe:session": "node tests/session.ts"
