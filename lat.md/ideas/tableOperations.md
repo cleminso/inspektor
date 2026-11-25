@@ -31,4 +31,4 @@ A future design must define:
 - Read-only exclusions, preview, confirmation, progress, cancellation, partial failure, and recovery.
 - Jazz transaction guarantees before any atomic-write claim.
 
-Internal [ledger sequencing](../../apps/studio/src/features/tables/mutationLedger/applyLedger.ts) is not a database transaction or a product-facing batch contract. Do not reuse the superseded floating-widget design as approval.
+Draft tracking is not a database transaction or a product-facing batch contract. Do not reuse the superseded floating-widget design as approval.

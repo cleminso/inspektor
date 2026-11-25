@@ -1,432 +1,74 @@
-/**
- * Local persistence model for Inspektor connection profiles.
- *
- * Persistent profiles contain the non-secret values needed to identify a Jazz app.
- *
- * From the Inspektor side, the same store keeps UI session preferences separate from
- * profile data so branch/schema selection can change without rewriting connection data.
- */
+import {
+  createConnectionFromDraft as createProfile,
+  createEmptyConnectionStore,
+  parseStoredConnections,
+  projectStoredConnections,
+  type ConnectionDraft,
+  type StoredConnection,
+  type StoredConnectionsStore,
+} from '@inspektor/core/connection'
+
+export {
+  DEFAULT_SERVER_URL,
+  DEFAULT_BRANCH_NAME,
+  createEmptyConnectionStore,
+  getActiveConnection,
+  getConnectionById,
+  getConnectionPreferences,
+  setActiveConnectionContext,
+  upsertConnection,
+  removeConnection,
+  getConnectionDisplayName,
+  normalizeBranchName,
+  normalizeEnvName,
+  resolveDefaultBranch,
+  resolveDefaultSchemaHash,
+  type ConnectionCredentials,
+  type CredentialRetention,
+  type ConnectionDraft,
+  type StoredConnection,
+  type RuntimeConnection,
+  type ConnectionPreferences,
+  type StoredConnectionsStore,
+} from '@inspektor/core/connection'
+
 const CONNECTIONS_STORAGE_KEY = 'inspektor-connections'
-export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
-export const DEFAULT_BRANCH_NAME = 'main'
-const DEFAULT_CONNECTION_NAME = 'my Jazz app'
 
-/** Jazz admin credentials shared by validation and runtime clients. */
-export interface ConnectionCredentials {
-  serverUrl: string
-  appId: string
-  adminSecret: string
-}
-
-export type CredentialRetention = 'memory' | 'session'
-
-/** Connection values before the Inspektor assigns its local profile ID. */
-export interface ConnectionDraft extends ConnectionCredentials {
-  name: string
-  env: string
-  credentialRetention: CredentialRetention
-}
-
-/** Saved non-secret Jazz connection profile. */
-export interface StoredConnection extends Omit<ConnectionDraft, 'adminSecret'> {
-  id: string
-}
-
-/** Saved profile hydrated with the credential required by privileged Jazz requests. */
-export interface RuntimeConnection extends StoredConnection {
-  adminSecret: string
-}
-
-/** Inspektor view state stored separately from Jazz connection credentials. */
-export interface ConnectionPreferences {
-  lastBranch: string
-  lastSchemaHash: string | null
-  rememberedBranches: string[]
-}
-
-/** Version 1 localStorage schema for non-secret profiles and Inspektor preferences. */
-export interface StoredConnectionsStore {
-  version: 1
-  activeConnectionId: string | null
-  connections: StoredConnection[]
-  preferencesByConnectionId: Record<string, ConnectionPreferences>
-}
-
-/** Creates the empty Inspektor connection store used when persisted data is unavailable. */
-export function createEmptyConnectionStore(): StoredConnectionsStore {
-  return {
-    version: 1,
-    activeConnectionId: null,
-    connections: [],
-    preferencesByConnectionId: {},
-  }
-}
-
-/**
- * Reads and validates the persisted Inspektor connection store.
- *
- * Stored JSON is treated as untrusted input because localStorage can be edited
- * manually and legacy Inspektor stores used different shapes.
- */
+/** Browser storage is an adapter. Core owns parsing and the secret-free projection. */
 export function readStoredConnections(): StoredConnectionsStore {
-  if (typeof localStorage === 'undefined') {
-    return createEmptyConnectionStore()
-  }
-
+  if (typeof localStorage === 'undefined') return createEmptyConnectionStore()
   try {
     const raw = localStorage.getItem(CONNECTIONS_STORAGE_KEY)
-    if (raw === null) {
-      return createEmptyConnectionStore()
-    }
-
-    const parsed = JSON.parse(raw) as unknown
+    if (raw === null) return createEmptyConnectionStore()
+    const parsed: unknown = JSON.parse(raw)
     const store = parseStoredConnections(parsed)
     if (store !== null) return store
-
     localStorage.removeItem(CONNECTIONS_STORAGE_KEY)
-    return createEmptyConnectionStore()
   } catch {
     try {
       localStorage.removeItem(CONNECTIONS_STORAGE_KEY)
     } catch {
-      // Storage can be unavailable. Reading still fails closed to an empty profile store.
+      // Storage failure must not restore an unvalidated profile.
     }
-    return createEmptyConnectionStore()
   }
+  return createEmptyConnectionStore()
 }
 
-/** Persists an explicitly projected profile store so runtime credentials cannot leak into it. */
 export function writeStoredConnections(store: StoredConnectionsStore): void {
-  if (typeof localStorage === 'undefined') {
-    return
-  }
-
-  const persistedStore: StoredConnectionsStore = {
-    version: 1,
-    activeConnectionId: store.activeConnectionId,
-    connections: store.connections.map(
-      ({ id, name, serverUrl, appId, env, credentialRetention }) => ({
-        id,
-        name,
-        serverUrl,
-        appId,
-        env,
-        credentialRetention,
-      }),
-    ),
-    preferencesByConnectionId: Object.fromEntries(
-      Object.entries(store.preferencesByConnectionId).map(([connectionId, preferences]) => [
-        connectionId,
-        {
-          lastBranch: preferences.lastBranch,
-          lastSchemaHash: preferences.lastSchemaHash,
-          rememberedBranches: preferences.rememberedBranches,
-        },
-      ]),
-    ),
-  }
-  localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(persistedStore))
+  if (typeof localStorage === 'undefined') return
+  localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(projectStoredConnections(store)))
 }
 
-/** Resolves the active Inspektor profile, falling back when the saved ID is stale. */
-export function getActiveConnection(store: StoredConnectionsStore): StoredConnection | null {
-  return getConnectionById(store, store.activeConnectionId) ?? store.connections[0] ?? null
-}
-
-export function getConnectionById(
-  store: StoredConnectionsStore,
-  connectionId: string | null | undefined,
-): StoredConnection | null {
-  if (connectionId === null || connectionId === undefined || connectionId.length === 0) {
-    return null
-  }
-
-  return store.connections.find((connection) => connection.id === connectionId) ?? null
-}
-
-/** Returns Inspektor preferences with defaults so callers never handle a missing record. */
-export function getConnectionPreferences(
-  store: StoredConnectionsStore,
-  connectionId: string,
-): ConnectionPreferences {
-  return (
-    store.preferencesByConnectionId[connectionId] ?? {
-      lastBranch: DEFAULT_BRANCH_NAME,
-      lastSchemaHash: null,
-      rememberedBranches: [DEFAULT_BRANCH_NAME],
-    }
-  )
-}
-
-export function setActiveConnectionContext(
-  store: StoredConnectionsStore,
-  connectionId: string,
-  branch: string,
-  schemaHash: string,
-): StoredConnectionsStore {
-  const currentPreferences = getConnectionPreferences(store, connectionId)
-  return {
-    ...updateConnectionPreferences(store, connectionId, {
-      lastBranch: branch,
-      lastSchemaHash: schemaHash,
-      rememberedBranches: [branch, ...currentPreferences.rememberedBranches],
-    }),
-    activeConnectionId: connectionId,
-  }
-}
-
-/** Saves a Jazz connection profile, marks it active, and ensures it has preferences. */
-export function upsertConnection(
-  store: StoredConnectionsStore,
-  connection: StoredConnection,
-): StoredConnectionsStore {
-  const existingConnection = getConnectionById(store, connection.id)
-
-  return {
-    ...store,
-    activeConnectionId: connection.id,
-    connections:
-      existingConnection !== null
-        ? store.connections.map((item) => (item.id === connection.id ? connection : item))
-        : [...store.connections, connection],
-    preferencesByConnectionId: {
-      ...store.preferencesByConnectionId,
-      [connection.id]: getConnectionPreferences(store, connection.id),
-    },
-  }
-}
-
-export function removeConnection(
-  store: StoredConnectionsStore,
-  connectionId: string,
-): StoredConnectionsStore {
-  const connections = store.connections.filter((connection) => connection.id !== connectionId)
-  const preferencesByConnectionId = { ...store.preferencesByConnectionId }
-  delete preferencesByConnectionId[connectionId]
-
-  return {
-    ...store,
-    activeConnectionId:
-      store.activeConnectionId === connectionId
-        ? (connections[0]?.id ?? null)
-        : store.activeConnectionId,
-    connections,
-    preferencesByConnectionId,
-  }
-}
-
-/**
- * Updates connection preferences while keeping branch labels normalized and deduped.
- *
- * The schema hash selects stored schema metadata. The branch label scopes local workspace state;
- * it is not an operation-scoped Jazz branch view.
- */
-function updateConnectionPreferences(
-  store: StoredConnectionsStore,
-  connectionId: string,
-  updates: Partial<ConnectionPreferences>,
-): StoredConnectionsStore {
-  const currentPreferences = getConnectionPreferences(store, connectionId)
-  const nextPreferences: ConnectionPreferences = {
-    lastBranch: normalizeBranchName(updates.lastBranch ?? currentPreferences.lastBranch),
-    lastSchemaHash:
-      updates.lastSchemaHash === undefined
-        ? currentPreferences.lastSchemaHash
-        : updates.lastSchemaHash,
-    rememberedBranches: dedupeBranches(
-      updates.rememberedBranches ?? currentPreferences.rememberedBranches,
-    ),
-  }
-
-  if (nextPreferences.rememberedBranches.includes(nextPreferences.lastBranch) === false) {
-    nextPreferences.rememberedBranches = [
-      nextPreferences.lastBranch,
-      ...nextPreferences.rememberedBranches,
-    ]
-  }
-
-  return {
-    ...store,
-    preferencesByConnectionId: {
-      ...store.preferencesByConnectionId,
-      [connectionId]: nextPreferences,
-    },
-  }
-}
-
-/** Converts editable values into the saved Jazz connection shape used by runtime hooks. */
 export function createConnectionFromDraft(
   draft: ConnectionDraft,
   connectionId = createConnectionId(),
 ): StoredConnection {
-  return {
-    id: connectionId,
-    name: draft.name.trim() || DEFAULT_CONNECTION_NAME,
-    serverUrl: draft.serverUrl.trim(),
-    appId: draft.appId.trim(),
-    env: normalizeEnvName(draft.env),
-    credentialRetention: draft.credentialRetention,
-  }
+  return createProfile(draft, connectionId)
 }
 
 function createConnectionId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
-
   return `connection-${Math.random().toString(36).slice(2, 10)}`
-}
-
-export function getConnectionDisplayName(connection: StoredConnection): string {
-  const name = connection.name.trim()
-  return name.length > 0 ? name : DEFAULT_CONNECTION_NAME
-}
-
-export function normalizeBranchName(branch: string | null | undefined): string {
-  const normalizedBranch = branch?.trim() ?? ''
-  return normalizedBranch.length > 0 ? normalizedBranch : DEFAULT_BRANCH_NAME
-}
-
-export function normalizeEnvName(env: string | null | undefined): string {
-  const normalizedEnv = env?.trim() ?? ''
-  return normalizedEnv.length > 0 ? normalizedEnv : 'dev'
-}
-
-export function resolveDefaultBranch(
-  store: StoredConnectionsStore,
-  connectionId: string,
-  branch?: string | null,
-): string {
-  return normalizeBranchName(branch ?? getConnectionPreferences(store, connectionId).lastBranch)
-}
-
-/**
- * Chooses the schema hash the Inspektor should use for a connection.
- *
- * Jazz can expose multiple stored schema hashes for the same app. The Inspektor only
- * reuses a requested or remembered hash when Jazz reports it as available.
- */
-export function resolveDefaultSchemaHash(
-  schemaCatalogue: readonly { hash: string }[],
-  schemaHash?: string | null,
-): string | null {
-  if (
-    schemaHash !== null &&
-    schemaHash !== undefined &&
-    schemaCatalogue.some(({ hash }) => hash === schemaHash) === true
-  ) {
-    return schemaHash
-  }
-
-  return schemaCatalogue[0]?.hash ?? null
-}
-
-function parseStoredConnections(parsed: unknown): StoredConnectionsStore | null {
-  if (containsAdminSecret(parsed) === false && isStoredConnectionsStore(parsed) === true) {
-    return {
-      version: 1,
-      activeConnectionId: parsed.activeConnectionId,
-      connections: parsed.connections.map((connection) => ({
-        id: connection.id,
-        name: connection.name,
-        serverUrl: connection.serverUrl,
-        appId: connection.appId,
-        env: normalizeEnvName(connection.env),
-        credentialRetention: connection.credentialRetention,
-      })),
-      preferencesByConnectionId: Object.fromEntries(
-        Object.entries(parsed.preferencesByConnectionId).map(([connectionId, preferences]) => [
-          connectionId,
-          {
-            lastBranch: normalizeBranchName(preferences.lastBranch),
-            lastSchemaHash: preferences.lastSchemaHash,
-            rememberedBranches: dedupeBranches(preferences.rememberedBranches),
-          },
-        ]),
-      ),
-    }
-  }
-
-  return null
-}
-
-function containsAdminSecret(value: unknown): boolean {
-  if (Array.isArray(value) === true) {
-    return value.some(containsAdminSecret)
-  }
-  if (typeof value !== 'object' || value === null) return false
-
-  return Object.entries(value).some(
-    ([key, child]) => key.toLowerCase() === 'adminsecret' || containsAdminSecret(child),
-  )
-}
-
-function isStoredConnectionsStore(value: unknown): value is StoredConnectionsStore {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const candidate = value as StoredConnectionsStore
-  return (
-    candidate.version === 1 &&
-    (candidate.activeConnectionId === null || typeof candidate.activeConnectionId === 'string') &&
-    Array.isArray(candidate.connections) === true &&
-    candidate.connections.every(isStoredConnection) === true &&
-    typeof candidate.preferencesByConnectionId === 'object' &&
-    candidate.preferencesByConnectionId !== null &&
-    Object.values(candidate.preferencesByConnectionId).every(isConnectionPreferences) === true
-  )
-}
-
-function isStoredConnection(value: unknown): value is StoredConnection {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const candidate = value as StoredConnection
-  return (
-    typeof candidate.id === 'string' &&
-    typeof candidate.name === 'string' &&
-    typeof candidate.serverUrl === 'string' &&
-    typeof candidate.appId === 'string' &&
-    typeof candidate.env === 'string' &&
-    isCredentialRetention(candidate.credentialRetention) === true &&
-    'adminSecret' in candidate === false
-  )
-}
-
-function isCredentialRetention(value: unknown): value is CredentialRetention {
-  return value === 'memory' || value === 'session'
-}
-
-function isConnectionPreferences(value: unknown): value is ConnectionPreferences {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const candidate = value as ConnectionPreferences
-  return (
-    typeof candidate.lastBranch === 'string' &&
-    (candidate.lastSchemaHash === null || typeof candidate.lastSchemaHash === 'string') &&
-    Array.isArray(candidate.rememberedBranches) === true &&
-    candidate.rememberedBranches.every((branch) => typeof branch === 'string') === true
-  )
-}
-
-/** Normalizes branch history while preserving input order for the branch picker. */
-function dedupeBranches(branches: string[]): string[] {
-  const normalizedBranches: string[] = []
-  const seen = new Set<string>()
-
-  for (const branch of branches) {
-    const normalizedBranch = normalizeBranchName(branch)
-    if (seen.has(normalizedBranch) === true) {
-      continue
-    }
-
-    seen.add(normalizedBranch)
-    normalizedBranches.push(normalizedBranch)
-  }
-
-  return normalizedBranches.length > 0 ? normalizedBranches : [DEFAULT_BRANCH_NAME]
 }

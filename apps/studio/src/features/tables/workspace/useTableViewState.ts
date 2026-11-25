@@ -663,11 +663,7 @@ export function useTableViewState({
     })
   }
 
-  const handleInsertSave = async (
-    values: Record<string, unknown>,
-    options: InsertRowSaveOptions,
-  ) => {
-    const insertedRowId = await mutations.insertRow(values)
+  const handleInsertSuccess = (insertedRowId: string, options: InsertRowSaveOptions) => {
     highlightRecentlyInsertedRow(insertedRowId)
     if (options.keepOpen === true) {
       return
@@ -802,7 +798,7 @@ export function useTableViewState({
     },
     handleEscape,
     handleColumnActivate,
-    handleInsertSave,
+    handleInsertSuccess,
     handleMutationUpdatesApplied: highlightRecentlyAppliedCells,
     handleRowDeleteSuccess,
     closeRowEditor,

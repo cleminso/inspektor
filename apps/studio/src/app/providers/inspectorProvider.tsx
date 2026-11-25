@@ -13,14 +13,15 @@ import { useStore } from '@nanostores/react'
 
 import type { PublishedBundle, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
-// Jazz exposes browser admin client creation through this unstable development entry point.
-import { createInspectorAdminClient } from 'jazz-tools/_dev/inspector-client'
+import {
+  observeQueryRecovery as decideQueryRecovery,
+  type QueryObservation,
+  type QueryRecovery,
+} from '@inspektor/core/session'
 
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
-import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
-import type { RuntimeConnection } from '@app/connections/connections'
 import { clearAutomaticConnectionRecovery } from '@app/connections/connectionRecovery'
 import {
   useInspectorSessionContext,
@@ -34,30 +35,14 @@ interface InspectorRuntimeContextValue {
   runtime: InspectorRuntimeStore
 }
 
-type RuntimeQueryRecoveryObservation =
-  | {
-      client: JazzClient
-      status: 'fulfilled'
-    }
-  | {
-      client: JazzClient
-      recoverableTransportFailure: boolean
-      status: 'rejected'
-    }
+type RuntimeQueryRecoveryObservation = QueryObservation<JazzClient>
 
 interface RuntimeQueryRecovery {
   observe: (observation: RuntimeQueryRecoveryObservation) => void
   status: 'exhausted' | 'idle' | 'recovering'
 }
 
-type RuntimeQueryRecoveryState =
-  | { scopeKey: string; status: 'idle' }
-  | {
-      failedClient: JazzClient
-      scopeKey: string
-      status: 'recovering'
-    }
-  | { scopeKey: string; status: 'exhausted' }
+type RuntimeQueryRecoveryState = QueryRecovery<JazzClient> & { scopeKey: string }
 
 const InspectorContext = createContext<InspectorContextValue | null>(null)
 const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | null>(null)
@@ -80,90 +65,6 @@ export function getConnectionIdentityToken(connection: object): number {
 
 interface InspectorProviderProps extends PropsWithChildren {
   initialRuntimeTarget?: ResolvedRuntimeTarget
-}
-
-/**
- * Owns one privileged Jazz client while stored schema verification runs in parallel.
- *
- * Publication remains gated on verified schema state. Stale resolutions and unmounts shut down the
- * client because it owns runtime and worker resources. Branch views belong to individual operations
- * and do not participate in this client identity.
- */
-function RuntimeAdminClient({
-  connection,
-  runtime,
-}: {
-  connection: RuntimeConnection
-  runtime: InspectorRuntimeStore
-}) {
-  const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading)
-  const wasmSchema = useStore(runtime.$wasmSchema)
-  const runtimeError = useStore(runtime.$error)
-  const [client, setClient] = useState<JazzClient | null>(null)
-
-  useEffect(() => {
-    if (runtimeError !== null) {
-      setClient(null)
-      return
-    }
-
-    let active = true
-    let ownedClient: JazzClient | null = null
-    setClient(null)
-    void prepareJazzWasm()
-      .then(() => {
-        if (active === false) {
-          return null
-        }
-        return createInspectorAdminClient({
-          appId: connection.appId,
-          serverUrl: connection.serverUrl,
-          env: connection.env,
-          adminSecret: connection.adminSecret,
-        })
-      })
-      .then(
-        (createdClient) => {
-          if (createdClient === null) {
-            return
-          }
-          if (active === false) {
-            void createdClient.shutdown()
-            return
-          }
-          ownedClient = createdClient
-          setClient(createdClient)
-        },
-        (error: unknown) => {
-          if (active === true) {
-            runtime.publishClientError(error)
-          }
-        },
-      )
-
-    return () => {
-      active = false
-      if (ownedClient !== null) {
-        void ownedClient.shutdown()
-      }
-    }
-  }, [connection, runtime, runtimeError])
-
-  useEffect(() => {
-    if (
-      client === null ||
-      isWasmSchemaLoading === true ||
-      wasmSchema === null ||
-      runtimeError !== null
-    ) {
-      return
-    }
-
-    runtime.publishClient(client)
-    return () => runtime.clearClient(client)
-  }, [client, isWasmSchemaLoading, runtime, runtimeError, wasmSchema])
-
-  return null
 }
 
 function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void): void {
@@ -274,39 +175,10 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
           ? storedState
           : ({ scopeKey: recoveryScopeKey, status: 'idle' } as const)
 
-      if (state.status === 'idle') {
-        if (
-          observation.status !== 'rejected' ||
-          observation.recoverableTransportFailure === false ||
-          runtime.$client.get() !== observation.client
-        ) {
-          return
-        }
-        publishQueryRecoveryState({
-          failedClient: observation.client,
-          scopeKey: recoveryScopeKey,
-          status: 'recovering',
-        })
-        replaceRuntime()
-        return
-      }
-
-      if (state.status === 'recovering' && observation.client === state.failedClient) {
-        return
-      }
-      if (runtime.$client.get() !== observation.client) {
-        return
-      }
-      if (observation.status === 'fulfilled') {
-        publishQueryRecoveryState({ scopeKey: recoveryScopeKey, status: 'idle' })
-        return
-      }
-      if (state.status === 'recovering') {
-        publishQueryRecoveryState({
-          scopeKey: recoveryScopeKey,
-          status: 'exhausted',
-        })
-      }
+      const decision = decideQueryRecovery(state, runtime.$client.get(), observation)
+      if (decision.state === state) return
+      publishQueryRecoveryState({ ...decision.state, scopeKey: recoveryScopeKey })
+      if (decision.replace === true) replaceRuntime()
     },
     [publishQueryRecoveryState, recoveryScopeKey, runtime],
   )
@@ -338,13 +210,6 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
   return (
     <RuntimeQueryRecoveryContext.Provider value={queryRecovery}>
       <InspectorRuntimeContext.Provider value={runtimeContext}>
-        {session.activeConnection === null ? null : (
-          <RuntimeAdminClient
-            key={`${clientIdentity}:${retryGeneration}`}
-            connection={session.activeConnection}
-            runtime={runtime}
-          />
-        )}
         <InspectorContext.Provider value={value}>{children}</InspectorContext.Provider>
       </InspectorRuntimeContext.Provider>
     </RuntimeQueryRecoveryContext.Provider>

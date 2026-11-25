@@ -21,6 +21,7 @@
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
+    "@inspektor/core": "workspace:*",
     "@inspektor/ds": "workspace:*",
     "@nanostores/react": "^2.0.1",
     "@tanstack/react-devtools": "^0.10.12",
@@ -30,6 +31,7 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@tanstack/router-plugin": "catalog:",
+    "effect": "catalog:",
     "jazz-tools": "catalog:",
     "lucide-react": "catalog:",
     "nanostores": "^1.5.3",

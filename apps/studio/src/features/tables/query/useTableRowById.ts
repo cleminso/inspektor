@@ -1,13 +1,12 @@
 import type { WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
+import { Effect } from 'effect'
+import { buildTableRowByIdQuery, projectRowById } from '@inspektor/core/query'
 
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { TABLE_QUERY_FAILURE_MESSAGE } from '@tables/query/jazzQueryError'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
-import { TABLE_PROVENANCE_COLUMN_NAMES } from '@tables/tableProvenance'
 import type { DynamicTableRow, TableRowId } from '@tables/tableTypes'
-
-import { GenericQueryBuilder } from './genericQueryBuilder'
 
 interface UseTableRowByIdOptions {
   client: JazzClient | null
@@ -29,10 +28,7 @@ export function useTableRowById({
   const queryBuilder =
     wasmSchema === null || rowId === null
       ? undefined
-      : new GenericQueryBuilder(tableName, wasmSchema)
-          .select('*', ...TABLE_PROVENANCE_COLUMN_NAMES)
-          .where({ id: { eq: rowId } })
-          .limit(1)
+      : Effect.runSync(buildTableRowByIdQuery({ schema: wasmSchema, tableName, rowId }))
   const queryState = useJazzQueryState<DynamicTableRow>(
     client,
     queryBuilder,
@@ -53,10 +49,6 @@ export function useTableRowById({
     return { status: 'pending', row: null }
   }
 
-  const row = queryState.data[0]
-  // This fallback owns only the requested identity; never return another row as active.
-  return {
-    status: 'fulfilled',
-    row: row !== undefined && String(row.id) === rowId ? row : null,
-  }
+  const result = projectRowById(queryState, rowId)
+  return { status: 'fulfilled', row: result.status === 'fulfilled' ? result.row : null }
 }

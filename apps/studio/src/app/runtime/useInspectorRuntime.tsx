@@ -1,16 +1,16 @@
 import { useEffect, useMemo } from 'react'
-import { atom, type ReadableAtom, type WritableAtom } from 'nanostores'
+import { Effect, Fiber, Stream } from 'effect'
+import { atom, type ReadableAtom } from 'nanostores'
 
-import {
-  fetchPublishedBundles,
-  fetchStoredWasmSchema,
-  type PublishedBundle,
-  type WasmSchema,
-} from 'jazz-tools'
+import type { PublishedBundle, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
+import { acquireAdminClient } from '@inspektor/core/jazz/client'
+import { fetchLatestPermissions, fetchStoredSchema } from '@inspektor/core/jazz/schema'
+import { openSession, type Session, type SessionState } from '@inspektor/core/session'
 
 import type { RuntimeConnection } from '@app/connections/connections'
 import type { SchemaCatalogueRecord } from '@app/routing/inspectorNavigation'
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import {
   normalizeRuntimeError,
   reportRuntimeError,
@@ -25,26 +25,7 @@ export interface InspectorRuntimeStore {
   $schemaCatalogue: ReadableAtom<readonly SchemaCatalogueRecord[]>
   $storedPermissions: ReadableAtom<PublishedBundle | null>
   $wasmSchema: ReadableAtom<WasmSchema | null>
-  clearClient: (client: JazzClient) => void
-  publishClient: (client: JazzClient) => void
   publishClientError: (error: unknown) => void
-}
-
-interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
-  $client: WritableAtom<JazzClient | null>
-  $error: WritableAtom<InspectorRuntimeError | null>
-  $isPermissionsLoading: WritableAtom<boolean>
-  $isWasmSchemaLoading: WritableAtom<boolean>
-  $schemaCatalogue: WritableAtom<readonly SchemaCatalogueRecord[]>
-  $storedPermissions: WritableAtom<PublishedBundle | null>
-  $wasmSchema: WritableAtom<WasmSchema | null>
-  getMetadataRequests: () => RuntimeMetadataRequests | null
-  publishSchemaError: (error: unknown) => void
-}
-
-interface RuntimeMetadataRequests {
-  permissions: ReturnType<typeof fetchPublishedBundles>
-  schema: ReturnType<typeof fetchStoredWasmSchema>
 }
 
 interface UseInspectorRuntimeOptions {
@@ -55,81 +36,54 @@ interface UseInspectorRuntimeOptions {
   retryGeneration?: number
 }
 
-function createInspectorRuntimeStore(
-  isWasmSchemaLoading: boolean,
-  sensitiveValues: readonly string[],
-  startMetadataRequests?: () => RuntimeMetadataRequests,
-): MutableInspectorRuntimeStore {
+function createInspectorRuntimeStore(loading: boolean, sensitiveValues: readonly string[]) {
   const $client = atom<JazzClient | null>(null)
   const $wasmSchema = atom<WasmSchema | null>(null)
   const $storedPermissions = atom<PublishedBundle | null>(null)
   const $schemaCatalogue = atom<readonly SchemaCatalogueRecord[]>([])
   const $error = atom<InspectorRuntimeError | null>(null)
-  const $isPermissionsLoading = atom(isWasmSchemaLoading)
-  const $isWasmSchemaLoading = atom(isWasmSchemaLoading)
-  let metadataRequests: RuntimeMetadataRequests | null = null
-
-  const getMetadataRequests = () => {
-    if (startMetadataRequests === undefined) {
-      return null
-    }
-    metadataRequests ??= startMetadataRequests()
-    return metadataRequests
-  }
-
-  const publishClient = (client: JazzClient) => {
-    $client.set(client)
-  }
-
-  const clearClient = (client: JazzClient) => {
-    // Cleanup from an old provider must not clear a replacement client published into this store.
-    if ($client.get() === client) {
-      $client.set(null)
-    }
-  }
-
-  const publishClientError = (error: unknown) => {
-    $client.set(null)
-    if ($error.get() !== null) {
-      return
-    }
-    const runtimeError = { source: 'client', error: normalizeRuntimeError(error) } as const
-    $error.set(runtimeError)
-    reportRuntimeError(runtimeError, sensitiveValues)
-  }
-
-  const publishSchemaError = (error: unknown) => {
-    if ($error.get() === null) {
-      const runtimeError = { source: 'schema', error: normalizeRuntimeError(error) } as const
-      $error.set(runtimeError)
-      reportRuntimeError(runtimeError, sensitiveValues)
-    }
-    $isWasmSchemaLoading.set(false)
-  }
+  const $isPermissionsLoading = atom(loading)
+  const $isWasmSchemaLoading = atom(loading)
+  let session: Session<JazzClient> | null = null
 
   return {
     $client,
     $error,
     $isPermissionsLoading,
     $isWasmSchemaLoading,
-    $storedPermissions,
     $schemaCatalogue,
+    $storedPermissions,
     $wasmSchema,
-    clearClient,
-    getMetadataRequests,
-    publishClient,
-    publishClientError,
-    publishSchemaError,
+    attach: (current: Session<JazzClient>) => {
+      session = current
+      return () => {
+        if (session === current) session = null
+      }
+    },
+    publish: (state: SessionState<JazzClient>) => {
+      $client.set(state.status === 'active' ? state.client : null)
+      $wasmSchema.set(state.schema.status === 'ready' ? state.schema.value : null)
+      $isWasmSchemaLoading.set(state.status === 'opening' && state.schema.status === 'loading')
+      $isPermissionsLoading.set(state.permissions.status === 'loading')
+      $storedPermissions.set(state.permissions.status === 'ready' ? state.permissions.value : null)
+      if (state.status === 'failed' && $error.get() === null) {
+        const error: InspectorRuntimeError = {
+          source: state.error.source,
+          error: normalizeRuntimeError(state.error.cause),
+        }
+        $error.set(error)
+        reportRuntimeError(error, sensitiveValues)
+      }
+    },
+    publishClientError: (cause: unknown) => {
+      if (session !== null) void Effect.runPromise(session.failClient(cause))
+    },
   }
 }
 
 /**
- * Loads stored schema and permissions into independently subscribable runtime projections.
- *
- * The route supplies the initial schema catalogue, while `InspectorProvider` owns Jazz client
- * creation and publishes the verified client into this store. Replacing the runtime identity or
- * retry generation replaces the store so stale asynchronous work cannot update the active runtime.
- * The branch label partitions local runtime state only; it does not configure Jazz operations.
+ * React owns the scope attachment and browser preparation. Core owns startup,
+ * schema-gated publication, failure, and retirement. Nanostores are UI projections.
  */
 export function useInspectorRuntime({
   connection,
@@ -143,21 +97,8 @@ export function useInspectorRuntime({
       createInspectorRuntimeStore(
         connection !== null && branch !== null && schemaHash !== null,
         connection === null ? [] : [connection.adminSecret],
-        connection === null || branch === null || schemaHash === null
-          ? undefined
-          : () => ({
-              permissions: fetchPublishedBundles(connection.serverUrl, {
-                appId: connection.appId,
-                adminSecret: connection.adminSecret,
-              }),
-              schema: fetchStoredWasmSchema(connection.serverUrl, {
-                appId: connection.appId,
-                adminSecret: connection.adminSecret,
-                schemaHash,
-              }),
-            }),
       ),
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Retry intentionally replaces the runtime store.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Retry retires the old scope and its projections.
     [branch, connection, retryGeneration, schemaHash],
   )
 
@@ -166,39 +107,41 @@ export function useInspectorRuntime({
   }, [initialSchemaCatalogue, runtime])
 
   useEffect(() => {
-    const requests = runtime.getMetadataRequests()
-    if (requests === null) return
-
+    if (connection === null || branch === null || schemaHash === null) return
     let active = true
-    void requests.schema.then(
-      ({ schema }) => {
-        if (active === true) {
-          runtime.$wasmSchema.set(schema)
-          runtime.$isWasmSchemaLoading.set(false)
-        }
-      },
-      (error: unknown) => {
-        if (active === true) runtime.publishSchemaError(error)
-      },
+    let detach = () => {}
+    const config = {
+      appId: connection.appId,
+      serverUrl: connection.serverUrl,
+      env: connection.env,
+      adminSecret: connection.adminSecret,
+    }
+    const program = Effect.scoped(
+      Effect.gen(function* () {
+        const session = yield* openSession({
+          acquireClient: Effect.tryPromise({
+            try: () => prepareJazzWasm(),
+            catch: (cause) => cause,
+          }).pipe(Effect.andThen(acquireAdminClient(config))),
+          loadSchema: fetchStoredSchema(connection, schemaHash),
+          loadPermissions: fetchLatestPermissions(connection),
+        })
+        if (active === false) return
+        detach = runtime.attach(session)
+        yield* Stream.runForEach(session.changes, (state) =>
+          Effect.sync(() => {
+            if (active === true) runtime.publish(state)
+          }),
+        )
+      }),
     )
-    void requests.permissions.then(
-      (bundles) => {
-        if (active === true) {
-          runtime.$storedPermissions.set(bundles.at(-1) ?? null)
-          runtime.$isPermissionsLoading.set(false)
-        }
-      },
-      () => {
-        if (active === true) {
-          runtime.$isPermissionsLoading.set(false)
-        }
-      },
-    )
-
+    const fiber = Effect.runFork(program)
     return () => {
       active = false
+      detach()
+      void Effect.runPromise(Fiber.interrupt(fiber))
     }
-  }, [runtime])
+  }, [branch, connection, runtime, schemaHash])
 
   return runtime
 }

@@ -14,8 +14,8 @@ Start with [lat.md/lat.md](lat.md/lat.md).
 
 - Read the owning contracts before planning. Use `lat search` and `lat section` before broad source searches. Verify claims against source; documents are not proof.
 - Agree on scope and obtain approval before edits. Ask about conflicting contracts. Build only what the approved scope needs.
-- Work in `apps/studio`, `apps/website`, `apps/design-system`, and `packages/design-system`. Other implementation areas need an explicit request.
-- Follow the [workspace boundaries](lat.md/architecture/boundaries.md). Keep reusable UI in the design system and application logic in applications.
+- Work in `apps/studio`, `apps/website`, `apps/design-system`, `packages/core`, and `packages/design-system`. Other implementation areas need an explicit request.
+- Follow the [workspace boundaries](lat.md/architecture/boundaries.md) when assigning headless behavior, platform adapters, and reusable UI.
 - Use explicit boolean comparisons, `node:` imports, and strict TypeScript settings. Prefer types that exclude invalid states.
 - Keep generated route trees unchanged by hand. Preserve stable provider ancestry when changing routes.
 

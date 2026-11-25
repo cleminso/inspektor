@@ -1,80 +1,64 @@
+import { Effect, Exit, Scope } from 'effect'
 import type { QueryBuilder, QueryOptions } from 'jazz-tools'
-import { getSubscriptionStore, type JazzClient } from 'jazz-tools/client'
+import type { JazzClient, UseAllState } from 'jazz-tools/client'
 import type { SubscriptionDelta } from 'jazz-tools/shared'
 import { useCallback, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react'
+import { canonicalQuery } from '@inspektor/core/jazz/query'
 
-/** Stable state projection exposed by one Jazz subscription-store cache entry. */
-export type JazzQueryState<T> =
+export type JazzQueryState<T extends { id: string }> =
+  | UseAllState<T>
   | { status: 'idle'; data: undefined; error: null }
-  | { status: 'pending'; data: undefined; error: null }
-  | { status: 'fulfilled'; data: T[]; error: null }
-  | { status: 'rejected'; data: undefined; error: unknown }
 
-const IDLE_QUERY_STATE = {
-  status: 'idle',
-  data: undefined,
-  error: null,
-} as const satisfies JazzQueryState<never>
+const IDLE_QUERY_STATE = { status: 'idle', data: undefined, error: null } as const
 
-/**
- * Subscribes React to the canonical Jazz cache entry for a query.
- *
- * `useSyncExternalStore` keeps subscription setup and cleanup aligned with React's lifecycle while
- * preserving the cache entry's snapshot identity between Jazz updates. Query callers that use the
- * same client, builder serialization, and options therefore share pending and fulfilled work.
- */
+/** React owns the listener scope. Jazz owns snapshots and canonical subscription identity. */
 export function useJazzQueryState<T extends { id: string }>(
   client: JazzClient | null,
   query: QueryBuilder<T> | undefined,
   options?: QueryOptions,
-  onDelta?: (delta: SubscriptionDelta<T>) => void,
+  onDelta?: (delta: SubscriptionDelta<T>, state: UseAllState<T>) => void,
 ): JazzQueryState<T> {
-  // Use Jazz's attached subscription store instead of relying on client internals.
-  const store = client === null ? null : getSubscriptionStore(client)
-  // Computing a key is render-safe; registering the query is deferred to subscription setup.
-  const key = useMemo(
-    () => (store !== null && query !== undefined ? store.computeKey(query, options) : null),
-    [options, query, store],
+  const descriptor = useMemo(
+    () => (client === null || query === undefined ? null : canonicalQuery(client, query, options)),
+    [client, query, options],
   )
-  const inputsRef = useRef({ query, options, onDelta })
-  // Subscription callbacks must use committed inputs without changing subscription identity.
+  const inputsRef = useRef({ descriptor, onDelta })
   useLayoutEffect(() => {
-    inputsRef.current = { query, options, onDelta }
+    inputsRef.current = { descriptor, onDelta }
   })
+  const key = descriptor?.key
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      const { query: currentQuery, options: currentOptions } = inputsRef.current
-      if (store === null || currentQuery === undefined || key === null) {
-        return () => undefined
+      const current = inputsRef.current.descriptor
+      if (client === null || current === null || current.key !== key) return () => undefined
+      const scope = Scope.makeUnsafe()
+      const release = () => Effect.runSync(Scope.close(scope, Exit.void))
+      try {
+        Effect.runSync(
+          Scope.provide(
+            current.acquire({
+              onDelta: (delta) => {
+                try {
+                  inputsRef.current.onDelta?.(delta, current.getSnapshot())
+                } finally {
+                  onStoreChange()
+                }
+              },
+              onError: onStoreChange,
+              onfulfilled: onStoreChange,
+              onReset: onStoreChange,
+            }),
+            scope,
+          ),
+        )
+      } catch (error) {
+        release()
+        throw error
       }
-
-      // Registration must precede cache-entry access and cannot run during React rendering.
-      store.makeQueryKey(currentQuery, currentOptions)
-      const entry = store.getCacheEntry<T>(key)
-      return entry.subscribe({
-        onDelta: (delta) => {
-          try {
-            inputsRef.current.onDelta?.(delta)
-          } finally {
-            // React must receive Jazz's snapshot even when product-specific delta handling fails.
-            onStoreChange()
-          }
-        },
-        onError: onStoreChange,
-        onfulfilled: onStoreChange,
-        onReset: onStoreChange,
-      })
+      return release
     },
-    [key, store],
+    [client, key],
   )
-  // Return Jazz's state object directly: cloning it here would make every snapshot appear changed.
-  const getSnapshot = useCallback(
-    () =>
-      store === null || key === null
-        ? (IDLE_QUERY_STATE as JazzQueryState<T>)
-        : (store.peekState<T>(key) as JazzQueryState<T>),
-    [key, store],
-  )
-
+  const getSnapshot = useCallback(() => descriptor?.getSnapshot() ?? IDLE_QUERY_STATE, [descriptor])
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
 }

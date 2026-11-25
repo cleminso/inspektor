@@ -21,13 +21,13 @@ Omission, SQL NULL, empty values, and invalid input have different meanings.
 - Empty text and empty collections remain values when the schema permits them.
 - Invalid input retains its raw text and error. It cannot enter a mutation payload.
 
-[[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#createInsertRowDraft]] sets insert defaults. The same module resolves field modes and builds sparse updates.
+[[packages/core/src/studio/draft.ts#insertDraft]] records omission for default-backed fields. The same module resolves field modes and builds sparse updates.
 
 ## Draft reconciliation
 
 Live source rows and dirty field overlays remain separate.
 
-[[apps/studio/src/features/tables/rowEditor/mutation/draft.ts#rebaseUpdateRowDraft]] replaces source values while retaining dirty input. An overlay becomes clean when its parsed value equals the current source value under schema-aware equality.
+[[packages/core/src/studio/draft.ts#rebaseDraft]] replaces source values while retaining dirty input. An overlay becomes clean when its parsed value equals the current source value under schema-aware equality.
 
 Structured input keeps the user's text during validation and representation changes. Parsing does not silently reformat that text. This avoids losing invalid input or changing an unfinished edit.
 
@@ -37,7 +37,7 @@ This is not a conflict-resolution or compare-and-swap guarantee.
 
 Studio validates generic inputs before sending them to Jazz.
 
-[[apps/studio/src/features/tables/rowEditor/mutation/parsing.ts#parseMutationFieldValue]] enforces numeric bounds, enum membership, UUID shape, and structured values.
+[[packages/core/src/studio/draft.ts#parseFieldText]] enforces numeric bounds, enum membership, UUID shape, and structured values.
 
 - Named Row values reject unknown fields. Positional Row values require complete tuples.
 - Missing nullable Row members become NULL. Missing required members fail validation.
@@ -51,7 +51,7 @@ Draft submission encodes JSON at the Jazz boundary. Parsed values remain availab
 
 Insert, update, and delete wait for Jazz global durability.
 
-[[apps/studio/src/features/tables/rowEditor/mutation/useTableMutation.ts#useTableMutationExecutor]] owns these calls. Server rejection remains a mutation failure; local validation cannot predict server acceptance.
+[[packages/core/src/studio/write.ts]] coordinates native handles behind [[apps/studio/src/features/tables/rowEditor/mutation/useTableMutation.ts#useTableMutationExecutor]]. Server rejection remains a mutation failure; local validation cannot predict server acceptance.
 
 A confirmed update followed by a failed refresh is already saved. Clear the submitted draft and report refresh failure; do not offer to repeat that write.
 

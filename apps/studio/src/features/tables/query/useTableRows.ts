@@ -9,6 +9,7 @@ import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState }
 import { type ColumnDescriptor, type WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/client'
 import { RowChangeKind } from 'jazz-tools/shared'
+import { projectTableResult, type SettledTablePage } from '@inspektor/core/query'
 
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import {
@@ -75,14 +76,6 @@ type TableRowsQueryObservation =
       recoverableTransportFailure: boolean
       status: 'rejected'
     }
-
-interface ResolvedRowsState {
-  dataScopeKey: string
-  hasNextPage: boolean
-  client: JazzClient | null
-  queryKey: string
-  rows: DynamicTableRow[]
-}
 
 /** Distinguishes post-mount inserts from existing rows entering a local-first query result. */
 function wasCreatedDuringObservation(row: DynamicTableRow, observationStartedAt: number): boolean {
@@ -163,7 +156,7 @@ export function useTableRows({
     client,
     requestedQueryBuilder ?? undefined,
     INSPEKTOR_QUERY_OPTIONS,
-    (delta) => {
+    (delta, snapshot) => {
       const updatedRows = delta.delta.flatMap((change) => {
         if (change.kind !== RowChangeKind.Updated || change.item === undefined) {
           return []
@@ -187,29 +180,33 @@ export function useTableRows({
       if (updatedRows.length > 0) {
         onRowsUpdated?.(updatedRows)
       }
-      if (delta.all !== undefined) {
-        liveRowsByIdRef.current = new Map(delta.all.slice(0, pageSize).map((row) => [row.id, row]))
-      } else {
-        const nextRowsById = new Map(liveRowsByIdRef.current)
-        for (const change of delta.delta) {
-          if (change.kind === RowChangeKind.Removed) {
-            nextRowsById.delete(change.id)
-          } else if (change.item !== undefined) {
-            nextRowsById.set(change.id, change.item)
-          }
-        }
-        liveRowsByIdRef.current = nextRowsById
-      }
+      // Feedback compares complete canonical snapshots. Never reconstruct query rows from deltas.
+      liveRowsByIdRef.current = new Map(
+        (snapshot.data ?? []).slice(0, pageSize).map((row) => [row.id, row]),
+      )
     },
   )
-  const fulfilledPage = useMemo(() => {
-    const rows = queryState.data
-    return rows === undefined
-      ? undefined
-      : { hasNextPage: rows.length > pageSize, rows: rows.slice(0, pageSize) }
-  }, [pageSize, queryState.data])
+  const resolvedRowsRef = useRef<SettledTablePage | undefined>(undefined)
+  const result = useMemo(() => {
+    if (client === null || wasmSchema === null || queryState.status === 'idle') return null
+    return projectTableResult({
+      identity: {
+        runtime: client,
+        schema: wasmSchema,
+        scopeKey,
+        intent: { ...search, tableName },
+        queryKey,
+      },
+      state: queryState,
+      previous: resolvedRowsRef.current,
+    })
+  }, [client, wasmSchema, scopeKey, search, tableName, queryKey, queryState])
+  const fulfilledPage =
+    result?.status === 'rows' || result?.status === 'empty' ? result.page : undefined
   const fulfilledRows = fulfilledPage?.rows
   const fulfilledHasNextPage = fulfilledPage?.hasNextPage ?? false
+  const prepareNextPage =
+    (result?.status === 'rows' || result?.status === 'empty') && result.prepareNextPage === true
   const isRecoverableTransportFailure =
     queryState.status === 'rejected' && isRecoverableJazzTransportError(queryState.error)
   const reportQueryState = useEffectEvent((observation: TableRowsQueryObservation) => {
@@ -230,13 +227,7 @@ export function useTableRows({
     }
   }, [client, isRecoverableTransportFailure, queryKey, queryState.status])
   useEffect(() => {
-    if (
-      client === null ||
-      wasmSchema === null ||
-      queryState.status !== 'fulfilled' ||
-      fulfilledHasNextPage === false ||
-      pageSize !== 100
-    ) {
+    if (client === null || wasmSchema === null || prepareNextPage === false) {
       return
     }
 
@@ -258,6 +249,7 @@ export function useTableRows({
     page,
     pageSize,
     queryState.status,
+    prepareNextPage,
     scopeKey,
     sortColumn,
     sortDirection,
@@ -267,40 +259,19 @@ export function useTableRows({
   useLayoutEffect(() => {
     liveRowsByIdRef.current = new Map((fulfilledRows ?? []).map((row) => [row.id, row]))
   }, [fulfilledRows, queryKey])
-  // Sort refreshes may preserve rows; data-scope or client changes and same-query resets may not.
-  const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   useLayoutEffect(() => {
-    if (fulfilledRows === undefined) return
-
-    resolvedRowsRef.current = {
-      dataScopeKey,
-      hasNextPage: fulfilledHasNextPage,
-      client,
-      queryKey,
-      rows: fulfilledRows,
-    }
-  }, [client, dataScopeKey, fulfilledHasNextPage, fulfilledRows, queryKey])
-  const previousRowsState = resolvedRowsRef.current
-  const canPreserveRows =
-    queryState.status === 'pending' &&
-    previousRowsState?.dataScopeKey === dataScopeKey &&
-    previousRowsState.client === client &&
-    previousRowsState.queryKey !== queryKey
-  const visibleRows =
-    fulfilledRows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS)
-  const hasNextPage =
-    fulfilledRows !== undefined
-      ? fulfilledHasNextPage
-      : canPreserveRows === true
-        ? previousRowsState.hasNextPage
-        : false
-  const isPending = queryState.status === 'pending'
+    if (fulfilledPage !== undefined) resolvedRowsRef.current = fulfilledPage
+  }, [fulfilledPage])
+  const visiblePage = result?.status === 'refreshing' ? result.page : fulfilledPage
+  const visibleRows = visiblePage?.rows ?? EMPTY_ROWS
+  const hasNextPage = visiblePage?.hasNextPage ?? false
   const isRuntimeReady = client !== null && wasmSchema !== null
-  const isInitialLoading =
-    isRuntimeReady === false || (isPending === true && canPreserveRows === false)
-  const isRefreshing = isPending === true && canPreserveRows === true
+  const isInitialLoading = isRuntimeReady === false || result?.status === 'loading'
+  const isRefreshing = result?.status === 'refreshing'
   const outOfRangePageKey =
-    queryState.status === 'fulfilled' && visibleRows.length === 0 && page > 1 ? queryKey : null
+    (result?.status === 'rows' || result?.status === 'empty') && result.correctPage === true
+      ? queryKey
+      : null
   const pageCorrectionKeyRef = useRef<string | null>(null)
   // Query state schedules correction; the latest router command should not make the effect reactive.
   const correctOutOfRangePage = useEffectEvent(onPageOutOfRange)

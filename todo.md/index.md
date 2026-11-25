@@ -21,6 +21,7 @@ Each ledger states its own next action. This list does not claim area readiness.
 - [Tables](tables.md): scrolling investigation and pane-only acceptance.
 - [Shared UI](sharedUi.md): JSON tree navigation and rendered accessibility checks.
 - [Runtime](runtime.md): private diagnostics and production measurements.
+- [Core](core.md): domain-first Effect rewrite and Studio integration.
 
 ## Work method
 

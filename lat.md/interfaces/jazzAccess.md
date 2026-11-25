@@ -40,10 +40,16 @@ Jazz owns permission enforcement. Displaying permission structures is not local 
 
 Studio uses generic runtime builders and table proxies rather than generated inspected-app code.
 
-[[apps/studio/src/features/tables/query/genericQueryBuilder.ts]] adapts stored schema to Jazz queries. [[tableQueries]] owns subscription readiness and cleanup.
+[[packages/core/src/studio/query.ts]] builds stored-schema queries with Jazz's public builder. [[tableQueries]] owns subscription readiness and cleanup.
 
 [[apps/studio/src/features/tables/rowEditor/mutation/useTableMutation.ts#useTableMutationExecutor]] submits insert, sparse update, and delete operations and waits for global durability. The same executor reads a row remotely after update.
 
 The executor supplies no branch or base options. [[inspectionContext#Schema and branch]] defines that limit. Local field support and validation do not replace Jazz admission or persistence checks.
+
+Jazz alone determines write acceptance, rejection, and durability. Effect completion, interruption, or timeout must not substitute for a Jazz verdict. A confirmed write remains confirmed if a later refresh fails.
+
+The core write boundary must retain the native write handle before waiting. An unresolved wait may resume on that same handle; it must not automatically resubmit the mutation. Recovery across client replacement or reload is not established.
+
+The workspace retains pending commands across view mounts with the same client. Client replacement retires the old command without inventing a verdict. Retirement keeps write restrictions but must still report any later native verdict. Reload and server-data verification precede another write on the replacement client.
 
 [[rowChanges]] owns value intent and [[changeRow]] owns the user-visible continuation after success or failure.

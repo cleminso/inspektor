@@ -7,10 +7,10 @@
  * generic query constraints.
  */
 
-import type { WhereOperator } from 'jazz-tools'
+import type { TableFilterClause as QueryFilterClause } from '@inspektor/core/query'
 
 /** Operators exposed by the generic filter UI and supported by query translation. */
-export type TableFilterOperator = WhereOperator
+export type TableFilterOperator = QueryFilterClause['operator']
 
 export type TableFilterValueMatch = 'exclude' | 'include'
 
@@ -28,9 +28,6 @@ export const tableFilterOperators = [
 ] as const satisfies readonly TableFilterOperator[]
 
 /** One URL-serializable filter clause targeting a runtime schema column. */
-export interface TableFilterClause {
+export interface TableFilterClause extends QueryFilterClause {
   id: string
-  column: string
-  operator: TableFilterOperator
-  value: unknown
 }

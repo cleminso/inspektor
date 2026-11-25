@@ -1,5 +1,13 @@
-import { createContext, use, useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { createContext, use, useCallback, useLayoutEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { Effect } from 'effect'
+import { canonicalQuery } from '@inspektor/core/jazz/query'
+import {
+  createTableNavigationPreparation,
+  type PreparationPolicy,
+  type PreparationResult,
+  type QueryDiagnosis,
+} from '@inspektor/core/query'
 
 import {
   useInspectorSessionState,
@@ -11,22 +19,13 @@ import { appRoutes } from '@app/routing/appRoutes'
 import { getCredentialSafeConnectionReturnUrl } from '@app/routing/credentialSafeUrl'
 import { fetchConnectionSchemaCatalogueWithRetry } from '@app/routing/inspectorNavigation'
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
-import { prefetchJazzQuery } from '@tables/query/prefetchJazzQuery'
 import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
 import type { TableRowsSearchState } from '@tables/tableTypes'
-
-type PreparationPolicy = 'ignore' | 'replace'
-type PreparationResult = 'busy' | 'committed' | 'recovery' | 'superseded' | 'unavailable'
 
 interface PrepareTableNavigationOptions {
   policy: PreparationPolicy
   search: TableRowsSearchState
   tableName: string
-}
-
-interface ActivePreparation {
-  abort: () => void
-  cancel: () => void
 }
 
 interface TableNavigationPreparationContextValue {
@@ -56,41 +55,30 @@ export function TableNavigationPreparationProvider({
   const client = useRuntimeClient()
   const navigate = useNavigate()
   const wasmSchema = useRuntimeSchema()
-  const activeRef = useRef<ActivePreparation | null>(null)
   const [pendingTableName, setPendingTableName] = useState<string | null>(null)
+  const [preparation] = useState(() =>
+    createTableNavigationPreparation<SchemaCatalogueLoadError['reason']>(setPendingTableName),
+  )
 
   const cancelActive = useCallback(() => {
-    const active = activeRef.current
-    activeRef.current = null
-    active?.abort()
-    active?.cancel()
-    setPendingTableName(null)
-  }, [])
+    Effect.runSync(preparation.cancel)
+  }, [preparation])
 
   useLayoutEffect(() => {
     setPendingTableName(null)
-    return () => {
-      const active = activeRef.current
-      activeRef.current = null
-      active?.abort()
-      active?.cancel()
-    }
-  }, [activeConnection, client, identity, scope, wasmSchema])
+    return cancelActive
+  }, [activeConnection, client, identity, scope, wasmSchema, cancelActive])
 
   const prepare = useCallback(
     async (
       options: PrepareTableNavigationOptions,
       commit: () => Promise<void> | void,
     ): Promise<PreparationResult> => {
-      if (activeRef.current !== null) {
-        if (options.policy === 'ignore') return 'busy'
-        cancelActive()
-      }
       if (activeConnection === null || client === null || wasmSchema === null) {
         return 'unavailable'
       }
 
-      const lease = prefetchJazzQuery(
+      const descriptor = canonicalQuery(
         client,
         buildTableRowsQuery({
           ...options.search,
@@ -99,67 +87,54 @@ export function TableNavigationPreparationProvider({
         }),
         INSPEKTOR_QUERY_OPTIONS,
       )
-      let cancel: () => void = () => undefined
-      const abortController = new AbortController()
-      const cancelled = new Promise<'superseded'>((resolve) => {
-        cancel = () => resolve('superseded')
-      })
-      const active = { abort: () => abortController.abort(), cancel }
-      activeRef.current = active
-      setPendingTableName(options.tableName)
-
-      try {
-        let readiness: 'ready' | 'superseded'
-        try {
-          readiness = await Promise.race([lease.promise.then(() => 'ready' as const), cancelled])
-        } catch (queryError) {
-          if (activeRef.current !== active) {
-            return 'superseded'
-          }
-
-          try {
-            await fetchConnectionSchemaCatalogueWithRetry(activeConnection, abortController.signal)
-          } catch (connectionError) {
-            if (abortController.signal.aborted === true || activeRef.current !== active) {
-              return 'superseded'
-            }
-            if (connectionError instanceof SchemaCatalogueLoadError) {
-              await navigate({
-                to: appRoutes.editConnection,
-                params: { connectionId: activeConnection.id },
-                search: {
-                  recovery: connectionError.reason,
-                  returnTo:
-                    getCredentialSafeConnectionReturnUrl(identity, activeConnection.id) ??
-                    undefined,
-                },
-                replace: true,
-              })
-              return 'recovery'
-            }
-            throw queryError
-          }
-
-          if (activeRef.current !== active) {
-            return 'superseded'
-          }
-          throw queryError
-        }
-        if (readiness === 'superseded' || activeRef.current !== active) {
-          return 'superseded'
-        }
-        await commit()
-        if (activeRef.current !== active) return 'superseded'
-        return 'committed'
-      } finally {
-        lease.release()
-        if (activeRef.current === active) {
-          activeRef.current = null
-          setPendingTableName(null)
-        }
-      }
+      return Effect.runPromise(
+        preparation.prepare({
+          policy: options.policy,
+          tableName: options.tableName,
+          query: Effect.gen(function* () {
+            yield* descriptor.acquire()
+            yield* descriptor.prepare
+          }),
+          diagnose: Effect.tryPromise({
+            try: async (signal): Promise<QueryDiagnosis<SchemaCatalogueLoadError['reason']>> => {
+              try {
+                await fetchConnectionSchemaCatalogueWithRetry(activeConnection, signal)
+                return { status: 'reachable' }
+              } catch (error) {
+                if (error instanceof SchemaCatalogueLoadError) {
+                  return { status: 'connectionFailure', reason: error.reason }
+                }
+                throw error
+              }
+            },
+            catch: (error) => error,
+          }),
+          repair: (reason) =>
+            Effect.tryPromise({
+              try: () =>
+                navigate({
+                  to: appRoutes.editConnection,
+                  params: { connectionId: activeConnection.id },
+                  search: {
+                    recovery: reason,
+                    returnTo:
+                      getCredentialSafeConnectionReturnUrl(identity, activeConnection.id) ??
+                      undefined,
+                  },
+                  replace: true,
+                }),
+              catch: (error) => error,
+            }),
+          commit: Effect.tryPromise({
+            try: async () => {
+              await commit()
+            },
+            catch: (error) => error,
+          }),
+        }),
+      )
     },
-    [activeConnection, cancelActive, client, identity, navigate, wasmSchema],
+    [activeConnection, client, identity, navigate, wasmSchema, preparation],
   )
 
   return (

@@ -1,0 +1,65 @@
+{
+  "name": "@inspektor/core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./connection": {
+      "inspektor-source": "./src/studio/connection.ts",
+      "types": "./dist/studio/connection.d.ts",
+      "import": "./dist/studio/connection.js"
+    },
+    "./session": {
+      "inspektor-source": "./src/studio/session.ts",
+      "types": "./dist/studio/session.d.ts",
+      "import": "./dist/studio/session.js"
+    },
+    "./query": {
+      "inspektor-source": "./src/studio/query.ts",
+      "types": "./dist/studio/query.d.ts",
+      "import": "./dist/studio/query.js"
+    },
+    "./draft": {
+      "inspektor-source": "./src/studio/draft.ts",
+      "types": "./dist/studio/draft.d.ts",
+      "import": "./dist/studio/draft.js"
+    },
+    "./write": {
+      "inspektor-source": "./src/studio/write.ts",
+      "types": "./dist/studio/write.d.ts",
+      "import": "./dist/studio/write.js"
+    },
+    "./jazz/client": {
+      "inspektor-source": "./src/jazz/client.ts",
+      "types": "./dist/jazz/client.d.ts",
+      "import": "./dist/jazz/client.js"
+    },
+    "./jazz/query": {
+      "inspektor-source": "./src/jazz/query.ts",
+      "types": "./dist/jazz/query.d.ts",
+      "import": "./dist/jazz/query.js"
+    },
+    "./jazz/schema": {
+      "inspektor-source": "./src/jazz/schema.ts",
+      "types": "./dist/jazz/schema.d.ts",
+      "import": "./dist/jazz/schema.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "oxlint .",
+    "test": "node tests/connection.ts && node tests/session.ts && node tests/query.ts && node tests/draft.ts && node tests/write.ts",
+    "test:jazz": "node tests/admin.ts && node tests/draftJazz.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "probe:session": "node tests/session.ts"
+  },
+  "dependencies": {
+    "effect": "catalog:",
+    "jazz-tools": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -12,8 +12,18 @@ import {
   type SetStateAction,
 } from 'react'
 import type { ColumnDescriptor } from 'jazz-tools'
+import {
+  createTableWriteWorkspace,
+  unknownWriteWarning,
+  retiredWriteWarning,
+  type TableWriteAccess,
+  type TableWriteCommand,
+  type TableWriteCoordinator,
+  type WriteWorkspaceEvent,
+} from '@inspektor/core/write'
 
 import { useRegisterRuntimeScopeExitBlocker } from '@app/providers/runtimeScopeExitGuard'
+import { useRuntimeClient } from '@app/providers/inspectorProvider'
 import {
   createTableMutationState,
   reduceTableMutationState,
@@ -30,12 +40,12 @@ import {
   rebaseUpdateRowDraft,
   type RowMutationDraft,
 } from '@tables/rowEditor/mutation/draft'
-import type { TableRowId } from '@tables/tableTypes'
+import type { DynamicTableRow, TableRowId } from '@tables/tableTypes'
 import { useBoundRowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 
 interface TableMutationExecutionState {
   error: string | null
-  status: 'applying' | 'failed' | 'idle'
+  status: 'applying' | 'failed' | 'idle' | 'retired'
 }
 
 type PublicMutationAction = Exclude<
@@ -60,6 +70,8 @@ type ProviderAction =
     }
 
 interface TableMutationLedgerContextValue {
+  writes: TableWriteCoordinator<DynamicTableRow>
+  attachWrites: (access: TableWriteAccess<DynamicTableRow> | null) => void
   dispatch: Dispatch<ProviderAction>
   execution: TableMutationExecutionState
   projection: TableMutationProjection
@@ -107,15 +119,17 @@ function reduceProviderState(
 interface StoredTableMutationState {
   execution: TableMutationExecutionState
   state: TableMutationState
+  submittedCommand: TableWriteCommand | null
 }
 
 function createStoredTableMutationState(): StoredTableMutationState {
-  return { execution: idleExecution, state: createTableMutationState() }
+  return { execution: idleExecution, state: createTableMutationState(), submittedCommand: null }
 }
 
 const emptyStoredTableMutationState = createStoredTableMutationState()
 
 interface TableMutationLedgerWorkspaceContextValue {
+  writes: ReturnType<typeof createTableWriteWorkspace<DynamicTableRow>>
   isApplying: (scopeKey: string) => boolean
   discardPendingChanges: (scopeKey: string) => boolean
   dispatch: (scopeKey: string, action: ProviderAction) => void
@@ -157,12 +171,126 @@ export function TableMutationLedgerWorkspaceProvider({
     Readonly<Record<string, StoredTableMutationState>>
   >({})
   const entriesByScopeRef = useRef(entriesByScope)
-  const applyingScopesRef = useRef(new Set<string>())
+  const lockedScopesRef = useRef(new Set<string>())
+  const updateEntries = useCallback(
+    (
+      update: (
+        current: Readonly<Record<string, StoredTableMutationState>>,
+      ) => Readonly<Record<string, StoredTableMutationState>>,
+    ) => {
+      const next = update(entriesByScopeRef.current)
+      if (next === entriesByScopeRef.current) return
+      entriesByScopeRef.current = next
+      setEntriesByScope(next)
+    },
+    [],
+  )
+  const ticketsRef = useRef(
+    new Map<
+      string,
+      {
+        coordinator: object
+        operation: object
+        draft: RowMutationDraft | undefined
+      }
+    >(),
+  )
+  // Native settlement outlives keyed views. Pane continuations own only presentation.
+  const [writes] = useState(() =>
+    createTableWriteWorkspace<DynamicTableRow>({
+      onTransition: (event: WriteWorkspaceEvent) => {
+        const { scopeKey, command } = event
+        if (event.status === 'applying') {
+          const current = entriesByScopeRef.current[scopeKey] ?? createStoredTableMutationState()
+          ticketsRef.current.set(scopeKey, {
+            coordinator: event.coordinator,
+            operation: event.operation,
+            draft:
+              command.kind === 'insert' ? undefined : current.state.draftsByRowId[command.rowId],
+          })
+          lockedScopesRef.current.add(scopeKey)
+          updateEntries((entries) => ({
+            ...entries,
+            [scopeKey]: {
+              ...current,
+              execution: { status: 'applying', error: null },
+              submittedCommand: command,
+            },
+          }))
+          return
+        }
+        const ticket = ticketsRef.current.get(scopeKey)
+        if (ticket?.coordinator !== event.coordinator || ticket.operation !== event.operation)
+          return
+        const retired =
+          event.status === 'retired' ||
+          entriesByScopeRef.current[scopeKey]?.execution.status === 'retired'
+        // Native settlement changes the verdict, not the retired owner's admission lock.
+        if (retired === false) lockedScopesRef.current.delete(scopeKey)
+        updateEntries((entries) => {
+          const current = entries[scopeKey] ?? createStoredTableMutationState()
+          if (event.status === 'retired') {
+            return {
+              ...entries,
+              [scopeKey]: {
+                ...current,
+                execution: { status: 'retired', error: unknownWriteWarning },
+              },
+            }
+          }
+          if (event.status === 'failed' || event.status === 'rejected') {
+            return {
+              ...entries,
+              [scopeKey]: {
+                ...current,
+                execution:
+                  retired === true
+                    ? {
+                        status: 'retired',
+                        error: retiredWriteWarning(
+                          event.status === 'rejected' ? 'rejected' : undefined,
+                        ),
+                      }
+                    : { status: 'failed', error: String(event.error) },
+              },
+            }
+          }
+          let state = current.state
+          if (command.kind !== 'insert' && state.draftsByRowId[command.rowId] === ticket.draft) {
+            state = reduceTableMutationState(state, {
+              type: 'acknowledgeAppliedEntries',
+              entryIds: [
+                command.kind === 'delete' ? `delete:${command.rowId}` : `update:${command.rowId}`,
+              ],
+            })
+          }
+          return {
+            ...entries,
+            [scopeKey]: {
+              state,
+              execution:
+                retired === true
+                  ? { status: 'retired', error: retiredWriteWarning('confirmed') }
+                  : idleExecution,
+              submittedCommand: null,
+            },
+          }
+        })
+      },
+    }),
+  )
+  const client = useRuntimeClient()
+  const previousOwnerRef = useRef(client)
   useLayoutEffect(() => {
-    entriesByScopeRef.current = entriesByScope
-  }, [entriesByScope])
+    const previous = previousOwnerRef.current
+    previousOwnerRef.current = client
+    if (previous !== null && previous !== client) writes.retireOwner(previous)
+  }, [client, writes])
   const hasPending = Object.values(entriesByScope).some(
-    (entry) => entry.execution.status === 'applying' || hasUnresolvedMutationState(entry.state),
+    (entry) =>
+      entry.execution.status === 'applying' ||
+      entry.execution.status === 'retired' ||
+      hasUnresolvedMutationState(entry.state),
   )
   useRegisterRuntimeScopeExitBlocker(hasPending)
 
@@ -179,66 +307,72 @@ export function TableMutationLedgerWorkspaceProvider({
     }
   }, [hasPending])
 
-  const dispatch = useCallback((scopeKey: string, action: ProviderAction) => {
-    if (
-      applyingScopesRef.current.has(scopeKey) === true &&
-      action.type !== 'acknowledgeAppliedEntries'
-    ) {
-      return
-    }
-    setEntriesByScope((current) => {
-      const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
-      // A matching live value can be an optimistic echo, not global acceptance. A rejected write
-      // must keep its original baseline and raw inputs until Save succeeds or Cancel discards it.
-      if (currentEntry.execution.status === 'failed' && action.type === 'rebaseRows') {
-        return current
+  const dispatch = useCallback(
+    (scopeKey: string, action: ProviderAction) => {
+      if (lockedScopesRef.current.has(scopeKey) === true) {
+        return
       }
-      if (
-        currentEntry.execution.status === 'applying' &&
-        action.type !== 'acknowledgeAppliedEntries'
-      ) {
-        return current
+      updateEntries((current) => {
+        const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
+        // A matching live value can be an optimistic echo, not global acceptance. A rejected write
+        // must keep its original baseline and raw inputs until Save succeeds or Cancel discards it.
+        if (currentEntry.execution.status === 'failed' && action.type === 'rebaseRows') {
+          return current
+        }
+        if (
+          currentEntry.execution.status === 'applying' &&
+          action.type !== 'acknowledgeAppliedEntries'
+        ) {
+          return current
+        }
+        const state = reduceProviderState(currentEntry.state, action)
+        if (state === currentEntry.state) {
+          return current
+        }
+        if (
+          currentEntry.execution.status === 'idle' &&
+          hasUnresolvedMutationState(state) === false
+        ) {
+          const next = { ...current }
+          delete next[scopeKey]
+          return next
+        }
+        return { ...current, [scopeKey]: { ...currentEntry, state } }
+      })
+    },
+    [updateEntries],
+  )
+  const discardPendingChanges = useCallback(
+    (scopeKey: string) => {
+      if (lockedScopesRef.current.has(scopeKey) === true) {
+        return false
       }
-      const state = reduceProviderState(currentEntry.state, action)
-      if (state === currentEntry.state) {
-        return current
-      }
-      if (currentEntry.execution.status === 'idle' && hasUnresolvedMutationState(state) === false) {
+      // Tab-close navigation follows this command before React commits the workspace update.
+      updateEntries((current) => {
+        if (current[scopeKey] === undefined) {
+          return current
+        }
         const next = { ...current }
         delete next[scopeKey]
         return next
-      }
-      return { ...current, [scopeKey]: { ...currentEntry, state } }
-    })
-  }, [])
-  const discardPendingChanges = useCallback((scopeKey: string) => {
-    if (applyingScopesRef.current.has(scopeKey)) {
-      return false
-    }
-    // Tab-close navigation follows this command before React commits the workspace update.
-    const nextEntries = { ...entriesByScopeRef.current }
-    delete nextEntries[scopeKey]
-    entriesByScopeRef.current = nextEntries
-    setEntriesByScope((current) => {
-      if (current[scopeKey] === undefined) {
-        return current
-      }
-      const next = { ...current }
-      delete next[scopeKey]
-      return next
-    })
-    return true
-  }, [])
+      })
+      return true
+    },
+    [updateEntries],
+  )
   const setExecution = useCallback(
     (scopeKey: string, update: SetStateAction<TableMutationExecutionState>) => {
+      if (entriesByScopeRef.current[scopeKey]?.execution.status === 'retired') return
+      if (writes.table(scopeKey).getSnapshot().reloadRequired === true) return
+      if (writes.table(scopeKey).getSnapshot().pendingWrite !== null) return
       if (typeof update !== 'function') {
         if (update.status === 'applying') {
-          applyingScopesRef.current.add(scopeKey)
+          lockedScopesRef.current.add(scopeKey)
         } else {
-          applyingScopesRef.current.delete(scopeKey)
+          lockedScopesRef.current.delete(scopeKey)
         }
       }
-      setEntriesByScope((current) => {
+      updateEntries((current) => {
         const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
         const execution = typeof update === 'function' ? update(currentEntry.execution) : update
         if (
@@ -255,13 +389,21 @@ export function TableMutationLedgerWorkspaceProvider({
         return { ...current, [scopeKey]: { ...currentEntry, execution } }
       })
     },
-    [],
+    [updateEntries, writes],
   )
   const hasPendingChanges = useCallback((scopeKey: string) => {
     const entry = entriesByScopeRef.current[scopeKey]
-    return entry !== undefined && hasUnresolvedMutationState(entry.state)
+    return (
+      entry !== undefined &&
+      (entry.execution.status === 'applying' ||
+        entry.execution.status === 'retired' ||
+        hasUnresolvedMutationState(entry.state))
+    )
   }, [])
-  const isApplying = useCallback((scopeKey: string) => applyingScopesRef.current.has(scopeKey), [])
+  const isApplying = useCallback(
+    (scopeKey: string) => entriesByScopeRef.current[scopeKey]?.execution.status === 'applying',
+    [],
+  )
   const value = useMemo<TableMutationLedgerWorkspaceContextValue>(
     () => ({
       discardPendingChanges,
@@ -269,8 +411,9 @@ export function TableMutationLedgerWorkspaceProvider({
       hasPendingChanges,
       isApplying,
       setExecution,
+      writes,
     }),
-    [discardPendingChanges, dispatch, hasPendingChanges, isApplying, setExecution],
+    [discardPendingChanges, dispatch, hasPendingChanges, isApplying, setExecution, writes],
   )
 
   return (
@@ -337,9 +480,25 @@ export function TableMutationLedgerProvider({
     },
     [scopeKey, workspaceSetExecution],
   )
+  const writes = workspace.writes.table(scopeKey)
+  const attachWrites = useCallback(
+    (access: TableWriteAccess<DynamicTableRow> | null) => {
+      workspace.writes.attach(scopeKey, access)
+    },
+    [scopeKey, workspace.writes],
+  )
   const value = useMemo<TableMutationLedgerContextValue>(
-    () => ({ dispatch, execution, projection, schemaColumns, setExecution, state }),
-    [dispatch, execution, projection, schemaColumns, setExecution, state],
+    () => ({
+      dispatch,
+      execution,
+      projection,
+      schemaColumns,
+      setExecution,
+      state,
+      writes,
+      attachWrites,
+    }),
+    [dispatch, execution, projection, schemaColumns, setExecution, state, writes, attachWrites],
   )
 
   return <TableMutationLedgerContext value={value}>{children}</TableMutationLedgerContext>
@@ -351,6 +510,11 @@ function useMutationContext(): TableMutationLedgerContextValue {
     throw new Error('Table mutation hooks must be used within TableMutationLedgerProvider')
   }
   return context
+}
+
+export function useTableWriteCoordinator() {
+  const context = useMutationContext()
+  return { coordinator: context.writes, attach: context.attachWrites }
 }
 
 /**
@@ -380,7 +544,9 @@ export function useTableMutationLedger() {
   const recover = useCallback(
     (action: PublicMutationAction) => {
       contextDispatch(action)
-      setExecution((current) => (current.status === 'applying' ? current : idleExecution))
+      setExecution((current) =>
+        current.status === 'applying' || current.status === 'retired' ? current : idleExecution,
+      )
     },
     [contextDispatch, setExecution],
   )

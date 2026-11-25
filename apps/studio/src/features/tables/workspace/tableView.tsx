@@ -34,8 +34,13 @@ import {
 } from '@app/hotkeys/appHotkeys'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
-import { useRuntimeSchema } from '@app/providers/inspectorProvider'
+import {
+  getConnectionIdentityToken,
+  useRuntimeClient,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
 import { useConnectionContentReady } from '@app/runtime/connectionContentBoundary'
+import { unknownWriteWarning } from '@inspektor/core/write'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
@@ -149,6 +154,7 @@ function EditRowPane({
 }
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
+  const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
   const { scope } = useTableTabs()
   const schemaColumns = useMemo(
@@ -156,6 +162,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     [tableName, wasmSchema],
   )
   const mutationScopeKey = createTableScope(scope, tableName)
+  const runtimeKey = `${client === null ? 'none' : getConnectionIdentityToken(client)}:${wasmSchema === null ? 'none' : getConnectionIdentityToken(wasmSchema)}`
 
   return (
     <TableMutationLedgerProvider
@@ -163,6 +170,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
       scopeKey={mutationScopeKey}
     >
       <TableViewContent
+        key={`${mutationScopeKey}:${runtimeKey}`}
         schemaColumns={schemaColumns}
         tableKey={mutationScopeKey}
         tableName={tableName}
@@ -190,7 +198,12 @@ function TableViewContent({
   const [pendingTransition, setPendingTransition] = useState<(() => void) | null>(null)
   const requestTransition = useCallback(
     (action: () => void) => {
-      if (operationPendingRef.current === true || mutations.execution.status === 'applying') return
+      if (
+        operationPendingRef.current === true ||
+        mutations.execution.status === 'applying' ||
+        mutations.execution.status === 'retired'
+      )
+        return
       if (mutations.stagedCount > 0 && transitionApprovedRef.current === false) {
         setPendingTransition(() => action)
         return
@@ -228,6 +241,16 @@ function TableViewContent({
     tableKey,
     tableName,
   })
+  const currentExecutorRef = useRef(state.mutationExecutor)
+  const mountedRef = useRef(true)
+  useLayoutEffect(() => {
+    currentExecutorRef.current = state.mutationExecutor
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [state.mutationExecutor])
+  const [resumingWrite, setResumingWrite] = useState(false)
   useConnectionContentReady(state.isInitialLoading === false)
   useEffect(() => {
     setDeleteError(null)
@@ -244,7 +267,11 @@ function TableViewContent({
   const pendingPaletteFocusReturnRef = useRef<MutationObserver | null>(null)
   const previousDetailPaneModeRef = useRef(state.detailPaneMode)
   const gridHotkeyOptions = { ...appHotkeyOptions, target: gridHotkeyTargetRef }
-  const mutationApplying = mutations.execution.status === 'applying'
+  const mutationApplying =
+    mutations.execution.status === 'applying' ||
+    mutations.execution.status === 'retired' ||
+    state.mutationExecutor.pendingWrite !== null ||
+    state.mutationExecutor.retired === true
   useEffect(() => {
     if (mutationApplying === true && routeBlocker.status === 'blocked') routeBlocker.reset()
   }, [mutationApplying, routeBlocker])
@@ -255,32 +282,28 @@ function TableViewContent({
     setDeleteError(null)
     setDeleteRequestedRowId(null)
   }
+  // @lat: [[rowChanges#Persistence outcome]]
   const saveRow = async (values: Record<string, unknown>): Promise<DynamicTableRow | null> => {
     const rowId = state.rowEditor.activeRowId
     if (rowId === null || operationPendingRef.current === true) return null
     operationPendingRef.current = true
-    mutations.setExecution({ status: 'applying', error: null })
+    const executor = state.mutationExecutor
+    const isCurrent = () => mountedRef.current === true && currentExecutorRef.current === executor
     try {
-      try {
-        await state.mutationExecutor.updateRow(rowId, values)
-      } catch (error) {
-        mutations.setExecution({ status: 'failed', error: String(error) })
-        throw error
-      }
+      await executor.updateRow(rowId, values)
+      if (isCurrent() === false) return null
+      // The workspace already settled the submitted ledger, even if this view unmounted.
+      state.handleMutationUpdatesApplied({ [rowId]: new Set(Object.keys(values)) })
       let refreshedRow: DynamicTableRow | null
       try {
-        refreshedRow = await state.mutationExecutor.readRow(rowId)
+        refreshedRow = await executor.readRow(rowId)
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
         throw new Error(
           `Row saved, but refresh failed. Reload the page to see current data. ${message}`,
         )
-      } finally {
-        // A failed read must not turn a confirmed write back into a retryable draft.
-        mutations.setExecution({ status: 'idle', error: null })
-        mutations.discardAll()
-        state.handleMutationUpdatesApplied({ [rowId]: new Set(Object.keys(values)) })
       }
+      if (isCurrent() === false) return null
       if (refreshedRow === null) {
         operationPendingRef.current = false
         state.handleRowDeleteSuccess(rowId)
@@ -293,18 +316,18 @@ function TableViewContent({
   const deleteRow = async (rowId: TableRowId) => {
     if (rowId !== state.rowEditor.activeRowId || operationPendingRef.current === true) return
     operationPendingRef.current = true
+    const executor = state.mutationExecutor
+    const isCurrent = () => mountedRef.current === true && currentExecutorRef.current === executor
     setDeleteError(null)
-    mutations.setExecution({ status: 'applying', error: null })
     try {
-      await state.mutationExecutor.deleteRow(rowId)
-      mutations.setExecution({ status: 'idle', error: null })
-      mutations.discardAll()
+      await executor.deleteRow(rowId)
+      if (isCurrent() === false) return
       setDeleteRequestedRowId(null)
       operationPendingRef.current = false
       state.handleRowDeleteSuccess(rowId)
     } catch (error) {
+      if (isCurrent() === false) return
       const message = error instanceof Error ? error.message : String(error)
-      mutations.setExecution({ status: 'failed', error: message })
       setDeleteError(message)
     } finally {
       operationPendingRef.current = false
@@ -742,6 +765,37 @@ function TableViewContent({
 
   return (
     <>
+      {state.mutationExecutor.reloadRequired === true ||
+      mutations.execution.status === 'retired' ? (
+        <Box role="alert">
+          <Text>
+            {state.mutationExecutor.retirementMessage ??
+              mutations.execution.error ??
+              unknownWriteWarning}
+          </Text>
+        </Box>
+      ) : state.mutationExecutor.pendingWrite?.status === 'unresolved' ? (
+        <Box role="status">
+          <Text>Write outcome is unknown. Do not submit it again.</Text>
+          <Button
+            type="button"
+            disabled={resumingWrite}
+            onClick={() => {
+              setResumingWrite(true)
+              void state.mutationExecutor
+                .resumePending()
+                .catch(() => {
+                  // Retirement is reported by the workspace warning, not as Jazz rejection.
+                })
+                .finally(() => {
+                  if (mountedRef.current === true) setResumingWrite(false)
+                })
+            }}
+          >
+            Resume waiting
+          </Button>
+        </Box>
+      ) : null}
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel>
           <Box
@@ -1018,9 +1072,18 @@ function TableViewContent({
                       closeRowEditorAndResetRepresentation()
                     }}
                     onSave={async (values, options) => {
-                      await state.handleInsertSave(values, options)
-                      if (options.keepOpen === false) {
-                        setInsertMoreEnabled(false)
+                      if (operationPendingRef.current === true) return
+                      operationPendingRef.current = true
+                      const executor = state.mutationExecutor
+                      const isCurrent = () =>
+                        mountedRef.current === true && currentExecutorRef.current === executor
+                      try {
+                        const insertedRowId = await executor.insertRow(values)
+                        if (isCurrent() === false) return
+                        state.handleInsertSuccess(insertedRowId, options)
+                        if (options.keepOpen === false) setInsertMoreEnabled(false)
+                      } finally {
+                        operationPendingRef.current = false
                       }
                     }}
                   />

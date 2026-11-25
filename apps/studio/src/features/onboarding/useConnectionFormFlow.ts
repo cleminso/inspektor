@@ -1,6 +1,14 @@
 import { useRef, useState, type FormEventHandler } from 'react'
 
 import { useNavigate } from '@tanstack/react-router'
+import { Effect } from 'effect'
+import {
+  EmptySchemaCatalogueError,
+  discoverConnection,
+  planConnectionOpening,
+  type SchemaCatalogueRecord,
+} from '@inspektor/core/connection'
+import { JazzMetadata } from '@inspektor/core/jazz/schema'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import {
@@ -8,8 +16,6 @@ import {
   DEFAULT_BRANCH_NAME,
   DEFAULT_SERVER_URL,
   getConnectionDisplayName,
-  normalizeBranchName,
-  normalizeEnvName,
   type StoredConnection,
 } from '@app/connections/connections'
 import {
@@ -19,10 +25,7 @@ import {
   type ConnectionError,
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
-import {
-  fetchConnectionSchemaCatalogue,
-  handoffStoredRuntimeTarget,
-} from '@app/routing/inspectorNavigation'
+import { handoffStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
 import type { ConnectionFormValues } from './connectionFormTypes'
@@ -105,31 +108,34 @@ export function useConnectionFormFlow(
 
   const openResolvedConnection = async (
     schemaHash: string,
-    schemaCatalogue: Awaited<ReturnType<typeof fetchConnectionSchemaCatalogue>>,
+    schemaCatalogue: readonly SchemaCatalogueRecord[],
   ) => {
-    const branch = normalizeBranchName(formValues.branch)
     const draft = {
       name: formValues.name,
       serverUrl: formValues.serverUrl,
       appId: formValues.appId,
       adminSecret: formValues.adminSecret,
-      env: normalizeEnvName(formValues.env),
+      env: formValues.env,
       credentialRetention: formValues.credentialRetention,
     }
-    const existingConnection = findConnectionByCredentials(draft)
-    const opensExistingConnection =
-      existingConnection !== null && existingConnection.id !== options?.connection.id
-    const connectionId = opensExistingConnection
-      ? existingConnection.id
-      : (options?.connection.id ?? createConnectionFromDraft(draft).id)
-
-    const result = opensExistingConnection
-      ? setConnectionContext(connectionId, branch, schemaHash)
-      : saveConnectionWithContext(draft, connectionId, branch, schemaHash)
+    const plan = planConnectionOpening({
+      draft,
+      branch: formValues.branch,
+      schemaHash,
+      schemaCatalogue,
+      existingConnection: findConnectionByCredentials(draft),
+      editingConnectionId: options?.connection.id,
+      createConnectionId: () => createConnectionFromDraft(draft).id,
+    })
+    const { connectionId, branch } = plan.target
+    const result =
+      plan.action === 'activate-existing'
+        ? setConnectionContext(connectionId, branch, schemaHash)
+        : saveConnectionWithContext(plan.draft, connectionId, branch, schemaHash)
     if (result === 'blocked') {
       return
     }
-    handoffStoredRuntimeTarget(draft, { branch, connectionId, schemaCatalogue, schemaHash })
+    handoffStoredRuntimeTarget(plan.draft, plan.target)
 
     if (options?.returnTo !== undefined && connectionId === options.connection.id) {
       await navigate({ href: options.returnTo })
@@ -159,28 +165,24 @@ export function useConnectionFormFlow(
         setError(validation.error)
         return
       }
-
       setError(null)
       void prepareJazzWasm()
-      let schemaCatalogue: Awaited<ReturnType<typeof fetchConnectionSchemaCatalogue>>
-      try {
-        schemaCatalogue = await fetchConnectionSchemaCatalogue({
-          serverUrl: validation.value.serverUrl,
-          appId: validation.value.appId,
-          adminSecret: validation.value.adminSecret,
-        })
-      } catch (fetchError) {
-        setError(normalizeSchemaFetchError(fetchError))
+      const discovery = await Effect.runPromise(
+        discoverConnection(validation.value).pipe(
+          Effect.provide(JazzMetadata.layer),
+          Effect.result,
+        ),
+      )
+      if (discovery._tag === 'Failure') {
+        const failure = discovery.failure
+        setError(
+          failure instanceof EmptySchemaCatalogueError
+            ? EMPTY_SCHEMA_ERROR
+            : normalizeSchemaFetchError(failure),
+        )
         return
       }
-
-      const schemaHash = schemaCatalogue[0]?.hash
-      if (schemaHash === undefined) {
-        setError(EMPTY_SCHEMA_ERROR)
-        return
-      }
-
-      await openResolvedConnection(schemaHash, schemaCatalogue)
+      await openResolvedConnection(discovery.success.schemaHash, discovery.success.schemaCatalogue)
     } catch (error) {
       setError(normalizeSchemaFetchError(error))
     } finally {

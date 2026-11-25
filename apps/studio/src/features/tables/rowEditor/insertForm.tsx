@@ -81,6 +81,7 @@ function InsertRowFormFields({
             py="m"
           >
             <RowEditorFields
+              disabled={saveDisabled === true || rowEditor.isSaving === true}
               errors={rowEditor.errors}
               expandedColumnName={rowEditor.expandedColumnName}
               fieldStates={rowEditor.fieldStates}

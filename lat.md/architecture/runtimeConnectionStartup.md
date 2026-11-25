@@ -26,9 +26,9 @@ Production pins an external WASM artifact and excludes the bundled fallback from
 
 ## Runtime ownership
 
-The runtime provider owns the privileged client and its cleanup.
+The React runtime adapter attaches one core session scope. Core owns privileged acquisition, publication, and cleanup.
 
-[[apps/studio/src/app/providers/inspectorProvider.tsx]] creates the client after shared WASM preparation and publishes it only when schema is available without runtime error.
+[[packages/core/src/studio/session.ts#openSession]] overlaps client acquisition with schema loading and gates publication on schema verification. [[packages/core/src/jazz/client.ts#acquireAdminClient]] closes the full client. Browser WASM preparation remains in the React adapter.
 
 Failure, replacement, or unmount shuts down owned clients. A client that resolves after its attempt retires is also shut down. Stale metadata work cannot publish into the replacement runtime.
 

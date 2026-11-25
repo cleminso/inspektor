@@ -1,46 +1,60 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-
+import { useCallback, useMemo, useState } from 'react'
+import { Effect } from 'effect'
 import {
-  createConnectionFromDraft,
+  createConnectionProfiles,
   getActiveConnection,
-  getConnectionById,
-  getConnectionPreferences as getStoredConnectionPreferences,
-  readStoredConnections,
-  removeConnection,
+  getConnectionPreferences,
   resolveDefaultBranch,
   resolveDefaultSchemaHash,
-  setActiveConnectionContext,
-  upsertConnection,
-  writeStoredConnections,
   type ConnectionDraft,
+  type ConnectionProfileAccess,
   type RuntimeConnection,
   type StoredConnection,
-  type StoredConnectionsStore,
-} from '@app/connections/connections'
+} from '@inspektor/core/connection'
+import { readStoredConnections, writeStoredConnections } from '@app/connections/connections'
 import {
   clearConnectionCredential,
   resolveRuntimeConnection,
   saveConnectionCredential,
 } from '@app/connections/connectionCredentials'
-import { findConnectionByCredentials as findRuntimeConnectionByCredentials } from '@app/connections/connectionIdentity'
 import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
 
-/**
- * React-facing API for the Inspektor connection session.
- *
- * Components use this instead of reading localStorage directly so connection CRUD,
- * active connection selection, and workspace preferences stay synchronized through one state
- * boundary.
- */
+/** Each port is synchronous so React commands preserve their existing synchronous API. */
+const profileAccess: ConnectionProfileAccess = {
+  persistProfiles: (store) =>
+    Effect.try({
+      try: () => writeStoredConnections(store),
+      catch: (error) => error,
+    }),
+  resolveCredential: (profile) =>
+    Effect.try({
+      try: () => resolveRuntimeConnection(profile),
+      catch: (error) => error,
+    }),
+  saveCredential: (profile, adminSecret) =>
+    Effect.try({
+      try: () => saveConnectionCredential(profile, adminSecret),
+      catch: (error) => error,
+    }),
+  clearCredential: (connectionId) =>
+    Effect.try({
+      try: () => clearConnectionCredential(connectionId),
+      catch: (error) => error,
+    }),
+  removeScopedPreferences: (connectionId) =>
+    Effect.try({
+      try: () => removeConnectionScopedStorage(connectionId),
+      catch: (error) => error,
+    }),
+}
+
 export interface UseStoredConnectionsResult {
   connections: StoredConnection[]
   activeConnection: RuntimeConnection | null
   activeConnectionId: string | null
   getConnection: (connectionId: string | null | undefined) => RuntimeConnection | null
   findConnectionByCredentials: (draft: ConnectionDraft) => RuntimeConnection | null
-  getConnectionPreferences: (
-    connectionId: string,
-  ) => ReturnType<typeof getStoredConnectionPreferences>
+  getConnectionPreferences: (connectionId: string) => ReturnType<typeof getConnectionPreferences>
   getRememberedBranches: (connectionId: string) => string[]
   resolveBranch: (connectionId: string, branch?: string | null) => string
   resolveSchemaHash: (
@@ -57,129 +71,71 @@ export interface UseStoredConnectionsResult {
   setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void
 }
 
-/**
- * Owns the Inspektor's saved connection session.
- *
- * It selects the connection details and schema hash that `useInspectorRuntime` needs to create an
- * in-memory Jazz admin client. The stored branch label scopes Inspektor state only; Jazz branch
- * views must be passed to each query or mutation.
- *
- * From the Inspektor perspective, it provides a stable UI API for saved connections,
- * remembered branches, and selected schema hashes.
- */
+/** React publishes the core controller's committed snapshot. Browser state stays tab-local. */
 export function useStoredConnections(): UseStoredConnectionsResult {
-  const [store, setStore] = useState(readStoredConnections)
-  const storeRef = useRef(store)
-
-  const updateStore = useCallback(
-    (update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
-      const store = update(storeRef.current)
-      writeStoredConnections(store)
-      storeRef.current = store
-      setStore(store)
-    },
-    [],
+  const [profiles] = useState(() =>
+    Effect.runSync(createConnectionProfiles(readStoredConnections(), profileAccess)),
   )
-
+  const [store, setStore] = useState(() => Effect.runSync(profiles.snapshot))
+  const runCommand = useCallback(
+    <A>(command: Effect.Effect<A, unknown>): A => {
+      try {
+        return Effect.runSync(command)
+      } finally {
+        // Cleanup can fail after a successful profile commit. Publish that commit even on failure.
+        setStore(Effect.runSync(profiles.snapshot))
+      }
+    },
+    [profiles],
+  )
   const getConnection = useCallback(
     (connectionId: string | null | undefined) =>
-      resolveRuntimeConnection(getConnectionById(store, connectionId)),
-    [store],
+      Effect.runSync(profiles.getConnection(connectionId)),
+    [profiles],
   )
-
   const findConnectionByCredentials = useCallback(
-    (draft: ConnectionDraft) =>
-      findRuntimeConnectionByCredentials(
-        store.connections
-          .map((connection) => resolveRuntimeConnection(connection))
-          .filter((connection): connection is RuntimeConnection => connection !== null),
-        draft,
-      ),
-    [store.connections],
+    (draft: ConnectionDraft) => Effect.runSync(profiles.findByCredentials(draft)),
+    [profiles],
   )
-
   const deleteConnection = useCallback(
-    (connectionId: string) => {
-      // Remove secrets first so a blocked browser storage operation cannot leave
-      // a persisted credential behind after the profile has been deleted.
-      clearConnectionCredential(connectionId)
-      updateStore((store) => removeConnection(store, connectionId))
-      removeConnectionScopedStorage(connectionId)
-    },
-    [updateStore],
+    (connectionId: string) => runCommand(profiles.deleteProfile(connectionId)),
+    [profiles, runCommand],
   )
-
   const saveConnectionWithContext = useCallback(
-    (draft: ConnectionDraft, connectionId: string, branch: string, schemaHash: string) => {
-      const existingConnection = getConnectionById(storeRef.current, connectionId)
-      const existingRuntimeConnection = resolveRuntimeConnection(existingConnection)
-      const profile = createConnectionFromDraft(draft, connectionId)
-      const connection = saveConnectionCredential(profile, draft.adminSecret)
-      try {
-        updateStore((store) =>
-          setActiveConnectionContext(
-            upsertConnection(store, profile),
-            connectionId,
-            branch,
-            schemaHash,
-          ),
-        )
-      } catch (error) {
-        clearConnectionCredential(connectionId)
-        if (existingConnection !== null && existingRuntimeConnection !== null) {
-          saveConnectionCredential(existingConnection, existingRuntimeConnection.adminSecret)
-        }
-        throw error
-      }
-      if (
-        existingConnection !== null &&
-        (existingConnection.appId !== profile.appId ||
-          existingConnection.env !== profile.env ||
-          existingConnection.serverUrl !== profile.serverUrl)
-      ) {
-        removeConnectionScopedStorage(profile.id)
-      }
-      return connection
-    },
-    [updateStore],
+    (draft: ConnectionDraft, connectionId: string, branch: string, schemaHash: string) =>
+      runCommand(profiles.saveWithContext(draft, connectionId, branch, schemaHash)),
+    [profiles, runCommand],
   )
-
   const setConnectionContext = useCallback(
-    (connectionId: string, branch: string, schemaHash: string) => {
-      updateStore((store) => setActiveConnectionContext(store, connectionId, branch, schemaHash))
-    },
-    [updateStore],
+    (connectionId: string, branch: string, schemaHash: string) =>
+      runCommand(profiles.setContext(connectionId, branch, schemaHash)),
+    [profiles, runCommand],
   )
-
-  // Keep the returned session object stable for consumers that depend on it as one value.
   return useMemo(
     () => ({
       connections: store.connections,
-      activeConnection: resolveRuntimeConnection(getActiveConnection(store)),
+      activeConnection: getConnection(getActiveConnection(store)?.id),
       activeConnectionId: store.activeConnectionId,
       getConnection,
       findConnectionByCredentials,
       getConnectionPreferences: (connectionId: string) =>
-        getStoredConnectionPreferences(store, connectionId),
+        getConnectionPreferences(store, connectionId),
       getRememberedBranches: (connectionId: string) =>
-        getStoredConnectionPreferences(store, connectionId).rememberedBranches,
+        getConnectionPreferences(store, connectionId).rememberedBranches,
       resolveBranch: (connectionId: string, branch?: string | null) =>
         resolveDefaultBranch(store, connectionId, branch),
-      resolveSchemaHash: (
-        schemaCatalogue: readonly { hash: string }[],
-        schemaHash?: string | null,
-      ) => resolveDefaultSchemaHash(schemaCatalogue, schemaHash),
+      resolveSchemaHash: resolveDefaultSchemaHash,
       saveConnectionWithContext,
       deleteConnection,
       setConnectionContext,
     }),
     [
-      deleteConnection,
-      findConnectionByCredentials,
-      getConnection,
-      saveConnectionWithContext,
-      setConnectionContext,
       store,
+      getConnection,
+      findConnectionByCredentials,
+      saveConnectionWithContext,
+      deleteConnection,
+      setConnectionContext,
     ],
   )
 }
