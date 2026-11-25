@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 import { Box, ButtonLink, Text } from '@inspektor/ds'
 
-import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
+import { useConnections } from '@app/connections/connectionProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 
 import { ConnectionList } from './connectionList'
@@ -55,7 +55,7 @@ function ConnectionsSection({ children, title }: ConnectionsSectionProps): React
 }
 
 export function ConnectionsView(): React.ReactElement {
-  const { connections } = useInspectorSessionContext()
+  const { connections } = useConnections()
 
   return (
     <Box

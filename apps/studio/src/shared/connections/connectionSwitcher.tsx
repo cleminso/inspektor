@@ -14,7 +14,7 @@ import {
   type ContextSwitcherTriggerWidth,
 } from '@inspektor/ds'
 
-import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
+import { useConnections } from '@app/connections/connectionProvider'
 import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
 
@@ -35,7 +35,7 @@ export function ConnectionSwitcher({
     deleteConnection,
     openConnection,
     runtimeScopeExitBlocked,
-  } = useInspectorSessionContext()
+  } = useConnections()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [connectionToRemove, setConnectionToRemove] = useState<StoredConnection | null>(null)

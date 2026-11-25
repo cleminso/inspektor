@@ -11,7 +11,7 @@ Measure each boundary before selecting an optimization.
 
 ## Metadata and client reuse
 
-Schema discovery and Jazz client startup are separate costs in [runtime startup](../../apps/studio/src/app/runtime/useInspectorRuntime.tsx).
+Schema discovery and Jazz client startup are separate costs in [runtime startup](../../packages/core/src/workbench/connection.ts).
 
 Consider short-lived, runtime-profile-keyed metadata reuse only if discovery remains perceptible after request deduplication. Consider bounded warm-client retention only if client startup remains the dominant repeat-switch cost.
 
@@ -19,7 +19,7 @@ Any design must preserve credential and schema isolation, stale-intent rejection
 
 ## Prefetch and row persistence
 
-The [current prefetch adapter](../../apps/studio/src/features/tables/query/prefetchJazzQuery.ts) uses Jazz's subscription store and an explicit release operation.
+The [exploration feature](../../packages/core/src/workbench/exploration.ts) uses Jazz's subscription store and scoped next-page preparation.
 
 Measure cache hits, unused preparation, transferred rows, failures, and duplicate server work before broadening preparation beyond accepted navigation intent.
 

@@ -1,59 +1,69 @@
-import { useEffect, useRef, type PropsWithChildren, type ReactNode } from 'react'
+import { useEffect, type PropsWithChildren, type ReactNode } from 'react'
+import { useRouter } from '@tanstack/react-router'
 
-import { InspectorProvider } from '@app/providers/inspectorProvider'
-import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
-import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
+import { RuntimeProvider } from '@app/runtime/runtimeProvider'
+import { useConnections } from '@app/connections/connectionProvider'
+import { getRuntimeExecutionIdentity } from '@app/connections/connectionCredentials'
+import type { ResolvedConnectionEntry } from '@app/connections/connectionEntry'
 
 interface InspectorRuntimeBoundaryProps extends PropsWithChildren {
   fallback?: ReactNode
-  target: ResolvedRuntimeTarget
+  target: ResolvedConnectionEntry
 }
 
 /**
- * Synchronizes a route-resolved target with session state before mounting the Jazz runtime.
+ * Attaches a committed route entry to its validated execution settings.
  *
- * Route loaders and session preferences update through different mechanisms. Rendering nothing
- * while they disagree prevents a new route from observing the previous connection's runtime. A
- * rejected synchronization also stays unmounted instead of marking an attempted target as applied.
+ * Preferences only record the accepted selection. A credential or execution-setting change during
+ * discovery requires a new entry; it must not start a client against the old schema evidence.
  */
 export function InspectorRuntimeBoundary({
   children,
   fallback = null,
   target,
 }: InspectorRuntimeBoundaryProps): React.ReactNode {
-  const { currentBranch, currentConnectionId, currentSchemaHash, setConnectionContext } =
-    useInspectorSessionContext()
-  const targetIdentity = JSON.stringify([target.connectionId, target.branch, target.schemaHash])
-  const appliedTargetIdentityRef = useRef<string | null>(null)
-  const sessionMatchesTarget =
+  const {
+    currentBranch,
+    currentConnectionId,
+    currentSchemaHash,
+    getConnection,
+    setConnectionContext,
+  } = useConnections()
+  const router = useRouter()
+  const connection = getConnection(target.connectionId)
+  const executionMatches =
+    connection !== null && getRuntimeExecutionIdentity(connection) === target.executionIdentity
+  const preferencesMatch =
     currentConnectionId === target.connectionId &&
     currentBranch === target.branch &&
     currentSchemaHash === target.schemaHash
-  const isContextReady = appliedTargetIdentityRef.current === targetIdentity || sessionMatchesTarget
 
   useEffect(() => {
-    if (sessionMatchesTarget === true) {
-      appliedTargetIdentityRef.current = targetIdentity
-      return
-    }
-    if (
-      appliedTargetIdentityRef.current !== targetIdentity &&
-      setConnectionContext(target.connectionId, target.branch, target.schemaHash) === 'accepted'
-    ) {
-      appliedTargetIdentityRef.current = targetIdentity
+    if (executionMatches === false) {
+      void router.invalidate()
+    } else if (preferencesMatch === false) {
+      setConnectionContext(target.connectionId, target.branch, target.schemaHash)
     }
   }, [
-    sessionMatchesTarget,
+    executionMatches,
+    preferencesMatch,
+    router,
     setConnectionContext,
     target.branch,
     target.connectionId,
     target.schemaHash,
-    targetIdentity,
   ])
 
-  if (isContextReady === false) {
+  if (executionMatches === false || connection === null) {
     return fallback
   }
 
-  return <InspectorProvider initialRuntimeTarget={target}>{children}</InspectorProvider>
+  return (
+    <RuntimeProvider
+      target={target}
+      connection={connection}
+    >
+      {children}
+    </RuntimeProvider>
+  )
 }

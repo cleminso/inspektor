@@ -10,7 +10,7 @@ import {
 } from '@inspektor/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 
-import { useRuntimeError, useRuntimeRetry } from '@app/providers/inspectorProvider'
+import { useRuntimeError, useRuntimeRetry } from '@app/runtime/runtimeProvider'
 import { useConnectionContentReady } from '@app/runtime/connectionContentBoundary'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'

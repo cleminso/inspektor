@@ -12,7 +12,7 @@ import {
 } from 'react'
 
 import { resolveTableRowsSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
-import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
+import { useExplorationNavigation } from '@exploration/provider'
 
 interface TableNavigationHistoryState {
   entries: readonly TableNavigationHistoryEntry[]
@@ -177,7 +177,7 @@ export function TableNavigationHistoryProvider({
   children,
 }: TableNavigationHistoryProviderProps): React.ReactElement {
   const router = useRouter()
-  const { prepare } = useTableNavigationPreparation()
+  const { prepare } = useExplorationNavigation()
   const [history, setHistory] = useState(() =>
     createTableNavigationHistory(
       router.latestLocation.href,

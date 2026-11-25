@@ -19,7 +19,7 @@ import {
   useRuntimePermissions,
   useRuntimePermissionsLoading,
   useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+} from '@app/runtime/runtimeProvider'
 
 interface SchemaViewProps {
   tableName: string

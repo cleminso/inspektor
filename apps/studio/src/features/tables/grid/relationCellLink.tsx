@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 import { RelationValue } from '@inspektor/ds'
 
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import { buildRelationTableLink } from '@tables/routing/buildRelationTableLink'
 import { shouldPrepareTableLink } from '@tables/routing/preparedTableLink'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
@@ -16,7 +16,7 @@ export function RelationCellLink({
   relationId,
   relationTable,
 }: RelationCellLinkProps): React.ReactElement {
-  const { currentConnectionId } = useInspectorSessionState()
+  const { currentConnectionId } = useActiveWorkspace()
   const { openTable, pendingTableName } = useTableTabs()
 
   if (currentConnectionId === null) {

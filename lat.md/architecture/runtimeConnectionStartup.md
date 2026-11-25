@@ -20,19 +20,25 @@ Connection startup crosses Studio, Jazz, the browser, and the remote server.
 
 `createInspectorAdminClient()` is lazy. Its resolution neither opens a socket nor proves server acceptance. An HTTP upgrade does not prove authenticated readiness.
 
-[[apps/studio/src/app/providers/inspectorProvider.tsx#InspectorProvider]] documents the lazy boundary. [[apps/studio/src/app/runtime/jazzWasmPreparation.ts#prepareJazzWasm]] shares preparation across entry paths.
+[[apps/studio/src/app/runtime/runtimeProvider.tsx#RuntimeProvider]] documents the lazy boundary. [[apps/studio/src/app/runtime/jazzWasmPreparation.ts#prepareJazzWasm]] shares preparation across entry paths.
 
 Production pins an external WASM artifact and excludes the bundled fallback from deployment. When Jazz changes, verify that the hosted artifact matches the installed package bytes; a version label alone does not prove compatibility.
 
 ## Runtime ownership
 
-The React runtime adapter attaches one core session scope. Core owns privileged acquisition, publication, and cleanup.
+The React adapter attaches one connection owner. Core owns attempt replacement, observation, reconnect policy, and cleanup through the existing session scope.
+
+Runtime input comes from [[routing#Accepted workspace selection]], not persisted preferences. Browser visibility and query recovery can request retry; neither selects another workspace.
 
 [[packages/core/src/studio/session.ts#openSession]] overlaps client acquisition with schema loading and gates publication on schema verification. [[packages/core/src/jazz/client.ts#acquireAdminClient]] closes the full client. Browser WASM preparation remains in the React adapter.
 
+[[packages/core/src/workbench/connection.ts#createConnectionRuntime]] compares execution settings, not profile labels or retention preferences. Its guarded snapshot hides another execution's client and metadata before the accepted execution attaches. Reading starts no work.
+
+Manual and browser-resume retry pass through exploration to reset its recovery budget and cancel preparation. Admitted query recovery requests connection replacement directly. The connection owner adds no recovery budget.
+
 Failure, replacement, or unmount shuts down owned clients. A client that resolves after its attempt retires is also shut down. Stale metadata work cannot publish into the replacement runtime.
 
-[[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] loads schema and permissions independently. Permission-load failure ends permission loading; it does not itself establish a fatal schema failure.
+Schema and permissions load independently. Permission-load failure ends permission loading; it does not itself establish a fatal schema failure.
 
 Workspace children consume nullable runtime state. Hiding content does not defer its React work. Stable ancestry under [[routing#Stable route ancestry]] prevents accidental startup repetition.
 

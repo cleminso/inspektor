@@ -1,12 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 
 import {
   AlertDialog,
@@ -19,8 +11,6 @@ import {
   ResizablePanelGroup,
   Text,
   Tooltip,
-  toasts,
-  type BinaryCopyFormat,
   type DataGridCellTarget,
 } from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
@@ -35,24 +25,16 @@ import {
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import {
-  getConnectionIdentityToken,
+  getRuntimeResourceToken,
   useRuntimeClient,
   useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+} from '@app/runtime/runtimeProvider'
 import { useConnectionContentReady } from '@app/runtime/connectionContentBoundary'
 import { unknownWriteWarning } from '@inspektor/core/write'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
 import { DataGridFilterBuilder } from '@tables/filters/dataGridFilterBuilder'
-import {
-  canCreateTableFilterClauseFromValue,
-  createTableFilterClauseFromValue,
-  tableIdFilterColumn,
-} from '@tables/filters/filterParsing'
-import type { TableFilterValueMatch } from '@tables/filters/tableFilters'
-import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
-import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { DataGridExport, TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { EditRowForm, type RowRepresentation } from '@tables/rowEditor/editForm'
@@ -61,12 +43,16 @@ import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
+import { useTableCellActions } from '@tables/workspace/useTableCellActions'
+import { useTableRowWrites } from '@tables/workspace/useTableRowWrites'
+import { useTableQueryStatus } from '@tables/workspace/useTableQueryStatus'
+import { useTablePaneFocus } from '@tables/workspace/useTablePaneFocus'
 import {
-  TableMutationLedgerProvider,
-  useTableMutationEditorController,
-  useTableMutationLedger,
-  useTableMutationWorkspace,
-} from '@tables/mutationLedger/provider'
+  TableRowChangesProvider,
+  useTableRowChangeEditor,
+  useTableRowChanges,
+} from '@tables/rowChanges/provider'
+import { useTableRowChangeWorkspace } from '@tables/rowChanges/workspaceProvider'
 import type { ColumnDescriptor } from 'jazz-tools'
 import type { DynamicTableRow, TableRowId } from '@tables/tableTypes'
 import { appRoutes } from '@app/routing/appRoutes'
@@ -75,8 +61,6 @@ import { createTableScope } from '@tables/workspace/scope'
 interface TableViewProps {
   tableName: string
 }
-
-type PaneFocusReturn = { kind: 'insert' } | { kind: 'row'; rowId: TableRowId }
 
 function RowEditorStatus({ label }: { label: string }): React.ReactElement {
   return (
@@ -108,7 +92,7 @@ function RowEditorError({ message }: { message: string }): React.ReactElement {
 interface EditRowPaneProps {
   requestedField: DataGridCellTarget | null
   disabled: boolean
-  onSave: (values: Record<string, unknown>) => Promise<DynamicTableRow | null>
+  onSave: () => Promise<DynamicTableRow | null>
   onRepresentationChange: (representation: RowRepresentation) => void
   representation: RowRepresentation
   rowId: TableRowId
@@ -130,7 +114,7 @@ function EditRowPane({
   useEffect(() => {
     setSourceValues(rowValues)
   }, [rowValues])
-  const draftController = useTableMutationEditorController({
+  const { draft, setFieldInput } = useTableRowChangeEditor({
     initialRowValues: sourceValues,
     rowId,
   })
@@ -138,11 +122,12 @@ function EditRowPane({
   return (
     <EditRowForm
       key={rowId}
-      draftController={draftController}
+      draft={draft}
+      onFieldInputChange={setFieldInput}
       requestedField={requestedField}
       disabled={disabled}
-      onSave={async (values) => {
-        const refreshedRow = await onSave(values)
+      onSave={async () => {
+        const refreshedRow = await onSave()
         if (refreshedRow !== null) setSourceValues(refreshedRow)
       }}
       onRepresentationChange={onRepresentationChange}
@@ -162,12 +147,13 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     [tableName, wasmSchema],
   )
   const mutationScopeKey = createTableScope(scope, tableName)
-  const runtimeKey = `${client === null ? 'none' : getConnectionIdentityToken(client)}:${wasmSchema === null ? 'none' : getConnectionIdentityToken(wasmSchema)}`
+  const runtimeKey = `${client === null ? 'none' : getRuntimeResourceToken(client)}:${wasmSchema === null ? 'none' : getRuntimeResourceToken(wasmSchema)}`
 
   return (
-    <TableMutationLedgerProvider
+    <TableRowChangesProvider
       schemaColumns={schemaColumns}
       scopeKey={mutationScopeKey}
+      tableName={tableName}
     >
       <TableViewContent
         key={`${mutationScopeKey}:${runtimeKey}`}
@@ -175,7 +161,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
         tableKey={mutationScopeKey}
         tableName={tableName}
       />
-    </TableMutationLedgerProvider>
+    </TableRowChangesProvider>
   )
 }
 
@@ -187,40 +173,35 @@ function TableViewContent({
   schemaColumns: ColumnDescriptor[]
   tableKey: string
 }): React.ReactElement {
-  const mutations = useTableMutationLedger()
-  const discardAll = mutations.discardAll
-  const mutationWorkspace = useTableMutationWorkspace()
-  const operationPendingRef = useRef(false)
-  const transitionApprovedRef = useRef(false)
+  const mutations = useTableRowChanges()
+  const mutationWorkspace = useTableRowChangeWorkspace()
   const [editRevision, setEditRevision] = useState(0)
-  const [deleteRequestedRowId, setDeleteRequestedRowId] = useState<string | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [pendingTransition, setPendingTransition] = useState<(() => void) | null>(null)
   const requestTransition = useCallback(
     (action: () => void) => {
+      const current = mutations.editing.getSnapshot()
       if (
-        operationPendingRef.current === true ||
-        mutations.execution.status === 'applying' ||
-        mutations.execution.status === 'retired'
+        current.busy === true ||
+        current.execution.status === 'applying' ||
+        current.execution.status === 'retired'
       )
         return
-      if (mutations.stagedCount > 0 && transitionApprovedRef.current === false) {
+      if (current.draftCount > 0) {
         setPendingTransition(() => action)
         return
       }
-      if (mutations.execution.status === 'failed' && mutations.stagedCount === 0) {
-        discardAll()
+      if (current.execution.status === 'failed' && mutations.editing.discardAll() === false) {
+        return
       }
       action()
     },
-    [discardAll, mutations.execution.status, mutations.stagedCount],
+    [mutations.editing],
   )
   const routeBlocker = useBlocker({
     enableBeforeUnload: false,
     withResolver: true,
     shouldBlockFn: ({ current, next }) =>
-      (mutationWorkspace.hasPendingChanges(tableKey) === true ||
-        operationPendingRef.current === true) &&
+      mutationWorkspace.hasPendingChanges(tableKey) === true &&
       next.fullPath.startsWith(appRoutes.tables) === true &&
       'connectionId' in current.params &&
       'connectionId' in next.params &&
@@ -235,103 +216,52 @@ function TableViewContent({
   const { rebaseRows } = mutations
   const state = useTableViewState({
     requestTransition,
-    retainDisabledRows: mutations.execution.status !== 'idle',
+    retainDisabledRows: mutations.busy === true || mutations.execution.status !== 'idle',
     schemaColumns,
-    stagedValuesByRowId: mutations.stagedValuesByRowId,
+    draftValuesByRowId: mutations.draftValuesByRowId,
     tableKey,
     tableName,
   })
-  const currentExecutorRef = useRef(state.mutationExecutor)
-  const mountedRef = useRef(true)
-  useLayoutEffect(() => {
-    currentExecutorRef.current = state.mutationExecutor
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
-  }, [state.mutationExecutor])
-  const [resumingWrite, setResumingWrite] = useState(false)
+  const {
+    saveRow,
+    deleteRow,
+    insertRow,
+    duplicateRow,
+    resumeWaiting,
+    resumingWrite,
+    deleteRequestedRowId,
+    setDeleteRequestedRowId,
+    deleteError,
+    setDeleteError,
+  } = useTableRowWrites({
+    editing: mutations.editing,
+    columns: schemaColumns,
+    activeRowId: state.rowEditor.activeRowId,
+    onApplied: state.handleMutationUpdatesApplied,
+    onDeleted: state.handleRowDeleteSuccess,
+    onInserted: state.handleInsertSuccess,
+    onDuplicated: state.rowEditor.openInsert,
+  })
   useConnectionContentReady(state.isInitialLoading === false)
-  useEffect(() => {
-    setDeleteError(null)
-  }, [state.rowEditor.activeRowId, tableKey])
-  useEffect(() => {
-    if (deleteRequestedRowId !== null && deleteRequestedRowId !== state.rowEditor.activeRowId) {
-      setDeleteRequestedRowId(null)
-    }
-  }, [deleteRequestedRowId, state.rowEditor.activeRowId])
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
   const insertRowButtonRef = useRef<HTMLButtonElement>(null)
-  const paneFocusReturnRef = useRef<PaneFocusReturn | null>(null)
-  const pendingPaletteFocusReturnRef = useRef<MutationObserver | null>(null)
-  const previousDetailPaneModeRef = useRef(state.detailPaneMode)
   const gridHotkeyOptions = { ...appHotkeyOptions, target: gridHotkeyTargetRef }
   const mutationApplying =
+    mutations.busy === true ||
     mutations.execution.status === 'applying' ||
     mutations.execution.status === 'retired' ||
-    state.mutationExecutor.pendingWrite !== null ||
-    state.mutationExecutor.retired === true
+    mutations.pendingWrite !== null ||
+    mutations.retired === true
   useEffect(() => {
     if (mutationApplying === true && routeBlocker.status === 'blocked') routeBlocker.reset()
   }, [mutationApplying, routeBlocker])
   const cancelRowChanges = () => {
-    if (operationPendingRef.current === true) return
-    mutations.discardAll()
+    if (mutations.editing.discardAll() === false) return false
     setEditRevision((revision) => revision + 1)
     setDeleteError(null)
     setDeleteRequestedRowId(null)
-  }
-  // @lat: [[rowChanges#Persistence outcome]]
-  const saveRow = async (values: Record<string, unknown>): Promise<DynamicTableRow | null> => {
-    const rowId = state.rowEditor.activeRowId
-    if (rowId === null || operationPendingRef.current === true) return null
-    operationPendingRef.current = true
-    const executor = state.mutationExecutor
-    const isCurrent = () => mountedRef.current === true && currentExecutorRef.current === executor
-    try {
-      await executor.updateRow(rowId, values)
-      if (isCurrent() === false) return null
-      // The workspace already settled the submitted ledger, even if this view unmounted.
-      state.handleMutationUpdatesApplied({ [rowId]: new Set(Object.keys(values)) })
-      let refreshedRow: DynamicTableRow | null
-      try {
-        refreshedRow = await executor.readRow(rowId)
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        throw new Error(
-          `Row saved, but refresh failed. Reload the page to see current data. ${message}`,
-        )
-      }
-      if (isCurrent() === false) return null
-      if (refreshedRow === null) {
-        operationPendingRef.current = false
-        state.handleRowDeleteSuccess(rowId)
-      }
-      return refreshedRow
-    } finally {
-      operationPendingRef.current = false
-    }
-  }
-  const deleteRow = async (rowId: TableRowId) => {
-    if (rowId !== state.rowEditor.activeRowId || operationPendingRef.current === true) return
-    operationPendingRef.current = true
-    const executor = state.mutationExecutor
-    const isCurrent = () => mountedRef.current === true && currentExecutorRef.current === executor
-    setDeleteError(null)
-    try {
-      await executor.deleteRow(rowId)
-      if (isCurrent() === false) return
-      setDeleteRequestedRowId(null)
-      operationPendingRef.current = false
-      state.handleRowDeleteSuccess(rowId)
-    } catch (error) {
-      if (isCurrent() === false) return
-      const message = error instanceof Error ? error.message : String(error)
-      setDeleteError(message)
-    } finally {
-      operationPendingRef.current = false
-    }
+    return true
   }
   const canOpenInsert = state.canOpenRowEditor === true && mutationApplying === false
   useEffect(() => {
@@ -348,7 +278,7 @@ function TableViewContent({
         return 'default'
       }
 
-      if (mutations.stagedFieldsByRowId[cell.row.id]?.has(cell.column.id) === true) {
+      if (mutations.draftFieldsByRowId[cell.row.id]?.has(cell.column.id) === true) {
         return 'stagedUpdate'
       }
 
@@ -356,103 +286,21 @@ function TableViewContent({
         ? 'recentlyApplied'
         : 'default'
     },
-    [mutations.stagedFieldsByRowId, state.recentlyAppliedCells],
+    [mutations.draftFieldsByRowId, state.recentlyAppliedCells],
   )
   const handleCellEditRequest = (target: { columnId: string; rowId: string }) => {
     if (mutationApplying === false) {
-      const activate = () => {
-        transitionApprovedRef.current = true
-        state.handleCellEditRequest(target)
-        transitionApprovedRef.current = false
-      }
-      if (target.rowId === state.rowEditor.activeRowId) activate()
-      else requestTransition(activate)
+      state.handleCellEditRequest(target)
     }
   }
-  const resolveCellAction = useCallback(
-    (target: DataGridCellTarget) => {
-      const columnMeta = state.tableColumns.find((column) => column.id === target.columnId)
-      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
-      if (columnMeta === undefined || row === undefined) {
-        return null
-      }
-      const value = resolveStagedFieldValue(
-        row.original,
-        mutations.stagedValuesByRowId[target.rowId],
-        columnMeta.accessorKey,
-      )
-      return { columnMeta, value }
-    },
-    [mutations.stagedValuesByRowId, state.table, state.tableColumns],
-  )
-  const getCellActions = useCallback(
-    (target: DataGridCellTarget) => {
-      const resolvedCell = resolveCellAction(target)
-      if (resolvedCell === null) {
-        return {
-          canCopy: false,
-          canEdit: false,
-          canExclude: false,
-          canFilterBy: false,
-          copyAs: [],
-        }
-      }
-      const { columnMeta, value } = resolvedCell
-      const filterColumn = columnMeta.column ?? tableIdFilterColumn
-      const canEdit = state.canOpenRowEditor === true && mutationApplying === false
-      return {
-        canCopy: value !== undefined,
-        canEdit,
-        canExclude: canCreateTableFilterClauseFromValue(filterColumn, value, 'exclude'),
-        canFilterBy: canCreateTableFilterClauseFromValue(filterColumn, value),
-        copyAs: value instanceof Uint8Array ? (['hex', 'base64'] as const) : [],
-      }
-    },
-    [mutationApplying, resolveCellAction, state.canOpenRowEditor],
-  )
-  const handleCopyCell = useCallback(
-    async (target: DataGridCellTarget, format?: BinaryCopyFormat) => {
-      const resolvedCell = resolveCellAction(target)
-      if (resolvedCell === null) {
-        return
-      }
-      try {
-        const serializedValue = serializeCellValueForClipboard(
-          resolvedCell.value,
-          format ?? 'default',
-        )
-        await navigator.clipboard.writeText(serializedValue.text)
-        toasts.success(serializedValue.toast, {
-          duration: 'brief',
-          id: JSON.stringify(['cell-copy', tableKey, target.rowId, target.columnId]),
-        })
-      } catch {
-        toasts.error("Couldn't copy value")
-      }
-    },
-    [resolveCellAction, tableKey],
-  )
-  const handleFilterByCell = (target: DataGridCellTarget, match: TableFilterValueMatch) => {
-    const resolvedCell = resolveCellAction(target)
-    if (resolvedCell === null) {
-      return
-    }
-    const clause = createTableFilterClauseFromValue(
-      resolvedCell.columnMeta.column ?? tableIdFilterColumn,
-      resolvedCell.value,
-      match,
-    )
-    if (clause !== null) {
-      void state.setFilters([...state.filters, clause])
-    }
-  }
-  const canSelectRow = useCallback(
-    (rowId: string) => {
-      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === rowId)
-      return row?.getCanSelect() === true && row.getIsSelected() === false
-    },
-    [state.table],
-  )
+  const {
+    getCellActions,
+    handleCopyCell,
+    handleFilterByCell,
+    canSelectRow,
+    handleSelectRow,
+    handleTouchCellContextMenuOpen,
+  } = useTableCellActions(state, mutations.draftValuesByRowId, mutationApplying, tableKey)
   const canMutateRow = useCallback(
     (rowId: string) => {
       const rowExists = state.table.getRowModel().rows.some((candidate) => candidate.id === rowId)
@@ -462,33 +310,9 @@ function TableViewContent({
   )
   const handleDuplicateRow = useCallback(
     async (rowId: string) => {
-      if (canMutateRow(rowId) === false || operationPendingRef.current === true) {
-        return
-      }
-      const previousExecution = mutations.execution
-      const stagedValues = mutations.stagedValuesByRowId[rowId]
-      operationPendingRef.current = true
-      mutations.setExecution({ status: 'applying', error: null })
-      let sourceValues: Record<string, unknown>
-      try {
-        const row = await state.mutationExecutor.readRow(rowId)
-        if (row === null) throw new Error('The row is no longer available.')
-        sourceValues = Object.fromEntries(
-          schemaColumns.flatMap((column) => {
-            const value = resolveStagedFieldValue(row, stagedValues, column.name)
-            return value === undefined ? [] : [[column.name, value]]
-          }),
-        )
-      } catch {
-        toasts.error("Couldn't load the row to duplicate")
-        return
-      } finally {
-        mutations.setExecution(previousExecution)
-        operationPendingRef.current = false
-      }
-      state.rowEditor.openInsert(sourceValues)
+      if (canMutateRow(rowId) === true) await duplicateRow(rowId)
     },
-    [canMutateRow, mutations, schemaColumns, state.mutationExecutor, state.rowEditor],
+    [canMutateRow, duplicateRow],
   )
   const handleDeleteRow = useCallback(
     (rowId: string) => {
@@ -496,59 +320,18 @@ function TableViewContent({
         return
       }
       requestTransition(() => {
-        mutations.discardAll()
+        if (mutations.editing.discardAll() === false) return
         state.handleCellEditRequest({ rowId, columnId: schemaColumns[0]?.name ?? 'id' })
         setDeleteRequestedRowId(rowId)
       })
     },
-    [canMutateRow, mutations, requestTransition, schemaColumns, state],
-  )
-  const handleSelectRow = useCallback(
-    (rowId: string) => {
-      if (canSelectRow(rowId) === false) {
-        return
-      }
-      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === rowId)
-      row?.toggleSelected(true)
-    },
-    [canSelectRow, state.table],
-  )
-  const handleTouchCellContextMenuOpen = useCallback(
-    (target: DataGridCellTarget) => {
-      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
-      const cell = row
-        ?.getVisibleCells()
-        .find((candidate) => candidate.column.id === target.columnId)
-      if (cell?.getCanSelect() === true && cell.getIsSelected() === false) {
-        state.table.selectCellRange({
-          anchorRowId: target.rowId,
-          anchorColumnId: target.columnId,
-          focusRowId: target.rowId,
-          focusColumnId: target.columnId,
-        })
-      }
-    },
-    [state.table],
+    [canMutateRow, mutations, requestTransition, schemaColumns, state, setDeleteRequestedRowId],
   )
   // Reset on pagination start and completion so stale offsets cannot survive content-size changes.
   const scrollResetKey = `${state.scrollResetKey}:${state.isInitialLoading === true ? 'loading' : 'ready'}`
   const handleEscape = useEffectEvent(state.handleEscape)
-  const refreshPendingRef = useRef(false)
-  const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
   const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
-  const filteredEmpty =
-    state.error === null &&
-    state.isInitialLoading === false &&
-    state.isRefreshing === false &&
-    state.rows.length === 0 &&
-    state.filters.length > 0
-  const unfilteredEmpty =
-    state.error === null &&
-    state.isInitialLoading === false &&
-    state.isRefreshing === false &&
-    state.rows.length === 0 &&
-    state.page === 1 &&
-    state.filters.length === 0
+  const { filteredEmpty, unfilteredEmpty, queryStatus } = useTableQueryStatus(state)
   const { page, setPage } = state
   const hasPreviousPage = state.page > 1
   const canGoToPreviousPage =
@@ -612,56 +395,14 @@ function TableViewContent({
   const closeRowEditorAndResetRepresentation = useCallback(() => {
     closeRowEditor()
   }, [closeRowEditor])
-  const focusPaneReturn = useCallback(() => {
-    const focusReturn = paneFocusReturnRef.current
-    if (focusReturn === null) {
-      return
-    }
-    const restoreFocus = () => {
-      const target =
-        focusReturn.kind === 'insert'
-          ? insertRowButtonRef.current
-          : (Array.from(
-              gridHotkeyTargetRef.current?.querySelectorAll<HTMLElement>('[aria-label]') ?? [],
-            ).find(
-              (element) => element.getAttribute('aria-label') === `Select row ${focusReturn.rowId}`,
-            ) ?? null)
-      if (target?.isConnected === true) {
-        target.focus()
-      }
-    }
-    restoreFocus()
-    if (document.querySelector('[role="dialog"] [data-slot="command"]') !== null) {
-      pendingPaletteFocusReturnRef.current?.disconnect()
-      const observer = new MutationObserver(() => {
-        if (document.querySelector('[role="dialog"] [data-slot="command"]') === null) {
-          observer.disconnect()
-          pendingPaletteFocusReturnRef.current = null
-          restoreFocus()
-        }
-      })
-      pendingPaletteFocusReturnRef.current = observer
-      observer.observe(document.body, { childList: true, subtree: true })
-    }
-  }, [])
-  useEffect(() => {
-    return () => pendingPaletteFocusReturnRef.current?.disconnect()
-  }, [])
-  useLayoutEffect(() => {
-    const previousDetailPaneMode = previousDetailPaneModeRef.current
-    if (detailPaneMode === 'insert') {
-      pendingPaletteFocusReturnRef.current?.disconnect()
-      paneFocusReturnRef.current = { kind: 'insert' }
-    } else if (detailPaneMode === 'rows' && rowEditor.activeRowId !== null) {
-      pendingPaletteFocusReturnRef.current?.disconnect()
-      paneFocusReturnRef.current = { kind: 'row', rowId: rowEditor.activeRowId }
-    } else if (previousDetailPaneMode !== 'closed') {
-      setRowRepresentationState({ representation: 'details', tableKey })
-      focusPaneReturn()
-      paneFocusReturnRef.current = null
-    }
-    previousDetailPaneModeRef.current = detailPaneMode
-  }, [detailPaneMode, focusPaneReturn, rowEditor.activeRowId, tableKey])
+  const resetRowRepresentation = useCallback(() => {
+    setRowRepresentationState({ representation: 'details', tableKey })
+  }, [tableKey])
+  useTablePaneFocus(
+    { detailPaneMode, activeRowId: rowEditor.activeRowId },
+    { grid: gridHotkeyTargetRef, insert: insertRowButtonRef },
+    resetRowRepresentation,
+  )
   const openInsertPane = useCallback(() => {
     setInsertMoreEnabled(false)
     openInsert()
@@ -702,40 +443,6 @@ function TableViewContent({
     [canOpenInsert, toggleInsertPane],
   )
   useAppCommands(commands)
-  const queryStatus =
-    state.isReconnecting === true
-      ? 'Reconnecting'
-      : state.error !== null
-        ? ''
-        : state.isRefreshing === true
-          ? 'Refreshing rows'
-          : [
-              refreshAnnouncement,
-              filteredEmpty
-                ? 'No rows match these filters'
-                : unfilteredEmpty
-                  ? 'This table is empty'
-                  : '',
-            ]
-              .filter(Boolean)
-              .join('. ')
-
-  useEffect(() => {
-    if (state.isInitialLoading === true || state.error !== null) {
-      refreshPendingRef.current = false
-      setRefreshAnnouncement('')
-      return
-    }
-    if (state.isRefreshing === true) {
-      refreshPendingRef.current = true
-      return
-    }
-    if (refreshPendingRef.current === true) {
-      refreshPendingRef.current = false
-      setRefreshAnnouncement('Rows refreshed')
-    }
-  }, [state.error, state.isInitialLoading, state.isRefreshing])
-
   useEffect(() => {
     if (
       state.detailPaneMode === 'closed' &&
@@ -765,32 +472,19 @@ function TableViewContent({
 
   return (
     <>
-      {state.mutationExecutor.reloadRequired === true ||
-      mutations.execution.status === 'retired' ? (
+      {mutations.reloadRequired === true || mutations.execution.status === 'retired' ? (
         <Box role="alert">
           <Text>
-            {state.mutationExecutor.retirementMessage ??
-              mutations.execution.error ??
-              unknownWriteWarning}
+            {mutations.retirementMessage ?? mutations.execution.error ?? unknownWriteWarning}
           </Text>
         </Box>
-      ) : state.mutationExecutor.pendingWrite?.status === 'unresolved' ? (
+      ) : mutations.pendingWrite?.status === 'unresolved' ? (
         <Box role="status">
           <Text>Write outcome is unknown. Do not submit it again.</Text>
           <Button
             type="button"
             disabled={resumingWrite}
-            onClick={() => {
-              setResumingWrite(true)
-              void state.mutationExecutor
-                .resumePending()
-                .catch(() => {
-                  // Retirement is reported by the workspace warning, not as Jazz rejection.
-                })
-                .finally(() => {
-                  if (mountedRef.current === true) setResumingWrite(false)
-                })
-            }}
+            onClick={resumeWaiting}
           >
             Resume waiting
           </Button>
@@ -1026,7 +720,7 @@ function TableViewContent({
                 canNavigatePrevious={
                   state.rowEditor.canNavigatePrevious && mutationApplying === false
                 }
-                dirty={mutations.stagedCount > 0}
+                dirty={mutations.draftCount > 0}
                 onCancel={cancelRowChanges}
                 deleteRequested={
                   deleteRequestedRowId === state.rowEditor.activeRowId &&
@@ -1072,19 +766,9 @@ function TableViewContent({
                       closeRowEditorAndResetRepresentation()
                     }}
                     onSave={async (values, options) => {
-                      if (operationPendingRef.current === true) return
-                      operationPendingRef.current = true
-                      const executor = state.mutationExecutor
-                      const isCurrent = () =>
-                        mountedRef.current === true && currentExecutorRef.current === executor
-                      try {
-                        const insertedRowId = await executor.insertRow(values)
-                        if (isCurrent() === false) return
-                        state.handleInsertSuccess(insertedRowId, options)
+                      await insertRow(values, options, () => {
                         if (options.keepOpen === false) setInsertMoreEnabled(false)
-                      } finally {
-                        operationPendingRef.current = false
-                      }
+                      })
                     }}
                   />
                 ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
@@ -1133,11 +817,9 @@ function TableViewContent({
             <Button
               variant="danger"
               onClick={() => {
-                if (operationPendingRef.current === true) return
-                cancelRowChanges()
-                transitionApprovedRef.current = true
+                if (mutations.editing.getSnapshot().busy === true) return
+                if (cancelRowChanges() === false) return
                 pendingTransition?.()
-                transitionApprovedRef.current = false
                 setPendingTransition(null)
                 if (routeBlocker.status === 'blocked') routeBlocker.proceed()
               }}

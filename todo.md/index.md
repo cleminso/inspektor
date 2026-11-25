@@ -22,6 +22,7 @@ Each ledger states its own next action. This list does not claim area readiness.
 - [Shared UI](sharedUi.md): JSON tree navigation and rendered accessibility checks.
 - [Runtime](runtime.md): private diagnostics and production measurements.
 - [Core](core.md): domain-first Effect rewrite and Studio integration.
+- [Workbench structure](reshapeStructure.md): cohesive feature workflows and thinner Studio integration.
 
 ## Work method
 

@@ -1,7 +1,7 @@
 import { Navigate, useNavigate } from '@tanstack/react-router'
 import { Box, Text } from '@inspektor/ds'
 
-import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
+import { useConnections } from '@app/connections/connectionProvider'
 import {
   getSchemaCatalogueRecoveryError,
   type ConnectionError,
@@ -64,7 +64,7 @@ export function EditConnectionView({
   connectionId,
   recovery,
 }: EditConnectionViewProps): React.ReactElement {
-  const { connections, getConnection, getConnectionPreferences } = useInspectorSessionContext()
+  const { connections, getConnection, getConnectionPreferences } = useConnections()
   const navigate = useNavigate()
   const connection = connections.find((item) => item.id === connectionId)
 

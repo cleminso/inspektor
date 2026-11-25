@@ -4,7 +4,7 @@ import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
 
 import { appRoutes } from '@app/routing/appRoutes'
 import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
-import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
+import { useExplorationNavigation } from '@exploration/provider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { selectInitialTableView } from '@tables/workspace/tabs'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
@@ -15,7 +15,7 @@ export function TablesIndexRoute(): null {
   const search = useSearch({ strict: false }) as { empty?: string }
   const { isSchemaReady, tables } = useAvailableTables()
   const { recentViews } = useTableTabs()
-  const { cancel, prepare } = useTableNavigationPreparation()
+  const { cancel, prepare } = useExplorationNavigation()
   const initialView = useMemo(
     () => selectInitialTableView(recentViews, tables),
     [recentViews, tables],

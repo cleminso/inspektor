@@ -2,40 +2,36 @@ import { Effect } from 'effect'
 import { redirect } from '@tanstack/react-router'
 import {
   createRuntimeTargetHandoff,
-  discoverSchemaCatalogue,
   discoverSchemaCatalogueWithRetry,
-  resolveRuntimeTarget as resolveTarget,
   resolveConnectionEntry,
   type ConnectionCredentials,
   type ResolvedRuntimeTarget,
-  type RuntimeConnection,
   type SchemaCatalogueRecord,
   type StoredConnectionsStore,
-} from '@inspektor/core/connection'
+} from '@inspektor/core/workbench/connection'
 import { JazzMetadata } from '@inspektor/core/jazz/schema'
-import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
+import {
+  getRuntimeExecutionIdentity,
+  resolveRuntimeConnection,
+} from '@app/connections/connectionCredentials'
 import {
   getConnectionById,
   getConnectionPreferences,
-  readStoredConnections,
   resolveDefaultBranch,
 } from '@app/connections/connections'
-import { appRoutes } from './appRoutes'
+import { readConnectionProfiles } from '@app/connections/connectionProfiles'
+import { appRoutes } from '@app/routing/appRoutes'
 
-export {
-  buildSchemaCatalogue,
-  type ResolvedRuntimeTarget,
-  type SchemaCatalogueRecord,
-} from '@inspektor/core/connection'
+export type {
+  ResolvedRuntimeTarget,
+  SchemaCatalogueRecord,
+} from '@inspektor/core/workbench/connection'
 
 const runtimeTargetHandoff = createRuntimeTargetHandoff()
 
-export function fetchConnectionSchemaCatalogue(
-  connection: ConnectionCredentials,
-): Promise<readonly SchemaCatalogueRecord[]> {
-  return Effect.runPromise(
-    discoverSchemaCatalogue(connection).pipe(Effect.provide(JazzMetadata.layer)),
-  )
+/** Secret-free entry evidence. Runtime must use the execution settings that discovery validated. */
+export interface ResolvedConnectionEntry extends ResolvedRuntimeTarget {
+  executionIdentity: string
 }
 
 export function fetchConnectionSchemaCatalogueWithRetry(
@@ -56,22 +52,6 @@ export function handoffStoredRuntimeTarget(
   runtimeTargetHandoff.offer(connection, target)
 }
 
-/** Compatibility boundary for session callbacks. Core owns discovery and schema selection. */
-export function resolveRuntimeTarget(options: {
-  connectionId: string
-  branchOverride?: string | null
-  schemaHashOverride?: string | null
-  getConnection: (connectionId: string) => RuntimeConnection | null
-  resolveBranch: (connectionId: string, branchOverride?: string | null) => string
-  resolveSchemaHash: (
-    catalogue: readonly SchemaCatalogueRecord[],
-    schemaHashOverride?: string | null,
-  ) => string | null
-  knownSchemaHashes?: readonly string[]
-}): Promise<ResolvedRuntimeTarget | null> {
-  return Effect.runPromise(resolveTarget(options).pipe(Effect.provide(JazzMetadata.layer)))
-}
-
 /** Browser credentials and persisted state enter the headless selection boundary here. */
 export async function resolveStoredRuntimeTarget(options: {
   connectionId: string
@@ -79,13 +59,14 @@ export async function resolveStoredRuntimeTarget(options: {
   schemaHashOverride?: string | null
   store?: StoredConnectionsStore
   signal?: AbortSignal
-}): Promise<ResolvedRuntimeTarget | null> {
-  const store = options.store ?? readStoredConnections()
+}): Promise<ResolvedConnectionEntry | null> {
+  const store = options.store ?? readConnectionProfiles()
   const connection = resolveRuntimeConnection(getConnectionById(store, options.connectionId))
   if (connection === null) return null
+  const executionIdentity = getRuntimeExecutionIdentity(connection)
   const branch = resolveDefaultBranch(store, options.connectionId, options.branchOverride)
   options.signal?.throwIfAborted()
-  return Effect.runPromise(
+  const target = await Effect.runPromise(
     resolveConnectionEntry({
       connection,
       connectionId: options.connectionId,
@@ -96,6 +77,7 @@ export async function resolveStoredRuntimeTarget(options: {
     }).pipe(Effect.provide(JazzMetadata.layer)),
     { signal: options.signal },
   )
+  return target === null ? null : { ...target, executionIdentity }
 }
 
 export function redirectToConnections(): never {

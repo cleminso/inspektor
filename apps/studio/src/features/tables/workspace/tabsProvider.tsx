@@ -11,7 +11,7 @@ import {
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { AlertDialog, Button, toasts } from '@inspektor/ds'
 
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
@@ -38,9 +38,9 @@ import {
 } from '@tables/workspace/tabs'
 import { appRoutes } from '@app/routing/appRoutes'
 import { resolveTableRowsSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
-import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
+import { useExplorationNavigation } from '@exploration/provider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
-import { useTableMutationWorkspace } from '@tables/mutationLedger/provider'
+import { useTableRowChangeWorkspace } from '@tables/rowChanges/workspaceProvider'
 import { createTableScope } from '@tables/workspace/scope'
 
 interface TableTabsContextValue {
@@ -79,12 +79,12 @@ interface PendingTabClose {
 }
 
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
-  const { currentConnectionId, currentTableName } = useInspectorSessionState()
-  const { cancel: cancelPreparation, pendingTableName, prepare } = useTableNavigationPreparation()
+  const { currentConnectionId, currentTableName } = useActiveWorkspace()
+  const { cancel: cancelPreparation, pendingTableName, prepare } = useExplorationNavigation()
   const navigate = useNavigate({ from: appRoutes.tables })
   const routeSearch = useSearch({ strict: false }) as TableTabsRouteSearch
   const { isSchemaReady, tables: availableTables } = useAvailableTables()
-  const mutationWorkspace = useTableMutationWorkspace()
+  const mutationWorkspace = useTableRowChangeWorkspace()
   const [pendingTabClose, setPendingTabClose] = useState<PendingTabClose | null>(null)
   const [state, setState] = useState<TableTabsProviderState>(() => ({
     ...loadTableTabsState(scope),
@@ -308,7 +308,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     (tabId: string) => {
       if (
         currentTableName !== null &&
-        mutationWorkspace.isApplying(createTableScope(scope, currentTableName)) === true
+        mutationWorkspace.table(createTableScope(scope, currentTableName)).getSnapshot().busy ===
+          true
       ) {
         return
       }

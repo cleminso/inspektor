@@ -1,13 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  type PropsWithChildren,
-} from 'react'
-import { useBlocker, useNavigate, useParams } from '@tanstack/react-router'
+import { createContext, useCallback, useContext, useMemo, type PropsWithChildren } from 'react'
+import { useBlocker, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 
 import {
   getConnectionDisplayName,
@@ -16,8 +8,7 @@ import {
   type StoredConnection,
 } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
-import { resolveRuntimeTarget } from '@app/routing/inspectorNavigation'
-import { useStoredConnections } from '@app/session/useInspectorSession'
+import { useStoredConnections } from '@app/connections/useStoredConnections'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import {
   RuntimeScopeExitGuardProvider,
@@ -25,15 +16,13 @@ import {
 } from '@app/providers/runtimeScopeExitGuard'
 
 /**
- * Accepted connection intent and persisted workspace selection that are safe before a Jazz client
- * exists.
+ * Saved connections, restoration preferences, and guarded navigation commands.
  *
  * UI components originate intent. This boundary decides whether a runtime-scope change is safe,
- * requests connection navigation, and persists a local branch label or schema selection. The
- * branch label does not configure Jazz queries or mutations. Connection-entry
- * discovery belongs to the route loader; active connectivity belongs to `InspectorProvider`.
+ * Preferences record accepted selections; they do not select the running client.
+ * Connection-entry discovery belongs to the route loader; runtime lifetime stays below it.
  */
-export interface InspectorSessionContextValue {
+export interface ConnectionsContextValue {
   connections: StoredConnection[]
   activeConnection: RuntimeConnection | null
   currentConnectionId: string | null
@@ -45,9 +34,7 @@ export interface InspectorSessionContextValue {
   rememberedBranches: string[]
   /** Requests the canonical connection route without resolving or persisting its runtime target. */
   openConnection: (connectionId: string) => ConnectionOpenResult
-  /** Persists a local workspace branch label without configuring a Jazz branch view. */
-  switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>
-  /** Persists a caller-selected schema without repeating discovery. */
+  /** Requests schema navigation. Only committed entry records the new preference. */
   switchSchema: (schemaHash: string) => void
   saveConnectionWithContext: (
     draft: ConnectionDraft,
@@ -70,30 +57,30 @@ export interface InspectorSessionContextValue {
 
 type ConnectionOpenResult = 'accepted' | 'blocked'
 
-const InspectorSessionContext = createContext<InspectorSessionContextValue | null>(null)
+const ConnectionsContext = createContext<ConnectionsContextValue | null>(null)
 
 /**
- * Owns accepted connection intent, persisted selection, and runtime-scope exit policy.
+ * Owns profile adapters, restoration preferences, and runtime-scope exit policy.
  *
  * It stays above every route so onboarding can run without Jazz and so TanStack Router history
  * navigation cannot bypass workspace-owned mutation blockers. Remote connection-entry resolution
  * remains in the connection route loader.
  */
-export function InspectorSessionProvider({ children }: PropsWithChildren): React.ReactElement {
+export function ConnectionProvider({ children }: PropsWithChildren): React.ReactElement {
   return (
     <RuntimeScopeExitGuardProvider>
-      <InspectorSessionProviderValue>{children}</InspectorSessionProviderValue>
+      <ConnectionProviderValue>{children}</ConnectionProviderValue>
     </RuntimeScopeExitGuardProvider>
   )
 }
 
-/** Projects route identity and pending matches into persisted, router-blocked session commands. */
-function InspectorSessionProviderValue({ children }: PropsWithChildren): React.ReactElement {
+/** Profile commands remain available on onboarding routes, without an active runtime. */
+function ConnectionProviderValue({ children }: PropsWithChildren): React.ReactElement {
   const session = useStoredConnections()
   const runtimeScopeExitGuard = useRuntimeScopeExitGuard()
-  const runtimeScopeExitGuardRef = useRef(runtimeScopeExitGuard)
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
+  const routeSearch = useSearch({ strict: false })
   const schemaNavigationOrigin =
     routeParams.tableName !== undefined
       ? '/conn/$connectionId/tables/$tableName/'
@@ -109,30 +96,20 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         : session.activeConnection,
     [routeConnectionId, session],
   )
-  const activeConnectionIdRef = useRef(activeConnection?.id ?? null)
-  const branchRequestRef = useRef(0)
   const connectionPreferences =
     activeConnection === null ? null : session.getConnectionPreferences(activeConnection.id)
   const currentBranch = connectionPreferences?.lastBranch ?? null
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null
-  const currentBranchRef = useRef(currentBranch)
-  const currentSchemaHashRef = useRef(currentSchemaHash)
-
-  // Imperative navigation commands must observe the last committed session, not an abandoned render.
-  useLayoutEffect(() => {
-    runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
-    activeConnectionIdRef.current = activeConnection?.id ?? null
-    currentBranchRef.current = currentBranch
-    currentSchemaHashRef.current = currentSchemaHash
-  }, [activeConnection?.id, currentBranch, currentSchemaHash, runtimeScopeExitGuard])
 
   useBlocker({
     enableBeforeUnload: false,
     shouldBlockFn: ({ next }) => {
       const nextConnectionId = 'connectionId' in next.params ? next.params.connectionId : null
+      const nextSchema = 'schema' in next.search ? next.search.schema : undefined
       return (
         runtimeScopeExitGuard.isBlocked() === true &&
         (nextConnectionId !== currentConnectionId ||
+          nextSchema !== routeSearch.schema ||
           next.fullPath.startsWith(appRoutes.tables) === false)
       )
     },
@@ -163,43 +140,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
     [currentConnectionId, navigate, runtimeScopeExitGuard, session],
   )
 
-  const switchBranch = useCallback(
-    async (branch: string, knownSchemaHashes?: readonly string[]) => {
-      if (
-        activeConnection === null ||
-        branch === currentBranch ||
-        runtimeScopeExitGuardRef.current.isBlocked() === true
-      ) {
-        return
-      }
-
-      const requestId = branchRequestRef.current + 1
-      branchRequestRef.current = requestId
-      const nextTarget = await resolveRuntimeTarget({
-        connectionId: activeConnection.id,
-        branchOverride: branch,
-        schemaHashOverride: currentSchemaHash,
-        getConnection: session.getConnection,
-        resolveBranch: session.resolveBranch,
-        resolveSchemaHash: session.resolveSchemaHash,
-        knownSchemaHashes,
-      })
-      if (
-        nextTarget === null ||
-        branchRequestRef.current !== requestId ||
-        activeConnectionIdRef.current !== activeConnection.id ||
-        currentBranchRef.current !== currentBranch ||
-        currentSchemaHashRef.current !== currentSchemaHash ||
-        runtimeScopeExitGuardRef.current.isBlocked() === true
-      ) {
-        return
-      }
-
-      session.setConnectionContext(activeConnection.id, nextTarget.branch, nextTarget.schemaHash)
-    },
-    [activeConnection, currentBranch, currentSchemaHash, session],
-  )
-
   const switchSchema = useCallback(
     (schemaHash: string) => {
       if (
@@ -211,21 +151,13 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         return
       }
 
-      session.setConnectionContext(activeConnection.id, currentBranch, schemaHash)
       void navigateSchema({
         replace: true,
         resetScroll: false,
         search: (previous) => ({ ...previous, schema: schemaHash }),
       })
     },
-    [
-      activeConnection,
-      currentBranch,
-      currentSchemaHash,
-      navigateSchema,
-      runtimeScopeExitGuard,
-      session,
-    ],
+    [activeConnection, currentBranch, currentSchemaHash, navigateSchema, runtimeScopeExitGuard],
   )
   const setConnectionContext = useCallback(
     (connectionId: string, branch: string, schemaHash: string) => {
@@ -252,7 +184,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
     [runtimeScopeExitGuard, session],
   )
 
-  const value = useMemo<InspectorSessionContextValue>(
+  const value = useMemo<ConnectionsContextValue>(
     () => ({
       connections: session.connections,
       activeConnection,
@@ -266,7 +198,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       rememberedBranches:
         activeConnection !== null ? session.getRememberedBranches(activeConnection.id) : [],
       openConnection,
-      switchBranch,
       switchSchema,
       saveConnectionWithContext,
       deleteConnection: session.deleteConnection,
@@ -286,21 +217,18 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       session,
       saveConnectionWithContext,
       setConnectionContext,
-      switchBranch,
       switchSchema,
     ],
   )
 
-  return (
-    <InspectorSessionContext.Provider value={value}>{children}</InspectorSessionContext.Provider>
-  )
+  return <ConnectionsContext.Provider value={value}>{children}</ConnectionsContext.Provider>
 }
 
-/** Returns session-level state for screens that do not require a Jazz client. */
-export function useInspectorSessionContext(): InspectorSessionContextValue {
-  const context = useContext(InspectorSessionContext)
+/** Saved profile access and navigation commands do not require a Jazz client. */
+export function useConnections(): ConnectionsContextValue {
+  const context = useContext(ConnectionsContext)
   if (context === null) {
-    throw new Error('useInspectorSessionContext must be used within InspectorSessionProvider')
+    throw new Error('useConnections must be used within ConnectionProvider')
   }
 
   return context

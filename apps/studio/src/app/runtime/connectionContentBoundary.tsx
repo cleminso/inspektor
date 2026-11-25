@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useLayoutEffect, useState } fro
 
 import { Box } from '@inspektor/ds'
 
-import { useRuntimeError } from '@app/providers/inspectorProvider'
+import { useRuntimeError } from '@app/runtime/runtimeProvider'
 
 const ConnectionContentReadyContext = createContext<(() => void) | null>(null)
 

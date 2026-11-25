@@ -1,52 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Effect } from 'effect'
 import {
-  createConnectionProfiles,
   getActiveConnection,
   getConnectionPreferences,
-  resolveDefaultBranch,
-  resolveDefaultSchemaHash,
   type ConnectionDraft,
-  type ConnectionProfileAccess,
   type RuntimeConnection,
   type StoredConnection,
 } from '@inspektor/core/connection'
-import { readStoredConnections, writeStoredConnections } from '@app/connections/connections'
-import {
-  clearConnectionCredential,
-  resolveRuntimeConnection,
-  saveConnectionCredential,
-} from '@app/connections/connectionCredentials'
-import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
-
-/** Each port is synchronous so React commands preserve their existing synchronous API. */
-const profileAccess: ConnectionProfileAccess = {
-  persistProfiles: (store) =>
-    Effect.try({
-      try: () => writeStoredConnections(store),
-      catch: (error) => error,
-    }),
-  resolveCredential: (profile) =>
-    Effect.try({
-      try: () => resolveRuntimeConnection(profile),
-      catch: (error) => error,
-    }),
-  saveCredential: (profile, adminSecret) =>
-    Effect.try({
-      try: () => saveConnectionCredential(profile, adminSecret),
-      catch: (error) => error,
-    }),
-  clearCredential: (connectionId) =>
-    Effect.try({
-      try: () => clearConnectionCredential(connectionId),
-      catch: (error) => error,
-    }),
-  removeScopedPreferences: (connectionId) =>
-    Effect.try({
-      try: () => removeConnectionScopedStorage(connectionId),
-      catch: (error) => error,
-    }),
-}
+import { getConnectionProfiles } from './connectionProfiles'
 
 export interface UseStoredConnectionsResult {
   connections: StoredConnection[]
@@ -56,11 +17,6 @@ export interface UseStoredConnectionsResult {
   findConnectionByCredentials: (draft: ConnectionDraft) => RuntimeConnection | null
   getConnectionPreferences: (connectionId: string) => ReturnType<typeof getConnectionPreferences>
   getRememberedBranches: (connectionId: string) => string[]
-  resolveBranch: (connectionId: string, branch?: string | null) => string
-  resolveSchemaHash: (
-    schemaCatalogue: readonly { hash: string }[],
-    schemaHash?: string | null,
-  ) => string | null
   saveConnectionWithContext: (
     draft: ConnectionDraft,
     connectionId: string,
@@ -73,9 +29,7 @@ export interface UseStoredConnectionsResult {
 
 /** React publishes the core controller's committed snapshot. Browser state stays tab-local. */
 export function useStoredConnections(): UseStoredConnectionsResult {
-  const [profiles] = useState(() =>
-    Effect.runSync(createConnectionProfiles(readStoredConnections(), profileAccess)),
-  )
+  const [profiles] = useState(getConnectionProfiles)
   const [store, setStore] = useState(() => Effect.runSync(profiles.snapshot))
   const runCommand = useCallback(
     <A>(command: Effect.Effect<A, unknown>): A => {
@@ -122,9 +76,6 @@ export function useStoredConnections(): UseStoredConnectionsResult {
         getConnectionPreferences(store, connectionId),
       getRememberedBranches: (connectionId: string) =>
         getConnectionPreferences(store, connectionId).rememberedBranches,
-      resolveBranch: (connectionId: string, branch?: string | null) =>
-        resolveDefaultBranch(store, connectionId, branch),
-      resolveSchemaHash: resolveDefaultSchemaHash,
       saveConnectionWithContext,
       deleteConnection,
       setConnectionContext,

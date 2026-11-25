@@ -6,7 +6,7 @@
  */
 import { useMemo } from 'react'
 
-import { useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { useRuntimeSchema } from '@app/runtime/runtimeProvider'
 import { getTableNames } from '@tables/schema/tableSchema'
 
 interface UseAvailableTablesResult {

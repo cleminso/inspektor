@@ -12,6 +12,7 @@
     "paths": {
       "@app/*": ["./src/app/*"],
       "@tables/*": ["./src/features/tables/*"],
+      "@exploration/*": ["./src/features/exploration/*"],
       "@onboarding/*": ["./src/features/onboarding/*"],
       "@shared/*": ["./src/shared/*"]
     },
@@ -30,7 +31,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": false
   },
-  "include": ["src"],
+  "include": ["src"]
 }

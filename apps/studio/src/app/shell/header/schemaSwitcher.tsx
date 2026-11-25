@@ -8,7 +8,7 @@ import {
   type ContextSwitcherTriggerWidth,
 } from '@inspektor/ds'
 
-import { useInspectorSessionState, useRuntimeSchemaHashes } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace, useRuntimeSchemaHashes } from '@app/runtime/runtimeProvider'
 
 interface SchemaSwitcherProps {
   size?: ContextSwitcherTriggerSize
@@ -25,7 +25,7 @@ export function SchemaSwitcher({
   triggerLabel,
   width = 'content',
 }: SchemaSwitcherProps = {}): React.ReactElement {
-  const { currentSchemaHash, switchSchema } = useInspectorSessionState()
+  const { currentSchemaHash, switchSchema } = useActiveWorkspace()
   const availableSchemaHashes = useRuntimeSchemaHashes()
   const latestSchemaHash = availableSchemaHashes[0] ?? null
   const isLatestSchema = currentSchemaHash === latestSchemaHash

@@ -20,7 +20,7 @@ import {
 } from 'react'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { shouldPrepareTableLink } from '@tables/routing/preparedTableLink'
 import type { TableTabSearch } from '@tables/workspace/tabs'
@@ -168,7 +168,7 @@ export function TableListPane({
   onTableCheckedChange,
   onUnpinTables,
 }: TableListPaneProps): React.ReactElement {
-  const { currentConnectionId } = useInspectorSessionState()
+  const { currentConnectionId } = useActiveWorkspace()
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName))
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false)
   const deferTableRendering = tables.length > deferredRenderingThreshold

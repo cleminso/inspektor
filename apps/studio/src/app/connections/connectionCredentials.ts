@@ -1,5 +1,5 @@
 import type { RuntimeConnection, StoredConnection } from './connections'
-import { normalizeServerUrl } from './connectionIdentity'
+import { normalizeServerUrl } from '@inspektor/core/connection'
 
 const CONNECTION_CREDENTIALS_STORAGE_KEY = 'inspektor-connection-credentials'
 
@@ -33,6 +33,28 @@ const memoryCredentialVault = createMemoryCredentialVault()
  * browser blocks site storage, including in private browsing environments.
  */
 const sessionCredentialVault = createSessionCredentialVault()
+const credentialRevisions = new WeakMap<StoredCredential, number>()
+let nextCredentialRevision = 0
+
+/** Opaque credential revision. No secret enters route data, keys, or diagnostics. */
+export function getRuntimeExecutionIdentity(connection: RuntimeConnection): string {
+  const credential = memoryCredentialVault.get(connection.id)
+  if (matchesProfile(credential, connection) === false) {
+    throw new Error('Runtime credentials must be resolved before binding connection entry')
+  }
+  let revision = credentialRevisions.get(credential)
+  if (revision === undefined) {
+    revision = ++nextCredentialRevision
+    credentialRevisions.set(credential, revision)
+  }
+  return JSON.stringify([
+    connection.id,
+    connection.serverUrl,
+    connection.appId,
+    connection.env,
+    revision,
+  ])
+}
 
 /**
  * Stores a credential according to the profile's retention policy and returns
@@ -91,7 +113,17 @@ function createMemoryCredentialVault(): CredentialVault {
 
   return {
     get: (connectionId) => credentials.get(connectionId),
-    set: (connectionId, credential) => credentials.set(connectionId, credential),
+    set: (connectionId, credential) => {
+      const previous = credentials.get(connectionId)
+      if (
+        previous?.serverUrl === credential.serverUrl &&
+        previous.appId === credential.appId &&
+        previous.adminSecret === credential.adminSecret
+      ) {
+        return
+      }
+      credentials.set(connectionId, credential)
+    },
     delete: (connectionId) => credentials.delete(connectionId),
   }
 }

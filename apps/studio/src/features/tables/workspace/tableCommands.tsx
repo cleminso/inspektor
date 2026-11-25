@@ -3,10 +3,10 @@ import { toasts } from '@inspektor/ds'
 import { useMemo } from 'react'
 
 import { useAppCommands, type AppCommand } from '@app/hotkeys/appHotkeys'
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
-import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
+import { useExplorationNavigation } from '@exploration/provider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import {
   createTableSearchByName,
@@ -22,10 +22,10 @@ interface TableCommandsProps {
 }
 
 export function TableCommands({ onOpenTable, tabs }: TableCommandsProps): null {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+  const { currentBranch, currentConnectionId, currentSchemaHash } = useActiveWorkspace()
   const { isSchemaReady, tables } = useAvailableTables()
   const navigate = useNavigate()
-  const { prepare } = useTableNavigationPreparation()
+  const { prepare } = useExplorationNavigation()
   const scope = createTableWorkspaceScope({
     branch: currentBranch,
     connectionId: currentConnectionId,

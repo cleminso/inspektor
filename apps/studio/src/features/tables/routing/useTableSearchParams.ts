@@ -8,8 +8,8 @@ import { useCallback, useMemo } from 'react'
 
 import { useNavigate, useSearch } from '@tanstack/react-router'
 
-import { serializeFiltersToSearchParam } from '@tables/filters/filterParsing'
-import type { TableFilterClause } from '@tables/filters/tableFilters'
+import { createFilterClauseId, serializeFiltersToSearchParam } from '@tables/filters/filterParsing'
+import type { TableQueryIntent } from '@inspektor/core/query'
 import {
   canonicalizeTableRouteSearch,
   resolveTableRowsSearch,
@@ -17,17 +17,12 @@ import {
 import type {
   TableExplorerSearchState,
   TableExplorerView,
-  TablePageSize,
   TableRouteSearch,
-  TableSortDirection,
 } from '@tables/tableTypes'
 
-/** Parsed table explorer URL state plus setters that write back to route search params. */
+/** URL serialization does not decide query transitions or prepare Jazz work. */
 interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
-  setFilters: (filters: TableFilterClause[]) => Promise<void>
-  setPage: (page: number) => Promise<void>
-  setPageSize: (pageSize: TablePageSize) => Promise<void>
-  setSorting: (sortColumn: string, sortDirection: TableSortDirection) => Promise<void>
+  commitQuery: (intent: TableQueryIntent) => Promise<void>
 }
 
 function parseView(value: string | undefined): TableExplorerView {
@@ -80,27 +75,23 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     },
     [navigate],
   )
-  // Stable commands prevent consumers from treating unchanged route behavior as new state.
-  const setFilters = useCallback(
-    async (filters: TableFilterClause[]) => {
+  const commitQuery = useCallback(
+    async (intent: TableQueryIntent) => {
       await updateSearch({
-        filters: serializeFiltersToSearchParam(filters) ?? undefined,
-        page: undefined,
-      })
-    },
-    [updateSearch],
-  )
-  const setPage = useCallback(async (page: number) => updateSearch({ page }), [updateSearch])
-  const setPageSize = useCallback(
-    async (pageSize: TablePageSize) => updateSearch({ page: undefined, pageSize }),
-    [updateSearch],
-  )
-  const setSorting = useCallback(
-    async (sortColumn: string, sortDirection: TableSortDirection) => {
-      await updateSearch({
-        dir: sortDirection,
-        page: undefined,
-        sort: sortColumn,
+        filters:
+          serializeFiltersToSearchParam(
+            intent.filters.map((filter) => ({
+              ...filter,
+              id:
+                'id' in filter && typeof filter.id === 'string'
+                  ? filter.id
+                  : createFilterClauseId(),
+            })),
+          ) ?? undefined,
+        page: intent.page,
+        pageSize: intent.pageSize,
+        sort: intent.sortColumn,
+        dir: intent.sortDirection,
       })
     },
     [updateSearch],
@@ -108,9 +99,6 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
 
   return {
     ...state,
-    setFilters,
-    setPage,
-    setPageSize,
-    setSorting,
+    commitQuery,
   }
 }

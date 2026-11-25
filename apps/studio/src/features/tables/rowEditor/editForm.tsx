@@ -16,8 +16,7 @@ import {
 } from '@inspektor/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
-import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
-import { buildRowMutationValueProjection } from '@tables/rowEditor/mutation/draft'
+import { projectDraft, type FieldIntent, type RowDraft } from '@inspektor/core/draft'
 import { RowProvenanceFields } from '@tables/rowEditor/provenanceFields'
 import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
 import { TABLE_PROVENANCE_COLUMNS } from '@tables/tableProvenance'
@@ -25,8 +24,9 @@ import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 
 interface EditRowFormProps {
   requestedField?: DataGridCellTarget | null
-  draftController: RowDraftController
-  onSave: (values: Record<string, unknown>) => Promise<void>
+  draft: RowDraft
+  onFieldInputChange: (columnName: string, input: FieldIntent) => void
+  onSave: () => Promise<void>
   disabled?: boolean
   onRepresentationChange: (representation: RowRepresentation) => void
   representation: RowRepresentation
@@ -43,10 +43,10 @@ const defaultFindOptions: FindBarSearchOptions = {
 }
 
 function RowJsonRepresentation({
-  draftController,
+  draft,
   rowValues,
   schemaColumns,
-}: Pick<EditRowFormProps, 'draftController' | 'rowValues' | 'schemaColumns'>): React.ReactElement {
+}: Pick<EditRowFormProps, 'draft' | 'rowValues' | 'schemaColumns'>): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOptions, setSearchOptions] = useState(defaultFindOptions)
   const [activeMatchIndex, setActiveMatchIndex] = useState(0)
@@ -57,12 +57,12 @@ function RowJsonRepresentation({
     query: '',
   })
   const value = useMemo(() => {
-    const projection = buildRowMutationValueProjection(draftController.state.draft, schemaColumns)
+    const projection = projectDraft(draft, schemaColumns)
     return createRowJsonViewValue({ ...rowValues, ...projection.displayValues }, [
       ...schemaColumns,
       ...TABLE_PROVENANCE_COLUMNS,
     ])
-  }, [draftController.state.draft, rowValues, schemaColumns])
+  }, [draft, rowValues, schemaColumns])
   const findState: FindBarState =
     searchQuery.length === 0
       ? { status: 'idle' }
@@ -151,7 +151,8 @@ function RowProvenanceRepresentation({
 
 export function EditRowForm({
   requestedField = null,
-  draftController,
+  draft,
+  onFieldInputChange,
   onRepresentationChange,
   onSave,
   disabled = false,
@@ -160,7 +161,8 @@ export function EditRowForm({
   schemaColumns,
 }: EditRowFormProps): React.ReactElement {
   const rowEditor = useRowEditorFields({
-    draftController,
+    draft,
+    onFieldInputChange,
     mode: 'edit',
     onSubmit: onSave,
     onValidationFailure: () => onRepresentationChange('details'),
@@ -300,7 +302,7 @@ export function EditRowForm({
           </Box>
         ) : representation === 'json' ? (
           <RowJsonRepresentation
-            draftController={draftController}
+            draft={draft}
             rowValues={rowValues}
             schemaColumns={schemaColumns}
           />

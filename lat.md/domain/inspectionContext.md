@@ -24,7 +24,7 @@ The schema hash selects stored schema metadata. The local branch label does not 
 
 An available explicit URL schema takes precedence. Otherwise, connection entry uses the first schema in the catalogue. [[jazzAccess#Metadata access]] defines discovery ordering.
 
-[[packages/core/src/studio/connection.ts#buildSchemaCatalogue]] owns catalogue ordering. [[apps/studio/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] treats branch as local runtime identity only.
+[[packages/core/src/studio/connection.ts#buildSchemaCatalogue]] owns catalogue ordering. [[packages/core/src/workbench/connection.ts#createConnectionRuntime]] treats branch as local runtime identity only.
 
 Studio does not expose branch controls or supply operation-scoped Jazz branch views. A branch label is not evidence that reads or writes target that branch.
 

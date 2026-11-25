@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ShellLayout } from '@inspektor/ds'
 import { useSearch } from '@tanstack/react-router'
 
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import {
   TableListPane,
   type TableCheckedChangeOptions,
@@ -20,7 +20,7 @@ import { TableTabsView } from '@tables/workspace/tabsView'
 import { createTableSearchByName } from '@tables/workspace/tabs'
 
 export function TableExplorerScreen(): React.ReactElement {
-  const { currentTableName } = useInspectorSessionState()
+  const { currentTableName } = useActiveWorkspace()
   // Unrelated URL state must not rerender the complete table explorer.
   const routeSearch = useSearch({
     strict: false,

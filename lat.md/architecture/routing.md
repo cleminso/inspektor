@@ -9,6 +9,7 @@ This contract owns route identity, stable ancestry, and state placement.
 - [Route identity](#route-identity)
 - [Stable route ancestry](#stable-route-ancestry)
 - [State placement](#state-placement)
+- [Accepted workspace selection](#accepted-workspace-selection)
 
 ## Route identity
 
@@ -44,3 +45,15 @@ The URL owns active content and shareable query state. Local storage owns secret
 Memory owns transient interaction and active credentials. Opted-in session storage can retain credentials under [[jazzAccess#Credential boundary]]. Credentials never belong in URL state or local storage.
 
 Browser tabs mount independent React trees. Shared local preferences do not guarantee that two tabs restore different branch or schema choices.
+
+## Accepted workspace selection
+
+Committed connection entry is the only runtime selection authority. Preferences provide entry defaults and record accepted selection.
+
+Pending, cancelled, or blocked navigation cannot start the destination runtime. Schema commands request navigation before preferences change. History and schema navigation use the same exit admission as other scope changes.
+
+Entry binds its discovery to execution settings through a secret-free credential revision. Changed credentials or execution settings require entry resolution again; they cannot reuse the previous discovery evidence.
+
+Entry and React read the same tab-local profile controller. Local storage restores that controller once; loader rediscovery does not ingest another tab's profile writes.
+
+Connection labels, retention choices, and newly allocated profile snapshots do not replace a runtime. Connection execution settings, credentials, branch label, schema, and explicit retry determine replacement. Credentials never enter route data or identity strings.

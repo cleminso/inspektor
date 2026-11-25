@@ -2,9 +2,9 @@ import { useState } from 'react'
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { Box, Button, ScrollArea, Text } from '@inspektor/ds'
+import { editField, insertDraft, type FieldIntent } from '@inspektor/core/draft'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
-import { useRowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 
 interface InsertRowFormProps {
   insertMoreEnabled?: boolean
@@ -29,13 +29,18 @@ function InsertRowFormFields({
   saveDisabled = false,
   schemaColumns,
 }: InsertRowFormFieldsProps): React.ReactElement {
-  const draftController = useRowDraftController({
-    initialRowValues: rowValues,
-    mode: 'insert',
-    schemaColumns,
-  })
+  const [draft, setDraft] = useState(() => insertDraft(schemaColumns, rowValues))
+  const setFieldInput = (columnName: string, input: FieldIntent) => {
+    const column = schemaColumns.find((candidate) => candidate.name === columnName)
+    if (column === undefined) return
+    setDraft((currentDraft) => {
+      const result = editField(currentDraft, column, input)
+      return result.kind === 'changed' ? result.draft : currentDraft
+    })
+  }
   const rowEditor = useRowEditorFields({
-    draftController,
+    draft,
+    onFieldInputChange: setFieldInput,
     mode: 'insert',
     onSubmit: async (values) => {
       await onSave(values, { keepOpen: insertMoreEnabled })

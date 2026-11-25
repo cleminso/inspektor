@@ -1,26 +1,19 @@
-import {
-  Outlet,
-  createFileRoute,
-  redirect,
-  retainSearchParams,
-  useRouterState,
-} from '@tanstack/react-router'
+import { Outlet, createFileRoute, redirect, retainSearchParams } from '@tanstack/react-router'
 
 import {
   redirectToConnections,
   redirectToEditConnection,
   resolveStoredRuntimeTarget,
-} from '@app/routing/inspectorNavigation'
+} from '@app/connections/connectionEntry'
 import { resolveRuntimeConnection } from '@app/connections/connectionCredentials'
 import { SchemaCatalogueLoadError } from '@app/connections/connectionValidation'
 import { getCredentialSafeRelativeUrl } from '@app/routing/credentialSafeUrl'
 import { appRoutes } from '@app/routing/appRoutes'
-import { getConnectionById, readStoredConnections } from '@app/connections/connections'
+import { getConnectionById } from '@app/connections/connections'
+import { readConnectionProfiles } from '@app/connections/connectionProfiles'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
-import { TableNavigationPreparationProvider } from '@tables/routing/tableNavigationPreparation'
-import { createTableWorkspaceScope } from '@tables/workspace/scope'
 
 import { ConnectionRouteError, ConnectionRouteLoading } from './-connectionRouteStatus'
 import { ConnectionNotFound } from './-connectionNotFound'
@@ -53,7 +46,7 @@ export const Route = createFileRoute('/conn/$connectionId')({
   },
   loaderDeps: ({ search }) => ({ schemaHash: search.schema }),
   loader: async ({ abortController, deps, location, params }) => {
-    const store = readStoredConnections()
+    const store = readConnectionProfiles()
     const profile = getConnectionById(store, params.connectionId)
     if (profile === null) redirectToConnections()
     if (resolveRuntimeConnection(profile) === null) redirectToEditConnection(params.connectionId)
@@ -117,28 +110,15 @@ function ConnectionRoutePending(): React.ReactElement {
 
 function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()
-  const location = useRouterState({
-    select: (state) => state.location,
-  })
-  const workspaceScope = createTableWorkspaceScope({
-    branch: target.branch,
-    connectionId: target.connectionId,
-    schemaHash: target.schemaHash,
-  })
 
   return (
     <InspectorRuntimeBoundary
       target={target}
       fallback={<ConnectionRouteLoading message="Loading connection…" />}
     >
-      <TableNavigationPreparationProvider
-        identity={location.href}
-        scope={workspaceScope}
-      >
-        <InspectorLayout pageTitle="Tables">
-          <Outlet />
-        </InspectorLayout>
-      </TableNavigationPreparationProvider>
+      <InspectorLayout pageTitle="Tables">
+        <Outlet />
+      </InspectorLayout>
     </InspectorRuntimeBoundary>
   )
 }

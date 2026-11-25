@@ -5,44 +5,20 @@
  * table mutation provider owns edit drafts. This hook connects those systems without duplicating
  * parsing, dirty comparison, or Jazz mutation rules.
  */
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
-import { toasts, type DataGridCellTarget } from '@inspektor/ds'
-import type { CellSelectionState } from '@tanstack/react-table'
+import type { DataGridCellTarget } from '@inspektor/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import {
-  useRuntimeClient,
-  useRuntimeQueryRecovery,
-  useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+import { useRuntimeClient, useRuntimeSchema } from '@app/runtime/runtimeProvider'
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
 import { useTablePreferences } from '@tables/grid/useTablePreferences'
 import { useTableGrid } from '@tables/grid/useTableGrid'
-import type { TableFilterClause } from '@tables/filters/tableFilters'
-import { useTableRows } from '@tables/query/useTableRows'
+import { useTableExploration } from '@exploration/useTableExploration'
 import { useTableRowById } from '@tables/query/useTableRowById'
-import { useTableMutationExecutor } from '@tables/rowEditor/mutation/useTableMutation'
-import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
-import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
-import { useTableNavigationPreparation } from '@tables/routing/tableNavigationPreparation'
-import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
-import type {
-  DynamicTableRow,
-  TableFieldsByRowId,
-  TableRowId,
-  TableValuesByRowId,
-  TableRowsSearchState,
-  TablePageSize,
-} from '@tables/tableTypes'
+import { useTableChangeFeedback } from '@tables/workspace/useTableChangeFeedback'
+import { useTablePaneState } from '@tables/workspace/useTablePaneState'
+import type { DynamicTableRow, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
 
 interface UseTableViewStateOptions {
@@ -51,32 +27,17 @@ interface UseTableViewStateOptions {
   onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
   retainDisabledRows?: boolean
   schemaColumns: ColumnDescriptor[]
-  stagedValuesByRowId?: TableValuesByRowId
+  draftValuesByRowId?: TableValuesByRowId
   tableKey: string
   tableName: string
 }
 
 const emptyDisabledRowIds: ReadonlySet<TableRowId> = new Set()
-const emptyRecentlyAppliedCells: TableFieldsByRowId = {}
-const emptyRecentlyInsertedRowIds: ReadonlySet<TableRowId> = new Set()
-const emptyStagedValuesByRowId: TableValuesByRowId = {}
+const emptyDraftValuesByRowId: TableValuesByRowId = {}
 const runTransition = (action: () => void) => action()
-
-const recentChangeStatusDuration = 1200
-const recentlyAppliedTimerKey = Symbol('recentlyApplied')
 
 interface InsertRowSaveOptions {
   keepOpen: boolean
-}
-
-type DetailPaneState =
-  | { mode: 'closed' }
-  | { mode: 'insert'; values?: Record<string, unknown> }
-  | { mode: 'rows'; activeRowId: TableRowId }
-
-type PendingPageRowNavigation = {
-  edge: 'first' | 'last'
-  page: number
 }
 
 /**
@@ -90,129 +51,41 @@ export function useTableViewState({
   onUndoRowDeletions,
   retainDisabledRows = false,
   schemaColumns,
-  stagedValuesByRowId = emptyStagedValuesByRowId,
+  draftValuesByRowId = emptyDraftValuesByRowId,
   tableKey,
   tableName,
 }: UseTableViewStateOptions) {
   const client = useRuntimeClient()
-  const queryRecovery = useRuntimeQueryRecovery()
   const wasmSchema = useRuntimeSchema()
-  const { pendingTableName, prepare } = useTableNavigationPreparation()
-  const searchState = useTableExplorerSearchParams()
-  const sortColumn =
-    wasmSchema === null
-      ? searchState.sortColumn
-      : resolveTableSortColumn(schemaColumns, searchState.sortColumn)
-  const sortDirection = sortColumn === searchState.sortColumn ? searchState.sortDirection : 'asc'
-  const isPageNavigationPending = pendingTableName !== null
-  const runPreparedPageNavigation = useCallback(
-    async (
-      destination: TableRowsSearchState,
-      commit: () => Promise<void>,
-      options: {
-        errorMessage: string
-        policy: 'ignore' | 'replace'
-        requireCommit?: boolean
-      },
-    ): Promise<void> => {
-      let result: Awaited<ReturnType<typeof prepare>>
-      try {
-        result = await prepare({ policy: options.policy, search: destination, tableName }, commit)
-      } catch (error) {
-        toasts.error(options.errorMessage)
-        if (options.requireCommit === true) throw error
-        return
-      }
-      if (options.requireCommit === true && result === 'unavailable') {
-        throw new Error('Filters were not applied.')
-      }
-    },
-    [prepare, tableName],
-  )
-  const setPage = useCallback(
-    async (page: number) =>
-      runPreparedPageNavigation(
-        {
-          filters: searchState.filters,
-          page,
-          pageSize: searchState.pageSize,
-          sortColumn,
-          sortDirection,
-        },
-        () => searchState.setPage(page),
-        { errorMessage: "Couldn't load page", policy: 'ignore' },
-      ),
-    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
-  )
-  const setPageSize = useCallback(
-    async (pageSize: TablePageSize) =>
-      runPreparedPageNavigation(
-        {
-          filters: searchState.filters,
-          page: 1,
-          pageSize,
-          sortColumn,
-          sortDirection,
-        },
-        () => searchState.setPageSize(pageSize),
-        { errorMessage: "Couldn't change page size", policy: 'replace' },
-      ),
-    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
-  )
-  const setFilters = useCallback(
-    async (filters: TableFilterClause[]) =>
-      runPreparedPageNavigation(
-        {
-          filters,
-          page: 1,
-          pageSize: searchState.pageSize,
-          sortColumn,
-          sortDirection,
-        },
-        () => searchState.setFilters(filters),
-        { errorMessage: "Couldn't apply filters", policy: 'replace', requireCommit: true },
-      ),
-    [runPreparedPageNavigation, searchState, sortColumn, sortDirection],
-  )
-  const setSorting = useCallback(
-    async (nextSortColumn: string, nextSortDirection: 'asc' | 'desc') =>
-      runPreparedPageNavigation(
-        {
-          filters: searchState.filters,
-          page: 1,
-          pageSize: searchState.pageSize,
-          sortColumn: nextSortColumn,
-          sortDirection: nextSortDirection,
-        },
-        () => searchState.setSorting(nextSortColumn, nextSortDirection),
-        { errorMessage: "Couldn't change sorting", policy: 'replace' },
-      ),
-    [runPreparedPageNavigation, searchState],
-  )
-  // Sort values schedule canonicalization; router command identity is not part of that condition.
-  const setCanonicalSorting = useEffectEvent(searchState.setSorting)
-  const query = useTableRows({
+  const {
+    recentlyInsertedRowIds,
+    recentlyAppliedCells,
+    highlightRecentlyInsertedRow,
+    highlightRecentlyAppliedCells,
+    handleRowsAdded,
+    handleRowsUpdated,
+  } = useTableChangeFeedback(schemaColumns)
+  const query = useTableExploration({
     client,
-    onPageOutOfRange: () => setPage(1),
-    onQueryStateChange: queryRecovery.observe,
     onRowsAdded: handleRowsAdded,
     onRowsUpdated: handleRowsUpdated,
-    search: {
-      filters: searchState.filters,
-      page: searchState.page,
-      pageSize: searchState.pageSize,
-      sortColumn,
-      sortDirection,
-    },
     schemaColumns,
     scopeKey: tableKey,
     tableName,
-    wasmSchema,
+    schema: wasmSchema,
   })
-  const isReconnecting =
-    queryRecovery.status === 'recovering' ||
-    (queryRecovery.status === 'idle' && query.isRecoverableTransportFailure === true)
-  const isConnectionDiagnosisPending = pendingTableName !== null && query.error !== null
+  const {
+    searchState,
+    sortColumn,
+    sortDirection,
+    isPageNavigationPending,
+    isReconnecting,
+    runPreparedPageNavigation,
+    setPage,
+    setPageSize,
+    setFilters,
+    setSorting,
+  } = query
   const settledRowsRef = useRef(query.rows)
   useLayoutEffect(() => {
     if (retainDisabledRows === false) {
@@ -236,119 +109,29 @@ export function useTableViewState({
     })
     return [...retainedRows, ...currentRowsById.values()]
   }, [disabledRowIds, query.rows, retainDisabledRows])
-  useEffect(() => {
-    if (wasmSchema !== null && sortColumn !== searchState.sortColumn) {
-      void setCanonicalSorting(sortColumn, sortDirection)
-    }
-  }, [searchState.sortColumn, sortColumn, sortDirection, wasmSchema])
-  const [detailPane, setDetailPane] = useState<DetailPaneState>({ mode: 'closed' })
-  const [requestedField, setRequestedField] = useState<DataGridCellTarget | null>(null)
-  const [insertRevision, setInsertRevision] = useState(0)
-  const detailPaneMode = detailPane.mode
-  const activeRowId = detailPane.mode === 'rows' ? detailPane.activeRowId : null
-  const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
-  const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>([])
-  const pendingPageRowNavigationRef = useRef<PendingPageRowNavigation | null>(null)
-  const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] = useState<ReadonlySet<TableRowId>>(
-    emptyRecentlyInsertedRowIds,
-  )
-  const [recentlyAppliedCells, setRecentlyAppliedCells] =
-    useState<TableFieldsByRowId>(emptyRecentlyAppliedCells)
-  const recentChangeTimersRef = useRef(
-    new Map<TableRowId | typeof recentlyAppliedTimerKey, ReturnType<typeof setTimeout>>(),
-  )
-  // Local success and the live query can report the same insert; feedback runs once per view.
-  const highlightedInsertedRowIdsRef = useRef(new Set<TableRowId>())
-
-  useEffect(() => {
-    const timers = recentChangeTimersRef.current
-    return () => {
-      for (const timer of timers.values()) {
-        clearTimeout(timer)
-      }
-      timers.clear()
-    }
-  }, [])
-
-  const scheduleRecentChangeExpiry = (
-    key: TableRowId | typeof recentlyAppliedTimerKey,
-    onExpire: () => void,
-  ) => {
-    const timers = recentChangeTimersRef.current
-    clearTimeout(timers.get(key))
-    timers.set(
-      key,
-      setTimeout(() => {
-        timers.delete(key)
-        onExpire()
-      }, recentChangeStatusDuration),
-    )
-  }
-
-  const highlightRecentlyInsertedRow = (rowId: TableRowId) => {
-    if (highlightedInsertedRowIdsRef.current.has(rowId) === true) {
-      return
-    }
-    highlightedInsertedRowIdsRef.current.add(rowId)
-    setRecentlyInsertedRowIds((currentRowIds) => {
-      return new Set([...currentRowIds, rowId])
-    })
-
-    scheduleRecentChangeExpiry(rowId, () => {
-      setRecentlyInsertedRowIds((currentRowIds) => {
-        if (currentRowIds.has(rowId) === false) {
-          return currentRowIds
-        }
-
-        const nextRowIds = new Set(currentRowIds)
-        nextRowIds.delete(rowId)
-        return nextRowIds
-      })
-    })
-  }
-
-  function handleRowsAdded(rowIds: readonly TableRowId[]) {
-    for (const rowId of rowIds) {
-      highlightRecentlyInsertedRow(rowId)
-    }
-  }
-
-  function handleRowsUpdated(
-    updates: readonly { current: DynamicTableRow; previous: DynamicTableRow }[],
-  ) {
-    const changedFieldsByRowId: Record<TableRowId, ReadonlySet<string>> = {}
-    for (const { current, previous } of updates) {
-      const changedFields = new Set(
-        schemaColumns
-          .filter(
-            (column) =>
-              areMutationValuesEqual(
-                column.column_type,
-                previous[column.name],
-                current[column.name],
-              ) === false,
-          )
-          .map((column) => column.name),
-      )
-      if (changedFields.size > 0) {
-        changedFieldsByRowId[current.id] = changedFields
-      }
-    }
-    highlightRecentlyAppliedCells(changedFieldsByRowId)
-  }
-
-  const highlightRecentlyAppliedCells = (appliedUpdateFields: TableFieldsByRowId) => {
-    if (Object.keys(appliedUpdateFields).length === 0) {
-      return
-    }
-
-    setRecentlyAppliedCells(appliedUpdateFields)
-    scheduleRecentChangeExpiry(recentlyAppliedTimerKey, () => {
-      setRecentlyAppliedCells(emptyRecentlyAppliedCells)
-    })
-  }
-  const mutations = useTableMutationExecutor({ client, tableName, wasmSchema })
+  const pane = useTablePaneState(requestTransition)
+  const {
+    detailPane,
+    setDetailPane,
+    requestedField,
+    insertRevision,
+    detailPaneMode,
+    activeRowId,
+    cellSelection,
+    setCellSelection,
+    activeColumnId,
+    setActiveColumnId,
+    selectedRowIds,
+    pendingPageRowNavigationRef,
+    openRows,
+    resetSelection,
+    closeDetailPane,
+    closeRowEditor,
+    handleEscape,
+    openInsert,
+    handleRowDeleteSuccess,
+    handleColumnActivate,
+  } = pane
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
   const defaultHiddenColumnIds = useMemo(
     () => query.columns.flatMap((column) => (column.isHiddenByDefault === true ? [column.id] : [])),
@@ -417,31 +200,6 @@ export function useTableViewState({
   const activeRowQueryStatus = activeRowQuery.status
   const activeRow = activeRowQuery.row
 
-  /** Keeps the active draft while selected; otherwise opens the requested or first selected row. */
-  const openRows = useCallback(
-    (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
-      pendingPageRowNavigationRef.current = null
-      const resolvedActiveRowId =
-        nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
-          ? nextActiveRowId
-          : nextSelectedRowIds[0]
-      const commit = () => {
-        setRequestedField(null)
-        setSelectedRowIds(resolvedActiveRowId === undefined ? [] : [resolvedActiveRowId])
-        setActiveColumnId(null)
-
-        if (resolvedActiveRowId === undefined) {
-          setDetailPane({ mode: 'closed' })
-          return
-        }
-        setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
-      }
-      if (resolvedActiveRowId === activeRowId) commit()
-      else requestTransition(commit)
-    },
-    [activeRowId, requestTransition],
-  )
-
   useLayoutEffect(() => {
     if (
       retainDisabledRows === true ||
@@ -498,13 +256,6 @@ export function useTableViewState({
     openRows(nextSelectedRowIds, nextActiveRowId)
   }
 
-  const resetSelection = useCallback((nextSelectedRowIds: TableRowId[] = []) => {
-    setRequestedField(null)
-    setSelectedRowIds(nextSelectedRowIds)
-    setCellSelection([])
-    setActiveColumnId(null)
-  }, [])
-
   useLayoutEffect(() => {
     if (selectionScopeRef.current !== selectionScopeKey) {
       selectionScopeRef.current = selectionScopeKey
@@ -514,7 +265,13 @@ export function useTableViewState({
         setDetailPane({ mode: 'closed' })
       }
     }
-  }, [resetSelection, searchState.page, selectionScopeKey])
+  }, [
+    resetSelection,
+    searchState.page,
+    selectionScopeKey,
+    setDetailPane,
+    pendingPageRowNavigationRef,
+  ])
 
   useLayoutEffect(() => {
     const pendingNavigation = pendingPageRowNavigationRef.current
@@ -529,7 +286,13 @@ export function useTableViewState({
     const targetRowId =
       pendingNavigation.edge === 'first' ? navigablePageRowIds[0] : navigablePageRowIds.at(-1)
     openRows(targetRowId === undefined ? [] : [targetRowId], targetRowId ?? null)
-  }, [navigablePageRowIds, openRows, query.isInitialLoading, searchState.page])
+  }, [
+    navigablePageRowIds,
+    openRows,
+    query.isInitialLoading,
+    searchState.page,
+    pendingPageRowNavigationRef,
+  ])
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
     void setSorting(columnId, direction)
@@ -542,12 +305,6 @@ export function useTableViewState({
     }
   }
 
-  const handleColumnActivate = useCallback((columnId: string | null) => {
-    if (columnId !== null) {
-      setCellSelection([])
-    }
-    setActiveColumnId(columnId)
-  }, [])
   const setColumnOrder = tablePreferences.setColumnOrder
   const setPinnedColumnIds = tablePreferences.setPinnedColumnIds
   const columnVisibilityRef = useRef(tablePreferences.columnVisibility)
@@ -596,7 +353,7 @@ export function useTableViewState({
     columns: query.columns,
     sortColumn,
     sortDirection,
-    stagedValuesByRowId,
+    stagedValuesByRowId: draftValuesByRowId,
     selectedRowIds: visibleSelectedRowIds,
     columnVisibility: tablePreferences.columnVisibility,
     onSortChange: handleSortChange,
@@ -631,38 +388,6 @@ export function useTableViewState({
     return selectedRow ?? retainedActiveRow
   }, [detailPane, detailPaneMode, retainedActiveRow, selectedRow])
 
-  const closeDetailPane = () => {
-    setRequestedField(null)
-    pendingPageRowNavigationRef.current = null
-    setDetailPane({ mode: 'closed' })
-  }
-
-  const closeRowEditor = () => {
-    requestTransition(() => {
-      setSelectedRowIds([])
-      closeDetailPane()
-    })
-  }
-
-  const handleEscape = () => {
-    if (detailPaneMode !== 'closed') {
-      closeRowEditor()
-      return
-    }
-
-    setCellSelection([])
-    setActiveColumnId(null)
-  }
-
-  const openInsert = (values?: Record<string, unknown>) => {
-    requestTransition(() => {
-      pendingPageRowNavigationRef.current = null
-      resetSelection()
-      setInsertRevision((revision) => revision + 1)
-      setDetailPane({ mode: 'insert', values })
-    })
-  }
-
   const handleInsertSuccess = (insertedRowId: string, options: InsertRowSaveOptions) => {
     highlightRecentlyInsertedRow(insertedRowId)
     if (options.keepOpen === true) {
@@ -672,16 +397,7 @@ export function useTableViewState({
     closeDetailPane()
   }
 
-  const handleRowDeleteSuccess = (rowId: TableRowId) => {
-    setSelectedRowIds((currentRowIds) =>
-      currentRowIds.filter((candidateId) => candidateId !== rowId),
-    )
-    setCellSelection([])
-    setActiveColumnId(null)
-    closeDetailPane()
-  }
-
-  const goToPageEdge = (page: number, edge: PendingPageRowNavigation['edge']) => {
+  const goToPageEdge = (page: number, edge: 'first' | 'last') => {
     void runPreparedPageNavigation(
       {
         filters: searchState.filters,
@@ -692,7 +408,14 @@ export function useTableViewState({
       },
       () => {
         pendingPageRowNavigationRef.current = { edge, page }
-        return searchState.setPage(page)
+        return searchState.commitQuery({
+          tableName,
+          filters: searchState.filters,
+          page,
+          pageSize: searchState.pageSize,
+          sortColumn,
+          sortDirection,
+        })
       },
       { errorMessage: "Couldn't load page", policy: 'ignore' },
     )
@@ -743,15 +466,14 @@ export function useTableViewState({
     recentlyInsertedRowIds,
     detailPaneMode,
     insertRevision,
-    error: isReconnecting === true || isConnectionDiagnosisPending === true ? null : query.error,
+    error: query.error,
     table,
     rows,
-    mutationExecutor: mutations,
     page: searchState.page,
     pageSize: searchState.pageSize,
     hasNextPage: query.hasNextPage,
     hasCellSelection: cellSelection.length > 0,
-    isInitialLoading: query.isInitialLoading || isReconnecting || isConnectionDiagnosisPending,
+    isInitialLoading: query.isInitialLoading,
     isPageNavigationPending,
     isReconnecting,
     isRefreshing: query.isRefreshing,
@@ -776,26 +498,9 @@ export function useTableViewState({
       navigationLabel,
       openInsert,
     },
-    handleCellActivate: (target: DataGridCellTarget) => {
-      setActiveColumnId(null)
-      if (detailPaneMode === 'rows' && target.rowId === activeRowId) {
-        setRequestedField({ ...target })
-      }
-    },
-    handleCellEditRequest: (target: DataGridCellTarget) => {
-      const columnMeta = query.columns.find((column) => column.id === target.columnId)
-      if (columnMeta === undefined) {
-        return
-      }
-      const open = () => {
-        setSelectedRowIds([target.rowId])
-        setActiveColumnId(null)
-        setDetailPane({ mode: 'rows', activeRowId: target.rowId })
-        setRequestedField({ ...target })
-      }
-      if (activeRowId === target.rowId) open()
-      else requestTransition(open)
-    },
+    handleCellActivate: pane.handleCellActivate,
+    handleCellEditRequest: (target: DataGridCellTarget) =>
+      pane.handleCellEditRequest(target, query.columns),
     handleEscape,
     handleColumnActivate,
     handleInsertSuccess,

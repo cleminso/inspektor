@@ -1,13 +1,13 @@
 import { Outlet, createFileRoute, useSearch } from '@tanstack/react-router'
 
 import { formatStudioDocumentTitle } from '@shared/documentTitle'
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import { ConnectionContentBoundary } from '@app/runtime/connectionContentBoundary'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
 import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
 import { createTableWorkspaceScope } from '@tables/workspace/scope'
-import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
+import { TableRowChangeWorkspaceProvider } from '@tables/rowChanges/workspaceProvider'
 import { TableExplorerScreen } from '@tables/view'
 import { canonicalizeTableRouteSearch, toTableTabSearch } from '@tables/routing/tableRowsSearch'
 
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/conn/$connectionId/tables')({
  */
 function TablesWorkspaceLayout(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
-    useInspectorSessionState()
+    useActiveWorkspace()
   const routeSearch = useSearch({ strict: false })
   const workspaceScope = createTableWorkspaceScope({
     branch: currentBranch,
@@ -49,7 +49,7 @@ function TablesWorkspaceLayout(): React.ReactElement {
       fallback={<ConnectionRouteLoading message="Loading workspace…" />}
       readinessKey={readinessKey}
     >
-      <TableMutationLedgerWorkspaceProvider>
+      <TableRowChangeWorkspaceProvider>
         <TableNavigationHistoryProvider>
           <TableTabsProvider scope={workspaceScope}>
             <TableHotkeys />
@@ -57,7 +57,7 @@ function TablesWorkspaceLayout(): React.ReactElement {
             <Outlet />
           </TableTabsProvider>
         </TableNavigationHistoryProvider>
-      </TableMutationLedgerWorkspaceProvider>
+      </TableRowChangeWorkspaceProvider>
     </ConnectionContentBoundary>
   )
 }

@@ -1,7 +1,7 @@
 import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router'
 import { Toaster } from '@inspektor/ds'
 
-import { InspectorSessionProvider } from '@app/providers/inspectorSessionProvider'
+import { ConnectionProvider } from '@app/connections/connectionProvider'
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 import { InspectorDevtools } from '@app/devtools/inspectorDevtools'
 import { studioDocumentTitle } from '@shared/documentTitle'
@@ -18,11 +18,11 @@ function RootComponent(): React.ReactElement {
     <>
       <HeadContent />
       <AppHotkeysProvider>
-        <InspectorSessionProvider>
+        <ConnectionProvider>
           <Outlet />
           <Toaster />
           <InspectorDevtools />
-        </InspectorSessionProvider>
+        </ConnectionProvider>
       </AppHotkeysProvider>
     </>
   )

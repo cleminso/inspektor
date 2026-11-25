@@ -7,10 +7,10 @@ import {
   discoverConnection,
   planConnectionOpening,
   type SchemaCatalogueRecord,
-} from '@inspektor/core/connection'
+} from '@inspektor/core/workbench/connection'
 import { JazzMetadata } from '@inspektor/core/jazz/schema'
 
-import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
+import { useConnections } from '@app/connections/connectionProvider'
 import {
   createConnectionFromDraft,
   DEFAULT_BRANCH_NAME,
@@ -25,7 +25,7 @@ import {
   type ConnectionError,
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
-import { handoffStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
+import { handoffStoredRuntimeTarget } from '@app/connections/connectionEntry'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
 import type { ConnectionFormValues } from './connectionFormTypes'
@@ -62,7 +62,7 @@ export function useConnectionFormFlow(
   options?: UseConnectionFormFlowOptions,
 ): UseConnectionFormFlowResult {
   const { findConnectionByCredentials, saveConnectionWithContext, setConnectionContext } =
-    useInspectorSessionContext()
+    useConnections()
   const navigate = useNavigate()
   const [formValues, setFormValues] = useState<ConnectionFormValues>(() =>
     options === undefined

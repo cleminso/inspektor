@@ -10,20 +10,22 @@ import { useEffect, useMemo, useRef, useState, type FormEventHandler } from 'rea
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { Box, Field, Input, Text } from '@inspektor/ds'
+import {
+  fieldIntent,
+  projectDraft,
+  resolveField,
+  type FieldIntent,
+  type RowDraft,
+} from '@inspektor/core/draft'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
-import {
-  getMutationFieldError,
-  getMutationFieldInput,
-  type MutationFieldInput,
-} from '@tables/rowEditor/mutation/draft'
-import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import type { DetailPaneMode } from '@tables/tableTypes'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 
 interface UseRowEditorFieldsOptions {
-  draftController: RowDraftController
+  draft: RowDraft
+  onFieldInputChange: (columnName: string, input: FieldIntent) => void
   mode: DetailPaneMode
   onSubmit: (values: Record<string, unknown>) => Promise<void> | void
   onValidationFailure?: () => void
@@ -34,42 +36,39 @@ interface RowEditorFieldsProps {
   disabled?: boolean
   errors: Record<string, string>
   expandedColumnName: string | null
-  fieldStates: Record<string, MutationFieldInput>
+  fieldStates: Record<string, FieldIntent>
   schemaColumns: ColumnDescriptor[]
   initialRowValues: Record<string, unknown>
   mode: DetailPaneMode
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void
   onFieldContextLeave: (columnName: string) => void
-  onFieldInputChange: (columnName: string, input: MutationFieldInput) => void
+  onFieldInputChange: (columnName: string, input: FieldIntent) => void
 }
 
 /**
- * Owns one pane form draft from initialization through submission.
+ * Owns pane form validation, focus, and submission.
  *
  * For edit mode, typing in `name` creates a sparse `name` overlay while every untouched field
  * continues reading from the live row. For insert mode, the hook starts with the complete baseline
- * created by `createInsertRowDraft`. Both modes report one semantic dirty state to the transition
- * guard and send only validated values to `onSubmit`.
+ * created by `insertDraft`. Both modes send only validated values to `onSubmit`.
  */
 export function useRowEditorFields({
-  draftController,
+  draft,
+  onFieldInputChange,
   mode,
   onSubmit,
   onValidationFailure,
   schemaColumns,
 }: UseRowEditorFieldsOptions) {
-  const { draft } = draftController.state
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [expandedColumnName, setExpandedColumnName] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const isSavingRef = useRef(false)
   const focusFrameRef = useRef<number | null>(null)
-  const fieldStates = useMemo<Record<string, MutationFieldInput>>(
+  const fieldStates = useMemo<Record<string, FieldIntent>>(
     () =>
-      Object.fromEntries(
-        schemaColumns.map((column) => [column.name, getMutationFieldInput(draft, column)]),
-      ),
+      Object.fromEntries(schemaColumns.map((column) => [column.name, fieldIntent(draft, column)])),
     [draft, schemaColumns],
   )
 
@@ -92,10 +91,10 @@ export function useRowEditorFields({
     })
   }
 
-  const setFieldInput = (columnName: string, input: MutationFieldInput) => {
+  const setFieldInput = (columnName: string, input: FieldIntent) => {
     const previousInput = fieldStates[columnName]
     const column = schemaColumns.find((candidate) => candidate.name === columnName)
-    draftController.actions.setFieldInput(columnName, input)
+    onFieldInputChange(columnName, input)
     if (input.mode === 'null') {
       setExpandedColumnName((currentColumnName) =>
         currentColumnName === columnName ? null : currentColumnName,
@@ -120,8 +119,11 @@ export function useRowEditorFields({
     if (column === undefined || input === undefined) {
       return
     }
-    const error = getMutationFieldError(draft, column, input)
-    setErrors((currentErrors) => ({ ...currentErrors, [columnName]: error ?? '' }))
+    const resolved = resolveField(draft, column, input)
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      [columnName]: resolved.kind === 'invalid' ? resolved.error : '',
+    }))
   }
 
   const setFieldExpanded = (columnName: string, expanded: boolean) => {
@@ -136,7 +138,7 @@ export function useRowEditorFields({
     if (isSavingRef.current === true) {
       return
     }
-    const submission = draftController.actions.buildSubmission()
+    const submission = projectDraft(draft, schemaColumns)
     const nextErrors = submission.errors
 
     setErrors(nextErrors)
@@ -152,7 +154,7 @@ export function useRowEditorFields({
       }
       return
     }
-    if (mode === 'edit' && Object.keys(submission.values).length === 0) {
+    if (mode === 'edit' && Object.keys(submission.submissionValues).length === 0) {
       return
     }
 
@@ -160,7 +162,7 @@ export function useRowEditorFields({
       isSavingRef.current = true
       setIsSaving(true)
       setSaveError(null)
-      await onSubmit(submission.values)
+      await onSubmit(submission.submissionValues)
     } catch (nextError) {
       setSaveError(nextError instanceof Error ? nextError.message : String(nextError))
     } finally {

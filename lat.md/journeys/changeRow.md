@@ -46,4 +46,6 @@ Pane and context-menu deletion use the direct delete path. Failure retains the r
 
 Dirty pane dismissal, row replacement, and guarded in-app navigation ask before discarding input. Keeping edits cancels the transition. Query-scope changes cannot use selection reset as implicit consent to discard.
 
+Confirmation requests a discard; it does not override core admission. A refused discard preserves the draft and prevents the transition.
+
 These rules do not establish recovery after a browser crash, full reload, or an uncertain remote write. Runtime acceptance must verify each supported transition; documentation alone is not proof.

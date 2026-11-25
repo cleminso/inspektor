@@ -8,6 +8,7 @@ Use these rules when assigning code or choosing validation.
 
 - [Owners](#owners)
 - [Core boundary](#core-boundary)
+- [Studio coordination](#studio-coordination)
 - [Validation](#validation)
 
 ## Owners
@@ -36,7 +37,22 @@ The accepted rewrite separates workbench decisions from Jazz access without crea
 - Jazz types remain authoritative at the SDK boundary. Effect manages execution, observation, and resource lifetime. [[jazzAccess#Rows and writes]] owns write authority and settlement.
 - Modules use lowercase filenames. Model states, failures, and behavior scenarios before fixing public service APIs.
 
-Clients import explicit public `@inspektor/core/connection`, `/session`, `/query`, `/draft`, and `/write` entries. Jazz adapters use `/jazz/client`, `/jazz/query`, and `/jazz/schema`. Other package paths are private. Workspace builds select source through `inspektor-source`; other ESM consumers use emitted modules and declarations. Core does not import application aliases or UI packages.
+Clients import explicit public `@inspektor/core/connection`, `/session`, `/query`, `/draft`, `/write`, `/workbench/connection`, `/workbench/rowEditing`, and `/workbench/exploration` entries. Jazz adapters use `/jazz/client`, `/jazz/query`, and `/jazz/schema`. Other package paths are private. Workspace builds select source through `inspektor-source`; other ESM consumers use emitted modules and declarations. Core does not import application aliases or UI packages.
+
+## Studio coordination
+
+Studio separates accepted intent, resource attachment, retained workspace state, and presentation. These are application responsibilities, not new database authorities.
+
+- Connections adapt profile commands, credential retention, and browser persistence.
+- Entry resolves route intent into validated target evidence or repair navigation.
+- Runtime attaches the accepted target to core resource lifetime and projects observations.
+- The exploration feature owns query preparation and recovery. Studio coordinates route commits, tabs, and history.
+- The core row-editing feature retains update drafts, submission admission, and native settlement outside keyed panes. Studio attaches feature observations and applies pane outcomes.
+- Presentation owns pane transitions, focus, clipboard, and rendered feedback. Insert drafts keep their existing form-local lifetime.
+
+[[routing#Accepted workspace selection]] owns selection authority. [[rowChanges]] owns retained intent and write outcomes. Browser storage and lifecycle are adapters, not alternate workflow owners.
+
+Headless product features group complete workflows under `workbench/`; Jazz adapters remain separate. [Workbench structure](../../todo.md/reshapeStructure.md) records internal integration and its validation limits. Existing primitive entries remain available; developer-facing toolkit design is separate.
 
 ## Validation
 

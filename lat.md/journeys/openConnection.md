@@ -26,7 +26,7 @@ A missing profile returns to Connections. A missing credential opens the edit fo
 
 ## Start the runtime
 
-The runtime boundary synchronizes the resolved target with the session before runtime features use it.
+Committed entry selects the runtime under [[routing#Accepted workspace selection]]. The boundary records restoration preferences without making them a second runtime authority.
 
 WASM preparation overlaps metadata discovery. Client publication waits for the selected stored schema. The first schema-bound subscription starts Jazz transport work.
 

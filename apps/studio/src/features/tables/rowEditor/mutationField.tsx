@@ -21,7 +21,7 @@ import {
   type CodeEditorLayout,
 } from '@inspektor/ds'
 
-import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { useActiveWorkspace } from '@app/runtime/runtimeProvider'
 import {
   formatColumnNameLabel,
   formatColumnTypeLabel,
@@ -37,11 +37,10 @@ import { shouldPrepareTableLink } from '@tables/routing/preparedTableLink'
 import { useOptionalTableTabs } from '@tables/workspace/tabsProvider'
 import {
   formatColumnDefault,
-  setMutationFieldInputMode,
-  setMutationFieldInputText,
-  type MutationFieldInput,
-  type MutationFieldMode,
-} from '@tables/rowEditor/mutation/draft'
+  setIntentMode,
+  setIntentText,
+  type FieldIntent,
+} from '@inspektor/core/draft'
 
 interface MutationFieldProps {
   disabled?: boolean
@@ -50,14 +49,14 @@ interface MutationFieldProps {
   controlRef?: RefCallback<HTMLElement>
   error: string | undefined
   expanded: boolean
-  input: MutationFieldInput
+  input: FieldIntent
   focusOnMount?: boolean
   hidden: boolean
   idPrefix?: string
   initialValue: unknown
   onContextLeave?: () => void
   onExpandedChange: (expanded: boolean) => void
-  onInputChange: (input: MutationFieldInput) => void
+  onInputChange: (input: FieldIntent) => void
   readOnlyReason: FieldReadOnlyReason
   sourceUnavailable?: boolean
   structuredEditorLayout?: CodeEditorLayout
@@ -185,7 +184,7 @@ export function MutationField({
   sourceUnavailable = false,
   structuredEditorLayout = 'fill',
 }: MutationFieldProps): React.ReactElement {
-  const { currentConnectionId } = useInspectorSessionState()
+  const { currentConnectionId } = useActiveWorkspace()
   const tableTabs = useOptionalTableTabs()
   const [valuePickerOpen, setValuePickerOpen] = useState(false)
   const label = formatColumnNameLabel(column.name)
@@ -259,8 +258,8 @@ export function MutationField({
     ...(canOmit === true ? (['default'] as const) : []),
     ...(column.nullable === true ? (['null'] as const) : []),
   ]
-  const setInputMode = (mode: MutationFieldMode) => {
-    onInputChange(setMutationFieldInputMode(input, column, mode))
+  const setInputMode = (mode: FieldIntent['mode']) => {
+    onInputChange(setIntentMode(input, column, mode))
   }
   const setNullablePickerMode = (checked: boolean) => {
     setInputMode(checked === true ? 'null' : 'value')
@@ -447,7 +446,7 @@ export function MutationField({
             value={input.text.length === 0 ? null : input.text}
             onValueChange={(nextValue) => {
               if (typeof nextValue === 'string') {
-                onInputChange(setMutationFieldInputText(input, nextValue))
+                onInputChange(setIntentText(input, nextValue))
               }
             }}
             onOpenChange={setValuePickerOpen}
@@ -512,7 +511,7 @@ export function MutationField({
                 readOnly={isReadOnly}
                 onExpandedChange={onExpandedChange}
                 value={structuredPresentation?.source ?? input.text}
-                onValueChange={(text) => onInputChange(setMutationFieldInputText(input, text))}
+                onValueChange={(text) => onInputChange(setIntentText(input, text))}
               />
             </Box>
           )}
@@ -540,9 +539,7 @@ export function MutationField({
               disabled={disabled || isReadOnly === true}
               open={valuePickerOpen}
               value={timestampValue}
-              onApply={(nextValue) =>
-                onInputChange(setMutationFieldInputText(input, nextValue.toISOString()))
-              }
+              onApply={(nextValue) => onInputChange(setIntentText(input, nextValue.toISOString()))}
               onOpenChange={setValuePickerOpen}
             >
               <DatePicker.Trigger
@@ -583,7 +580,7 @@ export function MutationField({
               value={input.text}
               disabled={disabled || input.mode === 'null'}
               readOnly={isReadOnly === true || isBinaryColumn === true}
-              onValueChange={(text) => onInputChange(setMutationFieldInputText(input, text))}
+              onValueChange={(text) => onInputChange(setIntentText(input, text))}
             />
             {column.nullable === true && readOnlyReason === null ? (
               <NullInputGroupCheckbox
